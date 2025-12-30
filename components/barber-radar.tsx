@@ -97,8 +97,28 @@ const BarberRadar = ({ barbershops }: BarberRadarProps) => {
   };
 
   const nearbyBarbershops = userLocation
-    ? barbershops.filter((barbershop) => {
-        // Handle null coordinates in database if any
+    ? [
+        ...barbershops.map(b => ({ ...b, source: "internal" as const })),
+        // Mock Google Barbershops for demonstration
+        {
+            id: "google-1",
+            name: "Barbearia do Google (Mock)",
+            address: "Av. Exemplo do Google, 123",
+            imageUrl: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop",
+            latitude: userLocation.lat + 0.002,
+            longitude: userLocation.lng + 0.002,
+            source: "google" as const
+        },
+        {
+            id: "google-2",
+            name: "Corte & Cia Google",
+            address: "Rua das Flores, 456",
+            imageUrl: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop",
+            latitude: userLocation.lat - 0.003,
+            longitude: userLocation.lng + 0.001,
+            source: "google" as const
+        }
+      ].filter((barbershop) => {
         if (!barbershop.latitude || !barbershop.longitude) return false;
         
         const distance = calculateDistance(

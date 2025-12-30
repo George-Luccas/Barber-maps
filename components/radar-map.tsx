@@ -30,8 +30,17 @@ const userIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const shopIcon = new L.Icon({
+const internalIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const externalIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -46,6 +55,7 @@ interface BarbershopData {
   latitude: number;
   longitude: number;
   imageUrl: string | null;
+  source?: "internal" | "google";
 }
 
 interface RadarMapProps {
@@ -97,18 +107,36 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
           <Marker
             key={shop.id}
             position={[shop.latitude, shop.longitude]}
-            icon={shopIcon}
+            icon={shop.source === "google" ? externalIcon : internalIcon}
           >
             <Popup>
               <div className="flex flex-col gap-2 min-w-[200px]">
-                 <div className="relative h-[100px] w-full rounded-md overflow-hidden">
-                    <Image src={shop.imageUrl || ""} alt={shop.name} fill className="object-cover"/>
+                 {shop.imageUrl && (
+                    <div className="relative h-[100px] w-full rounded-md overflow-hidden">
+                        <Image src={shop.imageUrl} alt={shop.name} fill className="object-cover"/>
+                    </div>
+                 )}
+                 <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold text-sm truncate">{shop.name}</h3>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
+                        shop.source === "google" 
+                        ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" 
+                        : "bg-primary/10 text-primary border border-primary/20"
+                    }`}>
+                        {shop.source === "google" ? "Google" : "App"}
+                    </span>
                  </div>
-                 <h3 className="font-bold text-sm">{shop.name}</h3>
                  <p className="text-xs text-gray-500 truncate">{shop.address}</p>
-                 <Link href={`/barbershops/${shop.id}`} className="bg-primary text-primary-foreground text-xs p-2 rounded-md font-bold text-center mt-1 flex items-center justify-center gap-1 hover:opacity-90 transition-opacity">
-                    Ver Detalhes <ArrowRight size={12}/>
-                 </Link>
+                 
+                 {shop.source !== "google" ? (
+                    <Link href={`/barbershops/${shop.id}`} className="bg-primary text-primary-foreground text-xs p-2 rounded-md font-bold text-center mt-1 flex items-center justify-center gap-1 hover:opacity-90 transition-opacity">
+                        Ver Detalhes <ArrowRight size={12}/>
+                    </Link>
+                 ) : (
+                    <div className="text-[10px] text-muted-foreground italic text-center mt-1">
+                        Disponível apenas no Google
+                    </div>
+                 )}
               </div>
             </Popup>
           </Marker>

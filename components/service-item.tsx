@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { BarbershopService, Barbershop } from "@/generated/prisma/client";
+import { BarbershopService, Barbershop } from "@prisma/client";
 import {
   Sheet,
   SheetContent,

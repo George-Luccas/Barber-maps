@@ -1,0 +1,75 @@
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+import z from "zod";
+
+const metadataSchema = z.object({
+  serviceId: z.uuid(),
+  barbershopId: z.uuid(),
+  userId: z.string(),
+  date: z.string(),
+  appliedDiscount: z.string().optional(),
+});
+
+export const POST = async (request: Request) => {
+  if (
+    !process.env.STRIPE_SECRET_KEY ||
+    !process.env.STRIPE_WEBHOOK_SECRET_KEY
+  ) {
+    console.error("STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET is not set");
+    return NextResponse.error();
+  }
+  const signature = request.headers.get("stripe-signature");
+  if (!signature) {
+    return NextResponse.error();
+  }
+  const body = await request.text();
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-07-30.basil",
+  });
+  const event = stripe.webhooks.constructEvent(
+    body,
+    signature,
+    process.env.STRIPE_WEBHOOK_SECRET_KEY,
+  ); // SHA256 HMAC signature
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const metadata = metadataSchema.parse(session.metadata);
+    const expandedSession = await stripe.checkout.sessions.retrieve(
+      session.id,
+      {
+        expand: ["payment_intent"],
+      },
+    );
+    const paymentIntent =
+      expandedSession.payment_intent as Stripe.PaymentIntent;
+    const chargeId =
+      typeof paymentIntent.latest_charge === "string"
+        ? paymentIntent.latest_charge
+        : paymentIntent.latest_charge?.id;
+    await prisma.booking.create({
+      data: {
+        serviceId: metadata.serviceId,
+        barbershopId: metadata.barbershopId,
+        userId: metadata.userId,
+        date: metadata.date,
+        stripeChargeId: chargeId,
+      },
+    });
+    
+    if (metadata.appliedDiscount === "500") {
+      await prisma.user.update({
+        where: { id: metadata.userId },
+        data: { welcomeDiscountUsed: true } as any,
+      });
+    }
+
+    console.log(
+      "Booking created via webhook for service",
+      metadata.serviceId,
+      "at barbershop",
+      metadata.barbershopId,
+    );
+  }
+  return NextResponse.json({ received: true });
+};

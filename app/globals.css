@@ -1,0 +1,195 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+@source "../node_modules/streamdown/dist/index.js";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* TEMA CLARO */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.2 0 0);
+  --card: oklch(0.98 0 0);
+  --card-foreground: oklch(0.2 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  --primary: oklch(0.6 0.3 300); /* Neon Purple-ish */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.6 0.3 300);
+  --radius: 0.5rem;
+
+  /* NEON COLORS FOR GLOWS */
+  --neon-purple: oklch(0.6 0.3 300);
+  --neon-cyan: oklch(0.7 0.2 200);
+  --neon-green: oklch(0.8 0.25 140);
+  --neon-pink: oklch(0.6 0.3 340);
+}
+
+.dark {
+  /* TEMA DARK NEON */
+  --background: oklch(0.1 0 0); /* Darker Background */
+  --foreground: oklch(0.99 0 0);
+  --card: oklch(0.15 0 0 / 0.8);
+  --card-foreground: oklch(0.99 0 0);
+  --popover: oklch(0.1 0 0 / 0.95);
+  --popover-foreground: oklch(0.99 0 0);
+  --primary: oklch(0.7 0.25 300); /* VIBRANT NEON PURPLE */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(1 0 0 / 0.1);
+  --secondary-foreground: oklch(0.99 0 0);
+  --muted: oklch(1 0 0 / 0.05);
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: oklch(0.7 0.25 300 / 0.2);
+  --accent-foreground: oklch(0.99 0 0);
+  --border: oklch(0.7 0.25 300 / 0.3);
+  --input: oklch(1 0 0 / 0.1);
+  --ring: oklch(0.7 0.25 300);
+
+  /* DARK MODE NEON CORE */
+  --neon-purple: oklch(0.7 0.25 300);
+  --neon-cyan: oklch(0.8 0.2 200);
+  --neon-green: oklch(0.85 0.25 140);
+  --neon-pink: oklch(0.7 0.3 340);
+}
+
+@theme inline {
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-green: var(--neon-green);
+  --color-neon-pink: var(--neon-pink);
+  
+  --shadow-neon-purple: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+  --shadow-neon-cyan: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+  --shadow-neon-green: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+  --shadow-neon-pink: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-normal: var(--tracking-normal);
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50 transition-all duration-300;
+  }
+  body {
+    @apply bg-background text-foreground selection:bg-neon-purple/30;
+  }
+  
+  /* NEON GLOWS FOR DARK MODE */
+  .dark .card, .dark [role="dialog"] {
+    @apply border-neon-purple/20 shadow-neon-purple/5;
+    box-shadow: 0 0 15px oklch(0.7 0.25 300 / 0.05);
+  }
+
+  .dark .primary-glow {
+    text-shadow: 0 0 8px var(--neon-purple);
+  }
+
+  .dark button:hover:not([disabled]) {
+     box-shadow: 0 0 12px var(--neon-purple);
+     border-color: var(--neon-purple);
+  }
+}
+
+@layer components {
+  .neon-border {
+    @apply border border-neon-purple shadow-neon-purple;
+  }
+  .neon-text {
+    @apply text-neon-purple;
+    text-shadow: 0 0 5px var(--neon-purple);
+  }
+}
+
+@keyframes radar-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes sonar-scan {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar {
+  animation: radar-ripple 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-sonar {
+  animation: sonar-scan 2s linear infinite;
+}

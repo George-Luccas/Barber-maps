@@ -1,0 +1,46 @@
+﻿
+> barber-maps@0.1.0 build C:\Users\georg\OneDrive\├ürea de Trabalho\Barber maps
+> next build
+
+node.exe : 
+No C:\nvm4w\nodejs\pn
+pm.ps1:16 caractere:5
++     & 
+"$basedir/node$exe"  
+"$basedir/node_module
+s/pnpm/bin/pnpm.cjs" 
+ ...
++     ~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (:String   
+ ) [], RemoteExce    
+ption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+> Build error 
+occurred
+Error: EPERM: 
+operation not 
+permitted, rmdir 'C:\
+Users\georg\OneDrive\
+├ürea de 
+Trabalho\Barber maps\
+.next\build\chunks'
+    at ignore-listed 
+frames {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'rmdir',
+  path: 'C:\\Users\\g
+eorg\\OneDrive\\├ürea
+ de Trabalho\\Barber 
+maps\\.next\\build\\c
+hunks'
+}
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 1.

@@ -1,0 +1,142 @@
+﻿
+> barber-maps@0.1.0 lint C:\Users\georg\OneDrive\├ürea de Trabalho\Barber maps
+> eslint
+
+node.exe : 
+No 
+C:\nvm4w\nodejs\pnpm.ps1:16 
+caractere:5
++     & "$basedir/node$exe" 
+ "$basedir/node_modules/pnpm
+/bin/pnpm.cjs"  ...
++     ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: (:    
+String) [], RemoteExc    
+eption
+    + FullyQualifiedError   
+ Id : NativeCommandErr    or
+ 
+Oops! Something went wrong! 
+:(
+
+ESLint: 9.39.2
+
+Error: Cannot find module 
+'./fs'
+Require stack:
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.scandir@2.1.5\node_module
+s\@nodelib\fs.scandir\out\ut
+ils\index.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.scandir@2.1.5\node_module
+s\@nodelib\fs.scandir\out\pr
+oviders\async.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.scandir@2.1.5\node_module
+s\@nodelib\fs.scandir\out\in
+dex.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.walk@1.2.8\node_modules\@
+nodelib\fs.walk\out\readers\
+async.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.walk@1.2.8\node_modules\@
+nodelib\fs.walk\out\provider
+s\async.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@nodelib+
+fs.walk@1.2.8\node_modules\@
+nodelib\fs.walk\out\index.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\fast-glob
+@3.3.1\node_modules\fast-glo
+b\out\readers\async.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\fast-glob
+@3.3.1\node_modules\fast-glo
+b\out\providers\async.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\fast-glob
+@3.3.1\node_modules\fast-glo
+b\out\index.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@next+esl
+int-plugin-next@16.0.10\node
+_modules\@next\eslint-plugin
+-next\dist\utils\get-root-di
+rs.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@next+esl
+int-plugin-next@16.0.10\node
+_modules\@next\eslint-plugin
+-next\dist\rules\no-html-lin
+k-for-pages.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\@next+esl
+int-plugin-next@16.0.10\node
+_modules\@next\eslint-plugin
+-next\dist\index.js
+- C:\Users\georg\OneDrive\├ü
+rea de Trabalho\Barber maps\
+node_modules\.pnpm\eslint-co
+nfig-next@16.0.10__2812fb43e
+8121fc81c8bed9dc3da3fae\node
+_modules\eslint-config-next\
+dist\core-web-vitals.js
+    at 
+Module._resolveFilename (nod
+e:internal/modules/cjs/loade
+r:1207:15)
+    at Module._load (node:in
+ternal/modules/cjs/loader:10
+38:27)
+    at Module.require (node:
+internal/modules/cjs/loader:
+1289:19)
+    at require (node:interna
+l/modules/helpers:182:18)
+    at Object.<anonymous> (C
+:\Users\georg\OneDrive\├ürea
+ de Trabalho\Barber maps\nod
+e_modules\.pnpm\@nodelib+fs.
+scandir@2.1.5\node_modules\@
+nodelib\fs.scandir\out\utils
+\index.js:4:12)
+    at Module._compile (node
+:internal/modules/cjs/loader
+:1521:14)
+    at 
+Module._extensions..js (node
+:internal/modules/cjs/loader
+:1623:10)
+    at Module.load (node:int
+ernal/modules/cjs/loader:126
+6:32)
+    at Module._load (node:in
+ternal/modules/cjs/loader:10
+91:12)
+    at Module.require (node:
+internal/modules/cjs/loader:
+1289:19)
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 2.

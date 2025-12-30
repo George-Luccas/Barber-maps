@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Barber Maps</string>
+    <string name="title_activity_main">Barber Maps</string>
+    <string name="package_name">com.barbermaps.app</string>
+    <string name="custom_url_scheme">com.barbermaps.app</string>
+</resources>

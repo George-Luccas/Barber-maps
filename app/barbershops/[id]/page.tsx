@@ -148,6 +148,8 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
           barbershop={{
             name: barbershop.name,
             address: barbershop.address,
+            latitude: barbershop.latitude ? Number(barbershop.latitude) : null,
+            longitude: barbershop.longitude ? Number(barbershop.longitude) : null,
           }}
         />
 

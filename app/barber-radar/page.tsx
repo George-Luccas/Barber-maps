@@ -3,7 +3,16 @@ import Header from "@/components/header";
 import { prisma } from "@/lib/prisma";
 
 const BarberRadarPage = async () => {
-  const barbershops = await prisma.barbershop.findMany();
+  const barbershops = await prisma.barbershop.findMany({
+    where: {
+      NOT: {
+        OR: [
+          { latitude: null },
+          { longitude: null }
+        ]
+      }
+    }
+  });
 
   const serializedBarbershops = barbershops.map((barbershop) => ({
     ...barbershop,

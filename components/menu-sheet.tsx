@@ -15,7 +15,7 @@ import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare } fr
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
-const isLoggedIn = false;
+// Removed redundant constant
 
 const categories = [
   { label: "Cabelo", search: "cabelo" },
@@ -29,12 +29,21 @@ const categories = [
 const MenuSheet = () => {
   const { data: session } = authClient.useSession();
   const handleLogin = async () => {
-    const { error } = await authClient.signIn.social({
-      provider: "google",
-    });
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      console.log("Iniciando login com Google...");
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+      
+      if (error) {
+        console.error("Erro no login:", error);
+        toast.error(error.message || "Erro ao fazer login com Google");
+        return;
+      }
+    } catch (err) {
+      console.error("Erro inesperado no login:", err);
+      toast.error("Ocorreu um erro inesperado ao tentar fazer login.");
     }
   };
   const handleLogout = async () => {

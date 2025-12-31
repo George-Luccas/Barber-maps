@@ -86,6 +86,7 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
         center={[userLocation.lat, userLocation.lng]}
         zoom={14}
         scrollWheelZoom={false}
+        preferCanvas={true}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer

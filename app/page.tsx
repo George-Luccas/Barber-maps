@@ -16,6 +16,8 @@ import {
 import Footer from "@/components/footer";
 import QuickSearch from "@/components/quick-search";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();

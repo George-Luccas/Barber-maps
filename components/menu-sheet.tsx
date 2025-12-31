@@ -28,24 +28,8 @@ const categories = [
 
 const MenuSheet = () => {
   const { data: session } = authClient.useSession();
-  const handleLogin = async () => {
-    try {
-      console.log("Iniciando login com Google...");
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: "/",
-      });
-      
-      if (error) {
-        console.error("Erro no login:", error);
-        toast.error(error.message || "Erro ao fazer login com Google");
-        return;
-      }
-    } catch (err) {
-      console.error("Erro inesperado no login:", err);
-      toast.error("Ocorreu um erro inesperado ao tentar fazer login.");
-    }
-  };
+// Login functionality removed as requested
+
   const handleLogout = async () => {
     const { error } = await authClient.signOut();
     if (error) {
@@ -87,13 +71,25 @@ const MenuSheet = () => {
                 </div>
               </div>
             ) : (
-              <>
-                <p className="font-semibold">Olá. Faça seu login!</p>
-                <Button className="gap-3 rounded-full" onClick={handleLogin}>
-                  Login
-                  <LogIn className="size-4" />
-                </Button>
-              </>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <Avatar className="size-12">
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-sm">Olá. Faça seu login!</p>
+                    <p className="text-muted-foreground text-[10px]">BarberMaps</p>
+                  </div>
+                </div>
+                <SheetClose asChild>
+                  <Link href="/login">
+                    <Button size="sm" className="gap-2 rounded-full bg-neon-purple hover:bg-neon-purple/80 text-white font-bold transition-all shadow-[0_0_15px_rgba(180,0,255,0.3)]">
+                      Login
+                      <LogIn className="size-4" />
+                    </Button>
+                  </Link>
+                </SheetClose>
+              </div>
             )}
           </div>
 

@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && prisma generate --schema ./prisma/auth.prisma",
+    "generate:auth": "prisma generate --schema ./prisma/auth.prisma"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.1",

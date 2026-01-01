@@ -2,6 +2,8 @@ import BarberRadar from "@/components/barber-radar";
 import Header from "@/components/header";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const BarberRadarPage = async () => {
   const barbershops = await prisma.barbershop.findMany({
     where: {

@@ -59,7 +59,8 @@ model Booking {
   updatedAt      DateTime          @updatedAt @db.Timestamptz(6)
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  // User relation removed, userId remains as identifier
+  // User relation removed: userId stores the ID from the Auth Database.
+  // Foreign Key constraint is managed manually in application logic (data/bookings.ts).
 }
 
 model Account {

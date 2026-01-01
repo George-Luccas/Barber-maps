@@ -29,6 +29,7 @@ export const RegisterForm = () => {
             });
 
             if (error) {
+                console.error("Erro no cadastro (Client):", error);
                 toast.error(error.message || "Erro ao criar conta");
                 return;
             }
@@ -37,6 +38,7 @@ export const RegisterForm = () => {
             router.push("/");
             router.refresh();
         } catch (err: any) {
+            console.error("Exceção não tratada no cadastro:", err);
             toast.error("Ocorreu um erro inesperado ao criar conta.");
         } finally {
             setLoading(false);

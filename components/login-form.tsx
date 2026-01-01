@@ -27,6 +27,7 @@ export const LoginForm = () => {
             });
 
             if (error) {
+                console.error("Erro no login (Client):", error);
                 toast.error(error.message || "Erro ao fazer login");
                 return;
             }
@@ -35,6 +36,7 @@ export const LoginForm = () => {
             router.push("/");
             router.refresh();
         } catch (err: any) {
+            console.error("Exceção não tratada no login:", err);
             toast.error("Ocorreu um erro inesperado ao fazer login.");
         } finally {
             setLoading(false);

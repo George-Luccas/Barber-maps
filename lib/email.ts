@@ -48,3 +48,34 @@ export const sendContactsExportEmail = async (users: any[]) => {
     throw error;
   }
 };
+
+export const sendPasswordResetEmail = async (email: string, token: string) => {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is not set");
+    return;
+  }
+
+  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+
+  try {
+    await resend.emails.send({
+      from: "BarberMaps Security <security@barber-maps.vercel.app>", // Update domain if needed, or use a verified sender
+      to: email, // In production, this must work. In Resend free tier, might be restricted? Usually sends to verified email.
+      // Assuming 'onboarding@resend.dev' for free tier testing if domain not verified.
+      // Let's use the same sender as the other function for consistency/safety.
+      from: "BarberMaps Security <onboarding@resend.dev>",
+      subject: "Recuperação de Senha - BarberMaps",
+      html: `
+        <h1>Recuperação de Senha</h1>
+        <p>Você solicitou a redefinição de sua senha.</p>
+        <p>Clique no link abaixo para criar uma nova senha:</p>
+        <a href="${resetLink}">Redefinir Senha</a>
+        <p>Se você não solicitou isso, ignore este e-mail.</p>
+      `,
+    });
+    console.log(`Reset email sent to ${email}`);
+  } catch (error) {
+    console.error("Error sending reset email:", error);
+    throw error;
+  }
+};

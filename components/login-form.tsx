@@ -73,6 +73,11 @@ export const LoginForm = () => {
                         className="bg-background/50 border-neon-purple/20 focus:border-neon-purple transition-all"
                     />
                 </div>
+                <div className="flex justify-end">
+                    <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-neon-purple transition-colors">
+                        Esqueceu a senha?
+                    </Link>
+                </div>
                 <Button type="submit" className="w-full bg-neon-purple hover:bg-neon-purple/80 text-white font-bold transition-all" disabled={loading}>
                     {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Entrar"}
                 </Button>

@@ -11,5 +11,10 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
+    async sendResetPassword(data, request) {
+      // Import dynamically to avoid circular deps if any (though lib/email is fine)
+      const { sendPasswordResetEmail } = await import("./email");
+      await sendPasswordResetEmail(data.user.email, data.token);
+    },
   },
 });

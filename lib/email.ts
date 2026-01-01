@@ -59,7 +59,6 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 
   try {
     await resend.emails.send({
-      from: "BarberMaps Security <security@barber-maps.vercel.app>", // Update domain if needed, or use a verified sender
       to: email, // In production, this must work. In Resend free tier, might be restricted? Usually sends to verified email.
       // Assuming 'onboarding@resend.dev' for free tier testing if domain not verified.
       // Let's use the same sender as the other function for consistency/safety.

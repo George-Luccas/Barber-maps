@@ -7,8 +7,9 @@ export const auth = betterAuth({
   database: prismaAdapter(authPrisma, {
     provider: "postgresql",
   }),
-  baseURL: process.env.BETTER_AUTH_URL || 
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_APP_URL),
+  baseURL: process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL),
   trustedOrigins: [
     "https://barber-maps.vercel.app",
     "https://*.vercel.app", // Allow all vercel subdomains (previews)

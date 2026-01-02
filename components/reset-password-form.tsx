@@ -41,15 +41,14 @@ export const ResetPasswordForm = () => {
 
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/reset-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ newPassword: password, token }),
+            const { error } = await (authClient as any).resetPassword({
+                newPassword: password,
+                token: token,
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || "Erro ao redefinir senha");
+            if (error) {
+                toast.error(error.message || "Erro ao redefinir senha");
+                return;
             }
 
             toast.success("Senha alterada com sucesso! Faça login.");

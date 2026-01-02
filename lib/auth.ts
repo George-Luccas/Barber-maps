@@ -12,12 +12,12 @@ export const auth = betterAuth({
   //   : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL),
   rateLimit: {
     window: 10,
-    max: 1000, // Increase limit significantly
+    max: 1000, 
   },
   trustedOrigins: [
     "https://barber-maps.vercel.app",
     "http://localhost:3000",
-    "https://barber-maps-33sj2ta61-george-luccas-projects.vercel.app", // Specific Preview Fix (Restored)
+    "https://barber-maps-33sj2ta61-george-luccas-projects.vercel.app", // Keep specific preview as backstop
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
     ...(process.env.VERCEL_BRANCH_URL ? [`https://${process.env.VERCEL_BRANCH_URL}`] : []),
     ...(process.env.VERCEL_PROJECT_PRODUCTION_URL ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`] : []),
@@ -25,10 +25,6 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(data, request) {
-      // Import dynamically to avoid circular deps if any (though lib/email is fine)
-      const { sendPasswordResetEmail } = await import("./email");
-      await sendPasswordResetEmail(data.user.email, data.token);
-    },
+    // Recovery disabled for stability test
   },
 });

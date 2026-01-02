@@ -17,6 +17,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     "https://barber-maps.vercel.app",
     "http://localhost:3000",
+    "https://barber-maps-33sj2ta61-george-luccas-projects.vercel.app", // Specific Preview Fix (Restored)
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
     ...(process.env.VERCEL_BRANCH_URL ? [`https://${process.env.VERCEL_BRANCH_URL}`] : []),
     ...(process.env.VERCEL_PROJECT_PRODUCTION_URL ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`] : []),

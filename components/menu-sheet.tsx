@@ -9,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetDescription,
 } from "./ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare } from "lucide-react";
@@ -48,6 +49,7 @@ const MenuSheet = () => {
       <SheetContent side="left" className="p-0">
         <SheetHeader className="border-border border-b px-5 py-6 text-left">
           <SheetTitle>Menu</SheetTitle>
+          <SheetDescription className="sr-only">Menu de navegação da barbearia</SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-6 py-6">

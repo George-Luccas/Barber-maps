@@ -17,14 +17,15 @@ export const ForgotPasswordForm = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const { error } = await (authClient as any).forgetPassword({
-                email,
-                redirectTo: "/reset-password",
+            const res = await fetch("/api/auth/forget-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, redirectTo: "/reset-password" }),
             });
 
-            if (error) {
-                toast.error(error.message || "Erro ao enviar email de recuperação");
-                return;
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || "Erro ao enviar email");
             }
 
             setSubmitted(true);

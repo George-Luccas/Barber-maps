@@ -63,15 +63,74 @@ model Booking {
   // Foreign Key constraint is managed manually in application logic (data/bookings.ts).
 }
 
-model Account {
-    // Legacy model kept for now or should handle in auth schema?
-    // User requested separate DB for Auth.
-    // REMOVING from here entirely as it is in auth.prisma now.
-    id String @id // Dummy to satisfy parser if needed, but better to remove.
+// Merged Auth Models
+
+model User {
+  id            String      @id
+  name          String
+  email         String      @unique
+  emailVerified Boolean     @default(false)
+  image         String?
+  password      String?
+  phone         String?
+  role          UserRole    @default(BARBER)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  welcomeDiscountClaimed Boolean @default(false)
+  welcomeDiscountUsed    Boolean @default(false)
+  phoneExportedAt       DateTime?
+  
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("user")
 }
 
-// User, Session, Account, Verification removed. 
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
 
 model FinancialTransaction {
   id            String          @id

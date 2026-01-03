@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && prisma generate --schema ./prisma/auth.prisma",
-    "generate:auth": "prisma generate --schema ./prisma/auth.prisma"
+    "postinstall": "prisma generate",
+    "generate:auth": "echo 'Auth schema merged into main schema'"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.1",

@@ -1,4 +1,5 @@
 import Header from "@/components/header";
+export const dynamic = "force-dynamic"; // Ensure fresh data on each request
 import Footer from "@/components/footer";
 import BookingItem from "@/components/booking-item";
 import { getUserBookings } from "@/data/bookings";

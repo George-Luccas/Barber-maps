@@ -7,9 +7,9 @@ export const auth = betterAuth({
   database: prismaAdapter(authPrisma, {
     provider: "postgresql",
   }),
-  baseURL: process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL),
+  // baseURL: process.env.VERCEL_URL 
+  //   ? `https://${process.env.VERCEL_URL}` 
+  //   : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL),
   rateLimit: {
     window: 10,
     max: 1000, 

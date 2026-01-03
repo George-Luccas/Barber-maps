@@ -1,0 +1,13 @@
+=== Verificando Banco de Dados (Schema Unificado) ===
+
+--- Usuários ---
+Total de usuários: 1
+  ID: YIk3nwf8pzcShHl8HMCz3BlCFcn8pDsJ | Email: georgeluccas300@gmail.com | Nome: GeorgeLuccas
+
+--- Barbearias ---
+Total de barbearias: 20
+
+--- Agendamentos ---
+Total de agendamentos: 0
+
+--- Verificação de UserIds ---

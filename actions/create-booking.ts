@@ -52,19 +52,13 @@ export const createBooking = protectedActionClient
       "at barbershop",
       service.barbershopId,
     );
-    try {
-      const booking = await prisma.booking.create({
-        data: {
-          serviceId,
-          date: date, // Pass Date object directly
-          userId: user.id,
-          barbershopId: service.barbershopId,
-        },
-      });
-      return booking;
-    } catch (error) {
-      console.error('Error creating booking:', error);
-      // Return a generic error message to the client
-      return { error: 'Failed to create booking. Please try again later.' };
-    }
+    const booking = await prisma.booking.create({
+      data: {
+        serviceId,
+        date: date,
+        userId: user.id,
+        barbershopId: service.barbershopId,
+      },
+    });
+    return booking;
   });

@@ -1,10 +1,12 @@
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Beer, X, CupSoda } from "lucide-react"; // Changed icons
+import { ChevronLeft, Beer, X, CupSoda } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarbershopProduct } from "@prisma/client";
+import type { BarbershopProduct } from "@prisma/client";
 
 interface MinibarProps {
   products: BarbershopProduct[];

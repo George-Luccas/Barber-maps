@@ -74,6 +74,21 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
           </div>
         </div>
 
+        {/* Display Client Info in Sheet (App-side Join) */}
+        {booking.user && (
+            <div className="flex items-center justify-between border rounded-lg p-3">
+                <div className="flex items-center gap-3">
+                    <Avatar>
+                        <AvatarImage src={booking.user.image ?? ""} />
+                    </Avatar>
+                    <div>
+                        <p className="text-sm font-semibold">Cliente</p>
+                        <p className="text-sm text-foreground">{booking.user.name}</p>
+                    </div>
+                </div>
+            </div>
+        )}
+
         <div className="flex flex-col gap-3">
           {status === "cancelled" ? (
             <Badge variant="destructive" className="w-fit">

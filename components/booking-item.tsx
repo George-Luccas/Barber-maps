@@ -39,6 +39,18 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 </Avatar>
                 <p className="text-sm font-medium">{booking.barbershop.name}</p>
               </div>
+              
+              {/* Display Client Name if available (App-side Join) */}
+              {booking.user && (
+                 <div className="flex items-center gap-2 mt-1">
+                    <Avatar className="h-5 w-5">
+                       <AvatarImage src={booking.user.image ?? ""} />
+                    </Avatar>
+                    <p className="text-xs text-muted-foreground">
+                        Cliente: <span className="font-semibold text-foreground">{booking.user.name}</span>
+                    </p>
+                 </div>
+              )}
             </div>
           </div>
 

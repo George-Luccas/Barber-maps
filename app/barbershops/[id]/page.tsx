@@ -9,6 +9,7 @@ import BackButton from "./_components/back-button";
 import CopyButton from "./_components/copy-button";
 import BarbershopMap from "@/components/barbershop-map";
 import { Badge } from "@/components/ui/badge";
+import Minibar from "./_components/minibar";
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   const { id } = await params;
@@ -63,7 +64,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
         {/* Sobre Nós */}
         <div className="flex flex-col gap-3 px-5">
           <PageSectionTitle>Sobre Nós</PageSectionTitle>
-          <p className="text-sm">{barbershop.description}</p>
+          <p className="text-sm text-justify">{barbershop.aboutUs || barbershop.description}</p>
         </div>
 
         {/* Divider */}
@@ -160,6 +161,9 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
             longitude: barbershop.longitude ? Number(barbershop.longitude) : null,
           }}
         />
+
+        {/* Minibar Feature */}
+        <Minibar products={barbershop.BarbershopProduct} />
 
         {/* Footer spacing */}
         <div className="pt-[60px]" />

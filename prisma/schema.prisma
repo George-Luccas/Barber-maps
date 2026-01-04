@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -8,27 +8,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Auth models removed - moved to separate auth.prisma
-
-// Updated models to remove direct User relations
 model Barbershop {
   id                   String                 @id @default(uuid())
   name                 String
   address              String
-  latitude             Decimal?               @db.Decimal(10, 8)
-  longitude            Decimal?               @db.Decimal(11, 8)
   description          String
   imageUrl             String?
-  phones               String[]
+  phones               String[]               @default([])
   managerId            String?                @unique
   closingTime          String?
   lunchEnd             String?
   lunchStart           String?
   openingTime          String?
-  isOpen               Boolean                @default(true)
   dailyGoal            Decimal                @default(500.00) @db.Decimal(10, 2)
   photos               String[]               @default([])
-  // User relation removed, managerId remains as foreign key ID only
+  latitude             Float?
+  longitude            Float?
+  isOpen               Boolean                @default(true)
+  aboutUs              String?
+  Barber               Barber[]
+  // user relation removed
+  BarbershopProduct    BarbershopProduct[]
   services             BarbershopService[]
   bookings             Booking[]
   FinancialTransaction FinancialTransaction[]
@@ -58,14 +58,13 @@ model Booking {
   cancelledAt    DateTime?         @db.Timestamptz(6)
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime          @updatedAt @db.Timestamptz(6)
+  barberId       String?
+  Barber         Barber?           @relation(fields: [barberId], references: [id])
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  // User relation removed: userId stores the ID from the Auth Database.
-  // Foreign Key constraint is managed manually in application logic (data/bookings.ts).
+  // user relation removed
+
 }
-
-
-// Auth models moved to prisma/auth.prisma
 
 model FinancialTransaction {
   id            String          @id
@@ -78,6 +77,8 @@ model FinancialTransaction {
   barbershopId  String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime
+  barberId      String?
+  Barber        Barber?         @relation(fields: [barberId], references: [id])
   Barbershop    Barbershop      @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
   @@index([barbershopId])
@@ -110,6 +111,39 @@ model Style {
   @@index([barbershopId])
 }
 
+model Barber {
+  id                   String                 @id
+  name                 String
+  email                String?
+  phone                String?
+  imageUrl             String?
+  barbershopId         String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  Barbershop           Barbershop             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  Booking              Booking[]
+  FinancialTransaction FinancialTransaction[]
+
+  @@index([barbershopId])
+}
+
+model BarbershopProduct {
+  id           String     @id
+  name         String
+  description  String?
+  imageUrl     String?
+  priceInCents Int
+  quantity     Int        @default(0)
+  barbershopId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime
+  Barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+}
+
+// Auth models moved to prisma/auth.prisma
+
 enum PaymentMethod {
   MONEY
   CARD
@@ -122,3 +156,8 @@ enum TransactionType {
   EXPENSE
 }
 
+enum UserRole {
+  CLIENT
+  BARBER
+  ADMIN
+}

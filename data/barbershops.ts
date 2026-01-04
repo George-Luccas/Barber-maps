@@ -21,6 +21,7 @@ export const getBarbershopById = async (id: string) => {
     include: {
       services: true,
       Style: true,
+      BarbershopProduct: true,
     },
   });
   return barbershop;

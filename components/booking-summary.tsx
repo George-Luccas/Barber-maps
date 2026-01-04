@@ -18,7 +18,7 @@ const BookingSummary = ({
   date,
   time,
 }: BookingSummaryProps) => {
-  const formattedTime = time ?? format(date, "HH:mm");
+  const formattedTime = time ?? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(date);
 
   return (
     <Card>
@@ -31,7 +31,7 @@ const BookingSummary = ({
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">Data</p>
           <p className="text-sm">
-            {format(date, "d 'de' MMMM", { locale: ptBR })}
+            {new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "long" }).format(date)}
           </p>
         </div>
 

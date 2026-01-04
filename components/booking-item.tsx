@@ -58,8 +58,8 @@ const BookingItem = ({ booking }: BookingItemProps) => {
             <p className="text-xs capitalize">
               {format(booking.date, "MMMM", { locale: ptBR })}
             </p>
-            <p className="text-2xl">{format(booking.date, "dd")}</p>
-            <p className="text-xs">{format(booking.date, "HH:mm")}</p>
+            <p className="text-2xl">{new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit" }).format(booking.date)}</p>
+            <p className="text-xs">{new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(booking.date)}</p>
           </div>
         </Card>
       </SheetTrigger>

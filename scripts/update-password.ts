@@ -2,7 +2,7 @@
 // @ts-ignore
 import { PrismaClient } from "../generated/auth-client";
 // @ts-ignore
-import { hashPassword } from "better-auth";
+import { hashPassword } from "better-auth/crypto";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,14 +10,14 @@ dotenv.config();
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.AUTH_DATABASE_URL,
+      url: process.env.DATABASE_URL,
     },
   },
 });
 
 async function main() {
   const email = "georgeluccas300@gmail.com";
-  const newPassword = "12345";
+  const newPassword = "123456789";
 
   console.log(`Hashing password for: ${email}`);
   
@@ -32,13 +32,24 @@ async function main() {
       process.exit(1);
   }
 
-  console.log(`Updating user...`);
-  const user = await prisma.user.update({
+  console.log(`Upserting user...`);
+  const crypto = await import("crypto");
+  
+  const user = await prisma.user.upsert({
       where: { email },
-      data: { password: hashedPassword }
+      update: { password: hashedPassword },
+      create: {
+          id: crypto.randomUUID(),
+          email,
+          password: hashedPassword,
+          name: "George Luccas",
+          role: "ADMIN",
+          emailVerified: true,
+          updatedAt: new Date(),
+      }
   });
 
-  console.log("Password updated successfully for:", user.email);
+  console.log("Password updated/User created successfully for:", user.email);
 }
 
 main()

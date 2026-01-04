@@ -64,74 +64,8 @@ model Booking {
   // Foreign Key constraint is managed manually in application logic (data/bookings.ts).
 }
 
-// Merged Auth Models
 
-model User {
-  id            String      @id
-  name          String
-  email         String      @unique
-  emailVerified Boolean     @default(false)
-  image         String?
-  password      String?
-  phone         String?
-  role          UserRole    @default(BARBER)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  welcomeDiscountClaimed Boolean @default(false)
-  welcomeDiscountUsed    Boolean @default(false)
-  phoneExportedAt       DateTime?
-  
-  accounts      Account[]
-  sessions      Session[]
-
-  @@map("user")
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  @@map("account")
-}
-
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([identifier])
-  @@map("verification")
-}
+// Auth models moved to prisma/auth.prisma
 
 model FinancialTransaction {
   id            String          @id
@@ -188,8 +122,3 @@ enum TransactionType {
   EXPENSE
 }
 
-enum UserRole {
-  CLIENT
-  BARBER
-  ADMIN
-}

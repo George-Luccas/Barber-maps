@@ -1,20 +1,31 @@
-// lib/prisma.ts
-
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+// @ts-ignore
+import { PrismaClient as AuthPrismaClient } from "../generated/auth-client";
 
 // Main Project Database Connection
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { 
+  prisma: PrismaClient;
+  authPrisma: AuthPrismaClient;
+};
 
 export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
-// Alias authPrisma to prisma since we merged schemas
-export const authPrisma = prisma;
+
+// Auth Database Connection
+export const authPrisma = globalForPrisma.authPrisma || new AuthPrismaClient({
+  datasources: {
+    db: {
+      url: process.env.AUTH_DATABASE_URL,
+    },
+  },
+});
 
 if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma = prisma;
+  globalForPrisma.authPrisma = authPrisma;
 }

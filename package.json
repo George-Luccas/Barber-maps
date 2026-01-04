@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && prisma generate --schema prisma/auth.prisma",
     "generate:auth": "echo 'Auth schema merged into main schema'"
   },
   "dependencies": {
@@ -29,8 +29,10 @@
     "@stripe/stripe-js": "7.8.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "5.90.12",
+    "@types/bcryptjs": "^3.0.0",
     "@types/leaflet": "^1.9.21",
     "ai": "6.0.3",
+    "bcryptjs": "^3.0.3",
     "better-auth": "1.4.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

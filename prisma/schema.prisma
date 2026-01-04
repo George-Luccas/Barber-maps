@@ -63,6 +63,7 @@ model Booking {
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   // user relation removed
+  userName       String?           // Denormalized user name for cross-db visibility
 
 }
 

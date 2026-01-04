@@ -68,6 +68,7 @@ export const createBooking = protectedActionClient
         serviceId,
         date: date,
         userId: user.id,
+        userName: user.name, // Save user name for cross-db visibility
         barbershopId: service.barbershopId,
       },
     });

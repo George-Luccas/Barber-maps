@@ -47,7 +47,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
             <h1 className="text-xl font-bold">{barbershop.name}</h1>
             <Badge 
               className="ml-2" 
-              variant={barbershop.isOpen ? "default" : "destructive"}
+              variant={barbershop.isOpen ? "success" : "destructive"}
             >
               {barbershop.isOpen ? "Aberto" : "Fechado"}
             </Badge>

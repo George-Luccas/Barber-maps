@@ -8,6 +8,7 @@ import ServiceItem from "@/components/service-item";
 import BackButton from "./_components/back-button";
 import CopyButton from "./_components/copy-button";
 import BarbershopMap from "@/components/barbershop-map";
+import { Badge } from "@/components/ui/badge";
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   const { id } = await params;
@@ -44,6 +45,12 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
               />
             </div>
             <h1 className="text-xl font-bold">{barbershop.name}</h1>
+            <Badge 
+              className="ml-2" 
+              variant={barbershop.isOpen ? "default" : "destructive"}
+            >
+              {barbershop.isOpen ? "Aberto" : "Fechado"}
+            </Badge>
           </div>
           <p className="text-muted-foreground text-sm">{barbershop.address}</p>
         </div>
@@ -113,6 +120,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
                 barbershop={{
                   id: barbershop.id,
                   name: barbershop.name,
+                  isOpen: barbershop.isOpen,
                 }}
               />
             ))}

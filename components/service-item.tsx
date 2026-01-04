@@ -24,7 +24,9 @@ import { createBooking } from "@/actions/create-booking";
 
 interface ServiceItemProps {
   service: BarbershopService;
-  barbershop: Pick<Barbershop, "name" | "id">;
+  barbershop: Pick<Barbershop, "name" | "id"> & {
+    isOpen?: boolean;
+  };
 }
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
@@ -77,6 +79,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedTime(undefined);
   };
 
+  const isOpen = barbershop.isOpen ?? true;
+
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
       {/* Service Image */}
@@ -104,8 +108,12 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
           <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
             <SheetTrigger asChild>
-              <Button className="rounded-full" size="sm">
-                Reservar
+              <Button 
+                className="rounded-full" 
+                size="sm"
+                disabled={!isOpen}
+              >
+                {isOpen ? "Reservar" : "Fechado"}
               </Button>
             </SheetTrigger>
             <SheetContent className="overflow-y-auto px-0 pb-0">

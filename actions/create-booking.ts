@@ -24,6 +24,9 @@ export const createBooking = protectedActionClient
       where: {
         id: serviceId,
       },
+      include: {
+        barbershop: true,
+      },
     });
     // Serviço existe?
     if (!service) {
@@ -33,6 +36,14 @@ export const createBooking = protectedActionClient
         ],
       });
     }
+    
+    // Barbearia aberta?
+    if (!service.barbershop.isOpen) {
+      returnValidationErrors(inputSchema, {
+        _errors: ["A barbearia está fechada no momento."],
+      });
+    }
+
     // Já tem agendamento pra esse horário?
     const existingBooking = await prisma.booking.findFirst({
       where: {

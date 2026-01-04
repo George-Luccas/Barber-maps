@@ -25,6 +25,7 @@ model Barbershop {
   lunchEnd             String?
   lunchStart           String?
   openingTime          String?
+  isOpen               Boolean                @default(true)
   dailyGoal            Decimal                @default(500.00) @db.Decimal(10, 2)
   photos               String[]               @default([])
   // User relation removed, managerId remains as foreign key ID only

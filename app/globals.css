@@ -25,6 +25,8 @@
   --input: oklch(0.9 0 0);
   --ring: oklch(0.6 0.3 300);
   --radius: 0.5rem;
+  --destructive: oklch(0.57 0.25 27);
+  --destructive-foreground: oklch(1 0 0);
 
   /* NEON COLORS FOR GLOWS */
   --neon-purple: oklch(0.6 0.3 300);
@@ -52,6 +54,8 @@
   --border: oklch(0.7 0.25 300 / 0.3);
   --input: oklch(1 0 0 / 0.1);
   --ring: oklch(0.7 0.25 300);
+  --destructive: oklch(0.45 0.25 27);
+  --destructive-foreground: oklch(1 0 0);
 
   /* DARK MODE NEON CORE */
   --neon-purple: oklch(0.7 0.25 300);

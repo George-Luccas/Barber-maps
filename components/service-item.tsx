@@ -182,17 +182,26 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
               {/* Time Selection */}
               {selectedDate && (
-                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden w-full">
-                  {availableTimeSlots?.data?.map((time) => (
-                    <Button
-                      key={time}
-                      variant={selectedTime === time ? "default" : "outline"}
-                      className="rounded-full"
-                      onClick={() => handleTimeSelect(time)}
-                    >
-                      {time}
-                    </Button>
-                  ))}
+                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden w-full flex-col">
+                  {/* DEBUG INFO */}
+                  <div className="text-xs text-red-500 font-mono mb-2">
+                     <p>Date: {selectedDate.toString()}</p>
+                     <p>Slots: {availableTimeSlots?.length ?? "undefined"}</p>
+                     <p>Loading: {String(!availableTimeSlots && !availableTimeSlots)}</p>
+                  </div>
+                  
+                  <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden w-full pb-4 mobile-touch-scroll">
+                    {availableTimeSlots?.map((time) => (
+                      <Button
+                        key={time}
+                        variant={selectedTime === time ? "default" : "outline"}
+                        className="rounded-full"
+                        onClick={() => handleTimeSelect(time)}
+                      >
+                        {time}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               )}
 

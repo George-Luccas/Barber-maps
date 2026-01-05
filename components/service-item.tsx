@@ -183,13 +183,6 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
               {/* Time Selection */}
               {selectedDate && (
                 <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden w-full flex-col">
-                  {/* DEBUG INFO */}
-                  <div className="text-xs text-red-500 font-mono mb-2">
-                     <p>Date: {selectedDate.toString()}</p>
-                     <p>Slots: {availableTimeSlots?.data?.length ?? "undefined"}</p>
-                     <p>Loading: {String(!availableTimeSlots && !availableTimeSlots)}</p>
-                  </div>
-                  
                   <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden w-full pb-4 mobile-touch-scroll">
                     {availableTimeSlots?.data?.map((time) => (
                       <Button

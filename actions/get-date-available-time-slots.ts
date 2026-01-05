@@ -8,6 +8,7 @@ import { z } from "zod";
 const inputSchema = z.object({
   barbershopId: z.uuid(),
   date: z.date(),
+  barberId: z.string().optional(),
 });
 
 const TIME_SLOTS = [
@@ -32,17 +33,23 @@ const TIME_SLOTS = [
 
 export const getDateAvailableTimeSlots = actionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { barbershopId, date } }) => {
-    const bookings = await prisma.booking.findMany({
-      where: {
-        barbershopId,
-        // 2025-12-14 09:00:00
-        date: {
-          gte: startOfDay(date),
-          lte: endOfDay(date),
-        },
-        cancelledAt: null,
+  .action(async ({ parsedInput: { barbershopId, date, barberId } }) => {
+    const where: any = {
+      barbershopId,
+      date: {
+        gte: startOfDay(date),
+        lte: endOfDay(date),
       },
+      cancelledAt: null,
+    };
+
+    // If a barber is selected, check availability specifically for them
+    if (barberId) {
+      where.barberId = barberId;
+    }
+
+    const bookings = await prisma.booking.findMany({
+      where,
     });
     const occupiedSlots = bookings.map(
       (booking) => format(booking.date, "HH:mm"), // [12:00, 14:00]

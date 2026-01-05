@@ -14,7 +14,7 @@ import {
 } from "./ui/sheet";
 import { Calendar } from "./ui/calendar";
 import { ptBR } from "date-fns/locale";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -40,10 +40,18 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBooking);
-  const { data: availableTimeSlots } = useGetDateAvailableTimeSlots({
+  const { data: availableTimeSlots, refetch } = useGetDateAvailableTimeSlots({
     barbershopId: barbershop.id,
     date: selectedDate,
+    barberId: selectedBarberId,
   });
+
+  // Refetch when barber changes
+  useEffect(() => {
+    if (selectedDate) {
+        refetch();
+    }
+  }, [selectedBarberId, selectedDate, refetch]);
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);

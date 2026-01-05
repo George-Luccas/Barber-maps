@@ -174,7 +174,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
               {/* Time Selection */}
               {selectedDate && (
-                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden">
+                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden w-full">
                   {availableTimeSlots?.data?.map((time) => (
                     <Button
                       key={time}

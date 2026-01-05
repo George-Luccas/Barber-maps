@@ -34,16 +34,23 @@ const TIME_SLOTS = [
 export const getDateAvailableTimeSlots = actionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { barbershopId, date, barberId } }) => {
+    console.log("--- DEBUG TIME SLOTS ---");
+    console.log("Received Date:", date);
+    console.log("BarberId:", barberId);
+    
+    const start = startOfDay(date);
+    const end = endOfDay(date);
+    console.log("Query Range:", start, "to", end);
+
     const where: any = {
       barbershopId,
       date: {
-        gte: startOfDay(date),
-        lte: endOfDay(date),
+        gte: start,
+        lte: end,
       },
       cancelledAt: null,
     };
 
-    // If a barber is selected, check availability specifically for them
     if (barberId) {
       where.barberId = barberId;
     }
@@ -51,11 +58,29 @@ export const getDateAvailableTimeSlots = actionClient
     const bookings = await prisma.booking.findMany({
       where,
     });
+    
+    console.log("Found Bookings:", bookings.length);
+
+    // Use Intl.DateTimeFormat to ensure we get the time in Sao Paulo time, regardless of server timezone
+    const timeFormatter = new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+
     const occupiedSlots = bookings.map(
-      (booking) => format(booking.date, "HH:mm"), // [12:00, 14:00]
+      (booking) => timeFormatter.format(booking.date), // "09:00"
     );
+    
+    console.log("Occupied slots:", occupiedSlots);
+
     const availableTimeSlots = TIME_SLOTS.filter(
       (slot) => !occupiedSlots.includes(slot),
     );
+    
+    console.log("Available:", availableTimeSlots);
+    console.log("------------------------");
+
     return availableTimeSlots;
   });

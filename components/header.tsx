@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import MenuSheet from "./menu-sheet";
 import { ThemeToggle } from "./theme-toggle"
+import NotificationList from "./notification-list";
 
 const Header = () => {
   return (
@@ -13,6 +14,7 @@ const Header = () => {
         <Image src="/logo1.png" alt="BarberMaps" width={400} height={24} className="dark:drop-shadow-[0_0_8px_rgba(180,0,255,0.3)] transition-all" />
       </Link>
       <div className="flex items-center gap-2">
+        <NotificationList />
         <ThemeToggle />
         <MenuSheet />
       </div>

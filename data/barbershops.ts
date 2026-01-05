@@ -22,6 +22,7 @@ export const getBarbershopById = async (id: string) => {
       services: true,
       Style: true,
       BarbershopProduct: true,
+      Barber: true,
     },
   });
   return barbershop;

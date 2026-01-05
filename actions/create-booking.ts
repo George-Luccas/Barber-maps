@@ -10,11 +10,13 @@ import { isPast } from "date-fns";
 const inputSchema = z.object({
   serviceId: z.uuid(),
   date: z.date(),
+  barberId: z.string().optional(),
 });
 
 export const createBooking = protectedActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { serviceId, date }, ctx: { user } }) => {
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const { serviceId, date, barberId } = parsedInput;
     if (isPast(date)) {
       returnValidationErrors(inputSchema, {
         _errors: ["Data e hora selecionadas já passaram."],
@@ -68,8 +70,14 @@ export const createBooking = protectedActionClient
         serviceId,
         date: date,
         userId: user.id,
-        userName: user.name, // Save user name for cross-db visibility
+        userName: user.name,
         barbershopId: service.barbershopId,
+        barberId: parsedInput.barberId,
+        displayDate: new Intl.DateTimeFormat("pt-BR", {
+          timeZone: "America/Sao_Paulo",
+          dateStyle: "long",
+          timeStyle: "short",
+        }).format(date),
       },
     });
     return booking;

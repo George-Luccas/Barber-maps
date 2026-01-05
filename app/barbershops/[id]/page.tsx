@@ -122,6 +122,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
                   id: barbershop.id,
                   name: barbershop.name,
                   isOpen: barbershop.isOpen,
+                  barbers: barbershop.Barber,
                 }}
               />
             ))}

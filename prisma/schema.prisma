@@ -64,6 +64,8 @@ model Booking {
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   // user relation removed
   userName       String?           // Denormalized user name for cross-db visibility
+  displayDate    String?           // Denormalized local date string for cross-app visibility
+  cancelledBy    String?           // "user" | "barbershop"
 
 }
 
@@ -161,4 +163,13 @@ enum UserRole {
   CLIENT
   BARBER
   ADMIN
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

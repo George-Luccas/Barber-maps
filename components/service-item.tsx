@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { BarbershopService, Barbershop } from "@prisma/client";
+import { BarbershopService, Barbershop, Barber } from "@prisma/client";
 import {
   Sheet,
   SheetContent,
@@ -21,15 +21,18 @@ import { Loader2 } from "lucide-react";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
 import BookingSummary from "./booking-summary";
 import { createBooking } from "@/actions/create-booking";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
 interface ServiceItemProps {
   service: BarbershopService;
   barbershop: Pick<Barbershop, "name" | "id"> & {
     isOpen?: boolean;
+    barbers?: Barber[];
   };
 }
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+  const [selectedBarberId, setSelectedBarberId] = useState<string | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
@@ -63,6 +66,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     const result = await executeCreateBooking({
       date,
       serviceId: service.id,
+      barberId: selectedBarberId,
     });
     if (result.validationErrors) {
       return toast.error(result.validationErrors._errors?.[0]);
@@ -77,6 +81,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSheetIsOpen(false);
     setSelectedDate(undefined);
     setSelectedTime(undefined);
+    setSelectedBarberId(undefined);
   };
 
   const isOpen = barbershop.isOpen ?? true;
@@ -116,12 +121,32 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                 {isOpen ? "Reservar" : "Fechado"}
               </Button>
             </SheetTrigger>
-            <SheetContent className="overflow-y-auto px-0 pb-0">
+            <SheetContent className="px-0 pb-0 overflow-y-auto w-[90%] sm:max-w-sm">
               <SheetHeader className="border-border border-b px-5 py-6">
                 <SheetTitle>Fazer Reserva</SheetTitle>
               </SheetHeader>
 
               <div className="border-border border-b px-5 py-6">
+                {barbershop.barbers && barbershop.barbers.length > 0 && (
+                   <div className="mb-6 w-full">
+                      <p className="mb-3 text-sm font-bold">Selecione o Profissional</p>
+                      <div className="flex gap-4 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden mobile-touch-scroll w-full">
+                         {barbershop.barbers.map((barber) => (
+                             <div 
+                                key={barber.id} 
+                                onClick={() => setSelectedBarberId(barber.id === selectedBarberId ? undefined : barber.id)}
+                                className={`flex flex-col items-center gap-2 cursor-pointer min-w-[80px] rounded-xl p-2 transition-all border ${selectedBarberId === barber.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted border-transparent'}`}
+                             >
+                                <Avatar className={`size-12 ${selectedBarberId === barber.id ? "border-2 border-primary" : "border border-border"}`}>
+                                   <AvatarImage src={barber.imageUrl ?? ""} />
+                                   <AvatarFallback className="font-bold">{barber.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <p className={`text-xs font-semibold text-center ${selectedBarberId === barber.id ? "text-primary" : "text-muted-foreground"}`}>{barber.name.split(" ")[0]}</p>
+                             </div>
+                         ))}
+                      </div>
+                   </div>
+                )}
                 <Calendar
                   mode="single"
                   selected={selectedDate}

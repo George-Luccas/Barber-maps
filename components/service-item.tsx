@@ -94,6 +94,10 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
   const isOpen = barbershop.isOpen ?? true;
 
+  const selectedBarber = barbershop.barbers?.find(
+     (barber) => barber.id === selectedBarberId
+  );
+
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
       {/* Service Image */}
@@ -180,27 +184,35 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                 />
               </div>
 
-              {/* Time Selection */}
-              {selectedDate && (
-                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden w-full flex-col">
-                  <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden w-full pb-4 mobile-touch-scroll">
-                    {availableTimeSlots?.data && availableTimeSlots.data.length > 0 ? (
-                      availableTimeSlots.data.map((time) => (
-                        <Button
-                          key={time}
-                          variant={selectedTime === time ? "default" : "outline"}
-                          className="rounded-full"
-                          onClick={() => handleTimeSelect(time)}
-                        >
-                          {time}
-                        </Button>
-                      ))
-                    ) : (
-                       <p className="text-xs text-muted-foreground w-full text-center">Nenhum horário disponível para esta data.</p>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Time Selection Container - Always Visible to debug layout */}
+              <div className="border-border border-b px-5 py-6 flex flex-col gap-3">
+                 <p className="text-sm font-bold">Horários</p>
+                 {!selectedDate ? (
+                     <p className="text-xs text-muted-foreground">Selecione uma data para ver os horários.</p>
+                 ) : (
+                     <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden w-full pb-4 mobile-touch-scroll">
+                        {availableTimeSlots === undefined ? (
+                            <div className="flex items-center gap-2">
+                                <Loader2 className="size-4 animate-spin text-primary" />
+                                <span className="text-xs text-muted-foreground">Carregando horários...</span>
+                            </div>
+                        ) : availableTimeSlots?.data && availableTimeSlots.data.length > 0 ? (
+                          availableTimeSlots.data.map((time) => (
+                            <Button
+                              key={time}
+                              variant={selectedTime === time ? "default" : "outline"}
+                              className="rounded-full"
+                              onClick={() => handleTimeSelect(time)}
+                            >
+                              {time}
+                            </Button>
+                          ))
+                        ) : (
+                           <p className="text-xs text-muted-foreground w-full">Nenhum horário disponível para esta data.</p>
+                        )}
+                      </div>
+                 )}
+              </div>
 
               {/* Booking Summary */}
               {selectedDate && selectedTime && (
@@ -211,6 +223,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     barbershopName={barbershop.name}
                     date={selectedDate}
                     time={selectedTime}
+                    barberName={selectedBarber?.name}
                   />
                 </div>
               )}

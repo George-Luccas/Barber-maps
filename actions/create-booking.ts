@@ -73,11 +73,7 @@ export const createBooking = protectedActionClient
         userName: user.name,
         barbershopId: service.barbershopId,
         barberId: parsedInput.barberId,
-        displayDate: new Intl.DateTimeFormat("pt-BR", {
-          timeZone: "America/Sao_Paulo",
-          dateStyle: "long",
-          timeStyle: "short",
-        }).format(date),
+        barberId: parsedInput.barberId,
       },
     });
     return booking;

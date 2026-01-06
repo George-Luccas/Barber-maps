@@ -9,6 +9,7 @@ interface BookingSummaryProps {
   barbershopName: string;
   date: Date;
   time?: string;
+  barberName?: string;
 }
 
 const BookingSummary = ({
@@ -17,6 +18,7 @@ const BookingSummary = ({
   barbershopName,
   date,
   time,
+  barberName,
 }: BookingSummaryProps) => {
   const formattedTime = time ?? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(date);
 
@@ -44,6 +46,13 @@ const BookingSummary = ({
           <p className="text-muted-foreground text-sm">Barbearia</p>
           <p className="text-sm">{barbershopName}</p>
         </div>
+
+        {barberName && (
+           <div className="flex items-center justify-between">
+             <p className="text-muted-foreground text-sm">Barbeiro</p>
+             <p className="text-sm">{barberName}</p>
+           </div>
+        )}
       </CardContent>
     </Card>
   );

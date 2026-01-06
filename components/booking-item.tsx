@@ -26,7 +26,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
           <div className="flex flex-1 flex-col gap-4 p-4">
             {status === "cancelled" ? (
               <Badge variant="destructive">
-                {booking.cancelledBy === "barbershop" ? "CANCELADO PELA BARBEARIA" : "CANCELADO"}
+                CANCELADO
               </Badge>
             ) : status === "confirmed" ? (
               <Badge>CONFIRMADO</Badge>

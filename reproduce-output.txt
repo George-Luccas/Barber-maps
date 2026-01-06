@@ -1,0 +1,13 @@
+Debug for Barbershop: Adrian Pacheco Barber Shop, Barber: Maria Adrian
+Target Date: 2026-01-06T12:00:00.000Z
+
+--- CASE A: Specific Barber (George/Id) ---
+Bookings found: 0
+Available Slots (Count): 17
+Available Slots: 09:00, 09:30, 10:00, 10:30, 11:00, 11:30, 12:00, 12:30, 13:00, 13:30, 14:00, 14:30, 15:00, 15:30, 16:00, 16:30, 17:00
+
+--- CASE B: Any Professional (No Barber ID) ---
+Total Barbers: 3
+Total Bookings for shop: 0
+Available Slots (Count): 17
+Available Slots: 09:00, 09:30, 10:00, 10:30, 11:00, 11:30, 12:00, 12:30, 13:00, 13:30, 14:00, 14:30, 15:00, 15:30, 16:00, 16:30, 17:00

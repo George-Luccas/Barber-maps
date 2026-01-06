@@ -64,8 +64,8 @@ model Booking {
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   // user relation removed
   userName       String?           // Denormalized user name for cross-db visibility
-  displayDate    String?           // Denormalized local date string for cross-app visibility
-  cancelledBy    String?           // "user" | "barbershop"
+  // displayDate removed per user request to maintain db compatibility
+  // cancelledBy removed per user request
 
 }
 

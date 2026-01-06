@@ -1,9 +1,15 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const getResend = () => {
+    if (!process.env.RESEND_API_KEY) {
+        return null; // Handle missing key gracefully
+    }
+    return new Resend(process.env.RESEND_API_KEY);
+}
 
 export const sendContactsExportEmail = async (users: any[]) => {
-  if (!process.env.RESEND_API_KEY) {
+  const resend = getResend();
+  if (!resend) {
     console.error("RESEND_API_KEY is not set");
     return;
   }
@@ -50,9 +56,10 @@ export const sendContactsExportEmail = async (users: any[]) => {
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not set");
-    return;
+  const resend = getResend();
+  if (!resend) {
+     console.error("RESEND_API_KEY is not set. Cannot send password reset email.");
+     return;
   }
 
   const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;

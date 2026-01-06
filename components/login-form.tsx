@@ -27,7 +27,8 @@ export const LoginForm = () => {
             });
 
             if (error) {
-                console.error("Erro no login (Client):", error);
+                console.error("Erro no login (Client):", JSON.stringify(error, null, 2));
+                console.error("Detalhes do erro:", error.message, error.status);
                 toast.error(error.message || "Erro ao fazer login");
                 return;
             }

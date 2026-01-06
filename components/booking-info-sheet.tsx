@@ -92,7 +92,7 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
         <div className="flex flex-col gap-3">
           {status === "cancelled" ? (
             <Badge variant="destructive" className="w-fit">
-              {booking.cancelledBy === "barbershop" ? "CANCELADO PELA BARBEARIA" : "CANCELADO"}
+              CANCELADO
             </Badge>
           ) : status === "confirmed" ? (
             <Badge className="w-fit">CONFIRMADO</Badge>

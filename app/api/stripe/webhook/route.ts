@@ -98,8 +98,9 @@ export const POST = async (request: Request) => {
     );
   } else if (event.type === "invoice.payment_succeeded") {
       const invoice = event.data.object as Stripe.Invoice;
-      if (invoice.subscription) {
-          const subscriptionId = invoice.subscription as string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((invoice as any).subscription) {
+          const subscriptionId = (invoice as any).subscription as string;
           // Find our subscription record
           const dbSubscription = await prisma.subscription.findFirst({
               where: { gateway_subscription_id: subscriptionId }

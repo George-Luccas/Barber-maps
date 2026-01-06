@@ -33,7 +33,33 @@ export const POST = async (request: Request) => {
     process.env.STRIPE_WEBHOOK_SECRET_KEY,
   ); // SHA256 HMAC signature
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
+    const session = event.data.object as Stripe.Checkout.Session;
+    
+    // Check if it is a subscription checkout
+    if (session.mode === 'subscription') {
+        // Validation for subscription checkout
+        const subMetadataSchema = z.object({
+            userId: z.string(),
+            planId: z.string().uuid(),
+        });
+        const subMetadata = subMetadataSchema.parse(session.metadata);
+        
+        await prisma.subscription.create({
+            data: {
+                userId: subMetadata.userId,
+                planId: subMetadata.planId,
+                gateway_subscription_id: session.subscription as string,
+                current_balance: 2, // Initial balance
+                status: "ACTIVE",
+                // Set billing date to 1 month from now for simplicity, or fetch from stripe subscription object
+                next_billing_date: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+            }
+        });
+        console.log("Subscription activated for user:", subMetadata.userId);
+        return NextResponse.json({ received: true });
+    }
+
+    // Normal Booking Checkout
     const metadata = metadataSchema.parse(session.metadata);
     const expandedSession = await stripe.checkout.sessions.retrieve(
       session.id,
@@ -70,6 +96,28 @@ export const POST = async (request: Request) => {
       "at barbershop",
       metadata.barbershopId,
     );
+  } else if (event.type === "invoice.payment_succeeded") {
+      const invoice = event.data.object as Stripe.Invoice;
+      if (invoice.subscription) {
+          const subscriptionId = invoice.subscription as string;
+          // Find our subscription record
+          const dbSubscription = await prisma.subscription.findFirst({
+              where: { gateway_subscription_id: subscriptionId }
+          });
+
+          if (dbSubscription) {
+              await prisma.subscription.update({
+                  where: { id: dbSubscription.id },
+                  data: {
+                      current_balance: 2, // Reset balance on renewal
+                      status: "ACTIVE",
+                      next_billing_date: new Date(new Date().setMonth(new Date().getMonth() + 1)), // Extend validity
+                  }
+              });
+              console.log("Subscription renewed for user:", dbSubscription.userId);
+          }
+      }
   }
+
   return NextResponse.json({ received: true });
 };

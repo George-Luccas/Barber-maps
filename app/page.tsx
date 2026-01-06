@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/page";
 import Footer from "@/components/footer";
 import QuickSearch from "@/components/quick-search";
+import MembershipWidget from "@/components/membership-widget";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function Home() {
       <Header />
       <PageContainer>
         <QuickSearch />
+        <MembershipWidget />
 
         {/* RADAR BANNER SECTION */}
         <Link href="/barber-radar" className="block px-5">

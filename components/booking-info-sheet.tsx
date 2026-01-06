@@ -95,7 +95,9 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
               CANCELADO
             </Badge>
           ) : status === "confirmed" ? (
-            <Badge className="w-fit">CONFIRMADO</Badge>
+            <Badge className={`w-fit ${booking.isSubscription ? "bg-violet-600 hover:bg-violet-700" : ""}`}>
+                 {booking.isSubscription ? "ASSINATURA" : "CONFIRMADO"}
+            </Badge>
           ) : (
             <Badge variant="secondary" className="w-fit">
               FINALIZADO
@@ -128,46 +130,64 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
         )}
       </div>
 
-      <div className="flex gap-3 border-t px-5 py-6">
-        <Button
-          variant="outline"
-          className="flex-1 rounded-full"
-          onClick={onClose}
-        >
-          Voltar
-        </Button>
+import FinishServiceButton from "./finish-service-button";
 
+// ... existing imports
+
+      <div className="flex gap-3 border-t px-5 py-6 flex-col">
+        <div className="flex gap-3 w-full">
+            <Button
+              variant="outline"
+              className="flex-1 rounded-full"
+              onClick={onClose}
+            >
+              Voltar
+            </Button>
+
+            {status === "confirmed" && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex-1 rounded-full">
+                    Cancelar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cancelar Reserva</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja cancelar esta reserva? Esta ação não
+                      pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Não, manter reserva</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCancelBooking}
+                      disabled={isCancelling}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isCancelling ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        "Sim, cancelar"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+        </div>
+        
+        {/* BARBER ACTION (For Demo Purposes - In prod, check if user is manager) */}
         {status === "confirmed" && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="flex-1 rounded-full">
-                Cancelar Reserva
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Cancelar Reserva</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tem certeza que deseja cancelar esta reserva? Esta ação não
-                  pode ser desfeita.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Não, manter reserva</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleCancelBooking}
-                  disabled={isCancelling}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {isCancelling ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    "Sim, cancelar"
-                  )}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <div className="border-t pt-4 mt-2">
+                 <p className="text-xs font-bold text-muted-foreground mb-2 text-center uppercase tracking-wider">Área do Profissional</p>
+                 <FinishServiceButton 
+                    bookingId={booking.id} 
+                    isSubscription={booking.isSubscription ?? false} 
+                    onSuccess={onClose}
+                 />
+            </div>
         )}
       </div>
     </SheetContent>

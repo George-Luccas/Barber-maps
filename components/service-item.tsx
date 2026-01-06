@@ -22,6 +22,7 @@ import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe
 import BookingSummary from "./booking-summary";
 import { createBooking } from "@/actions/create-booking";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { useUserMembership } from "@/hooks/data/use-user-membership";
 
 interface ServiceItemProps {
   service: BarbershopService;
@@ -37,6 +38,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
+  const [paymentMethod, setPaymentMethod] = useState<"MONEY" | "SUBSCRIPTION">("MONEY");
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBooking);
@@ -45,6 +47,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     date: selectedDate,
     barberId: selectedBarberId,
   });
+
+  // Fetch Membership
+  const { data: membership } = useUserMembership();
 
   // Refetch when barber changes
   useEffect(() => {
@@ -71,11 +76,14 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     const minutes = Number(splittedTime[1]);
     const date = new Date(selectedDate);
     date.setHours(hours, minutes);
+    
     const result = await executeCreateBooking({
       date,
       serviceId: service.id,
       barberId: selectedBarberId,
+      isSubscription: paymentMethod === "SUBSCRIPTION",
     });
+    
     if (result.validationErrors) {
       return toast.error(result.validationErrors._errors?.[0]);
     }
@@ -90,6 +98,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedDate(undefined);
     setSelectedTime(undefined);
     setSelectedBarberId(undefined);
+    setPaymentMethod("MONEY"); // Reset
   };
 
   const isOpen = barbershop.isOpen ?? true;
@@ -97,6 +106,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const selectedBarber = barbershop.barbers?.find(
      (barber) => barber.id === selectedBarberId
   );
+  
+  const hasMembership = membership?.status === "ACTIVE";
+  const hasCredits = (membership?.current_balance ?? 0) > 0;
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
@@ -213,18 +225,72 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       </div>
                  )}
               </div>
+              
+              {/* PAYMENT METHOD SELECTION */}
+              <div className="border-border border-b px-5 py-6">
+                 <p className="text-sm font-bold mb-3">Forma de Pagamento</p>
+                 <div className="flex flex-col gap-3">
+                    {/* OPTION 1: MONEY/LOCALE */}
+                    <div 
+                        className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition-all ${paymentMethod === 'MONEY' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}
+                        onClick={() => setPaymentMethod('MONEY')}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${paymentMethod === 'MONEY' ? 'border-primary' : 'border-muted-foreground'}`}>
+                                {paymentMethod === 'MONEY' && <div className="h-2 w-2 rounded-full bg-primary" />}
+                            </div>
+                            <span className="text-sm font-medium">No Local (Dinheiro/PIX/Cartão)</span>
+                        </div>
+                    </div>
+                    
+                    {/* OPTION 2: SUBSCRIPTION */}
+                    {hasMembership && (
+                        <div 
+                            className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition-all ${paymentMethod === 'SUBSCRIPTION' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'} ${!hasCredits ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={() => hasCredits && setPaymentMethod('SUBSCRIPTION')}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${paymentMethod === 'SUBSCRIPTION' ? 'border-primary' : 'border-muted-foreground'}`}>
+                                    {paymentMethod === 'SUBSCRIPTION' && <div className="h-2 w-2 rounded-full bg-primary" />}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium flex items-center gap-2">
+                                        Assinatura 
+                                        {hasCredits ? (
+                                             <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">
+                                                {membership.current_balance} créditos
+                                             </span> 
+                                        ) : (
+                                             <span className="text-[10px] bg-destructive/20 text-destructive px-2 py-0.5 rounded-full font-bold">
+                                                Esgotado
+                                             </span> 
+                                        )}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">Utilizar 1 crédito do plano</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                 </div>
+              </div>
+
 
               {/* Booking Summary */}
               {selectedDate && selectedTime && (
                 <div className="px-5 py-6">
                   <BookingSummary
                     serviceName={service.name}
-                    servicePrice={service.priceInCents}
+                    servicePrice={paymentMethod === 'SUBSCRIPTION' ? 0 : service.priceInCents}
                     barbershopName={barbershop.name}
                     date={selectedDate}
                     time={selectedTime}
                     barberName={selectedBarber?.name}
                   />
+                  {paymentMethod === 'SUBSCRIPTION' && (
+                       <p className="mt-2 text-xs text-primary font-bold text-center bg-primary/10 p-2 rounded-lg">
+                           Será descontado 1 crédito da sua assinatura
+                       </p>
+                  )}
                 </div>
               )}
 

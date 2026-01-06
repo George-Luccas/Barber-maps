@@ -11,17 +11,51 @@ const inputSchema = z.object({
   serviceId: z.uuid(),
   date: z.date(),
   barberId: z.string().optional(),
+  isSubscription: z.boolean().optional(),
 });
 
 export const createBooking = protectedActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
-    const { serviceId, date, barberId } = parsedInput;
+    const { serviceId, date, barberId, isSubscription } = parsedInput;
     if (isPast(date)) {
       returnValidationErrors(inputSchema, {
         _errors: ["Data e hora selecionadas já passaram."],
       });
     }
+
+    if (isSubscription) {
+        const subscription = await prisma.subscription.findUnique({
+            where: { userId: user.id },
+            include: { Plan: true }
+        });
+
+        if (!subscription || subscription.status !== "ACTIVE") {
+             returnValidationErrors(inputSchema, {
+                _errors: ["Assinatura inativa ou não encontrada."],
+             });
+        }
+
+        // Calculate Effective Balance
+        // Balance = CurrentBalance - Pending Future Subscription Bookings
+        const pendingBookingsCount = await prisma.booking.count({
+            where: {
+                userId: user.id,
+                isSubscription: true,
+                date: { gte: new Date() }, // Future bookings
+                cancelledAt: null
+            }
+        });
+
+        const effectiveBalance = subscription!.current_balance - pendingBookingsCount;
+
+        if (effectiveBalance <= 0) {
+            returnValidationErrors(inputSchema, {
+                _errors: ["Saldo de créditos insuficiente para este agendamento."],
+             });
+        }
+    }
+
     const service = await prisma.barbershopService.findUnique({
       where: {
         id: serviceId,
@@ -73,7 +107,7 @@ export const createBooking = protectedActionClient
         userName: user.name,
         barbershopId: service.barbershopId,
         barberId: parsedInput.barberId,
-        barberId: parsedInput.barberId,
+        isSubscription: !!isSubscription,
       },
     });
     return booking;

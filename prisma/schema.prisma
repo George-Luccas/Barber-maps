@@ -66,6 +66,8 @@ model Booking {
   userName       String?           // Denormalized user name for cross-db visibility
   // displayDate removed per user request to maintain db compatibility
   // cancelledBy removed per user request
+  isSubscription Boolean           @default(false)
+  UsageLog       UsageLog?
 
 }
 
@@ -172,4 +174,43 @@ model Notification {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model Plan {
+  id            String         @id @default(uuid())
+  name          String
+  price         Decimal        @db.Decimal(10, 2)
+  service_limit Int
+  description   String?
+  stripePriceId String?
+  Subscription  Subscription[]
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model Subscription {
+  id                      String             @id @default(uuid())
+  userId                  String             @unique
+  planId                  String
+  status                  SubscriptionStatus @default(ACTIVE)
+  current_balance         Int
+  next_billing_date       DateTime           @db.Timestamptz(6)
+  gateway_subscription_id String?
+  createdAt               DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime           @updatedAt @db.Timestamptz(6)
+  Plan                    Plan               @relation(fields: [planId], references: [id])
+  UsageLog                UsageLog[]
+}
+
+model UsageLog {
+  id             String       @id @default(uuid())
+  subscriptionId String
+  bookingId      String       @unique
+  date_used      DateTime     @default(now()) @db.Timestamptz(6)
+  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  Booking        Booking      @relation(fields: [bookingId], references: [id])
 }

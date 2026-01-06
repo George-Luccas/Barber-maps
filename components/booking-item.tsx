@@ -29,7 +29,9 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 CANCELADO
               </Badge>
             ) : status === "confirmed" ? (
-              <Badge>CONFIRMADO</Badge>
+              <Badge className={booking.isSubscription ? "bg-violet-600 hover:bg-violet-700" : ""}>
+                {booking.isSubscription ? "ASSINATURA" : "CONFIRMADO"}
+              </Badge>
             ) : (
               <Badge variant="secondary">FINALIZADO</Badge>
             )}

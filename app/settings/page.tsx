@@ -15,7 +15,7 @@ const SettingsPage = async () => {
     const plans = await prisma.plan.findMany();
     
     // 2. Fetch user membership
-    const membershipResult = await getUserMembership({});
+    const membershipResult = await getUserMembership();
     const membership = membershipResult.data;
 
     return (

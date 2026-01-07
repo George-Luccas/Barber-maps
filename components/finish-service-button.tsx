@@ -13,12 +13,14 @@ interface FinishServiceButtonProps {
 }
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 // ...
 
 const FinishServiceButton = ({ bookingId, isSubscription, onSuccess }: FinishServiceButtonProps) => {
   const { executeAsync, isPending } = useAction(finishService);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleFinish = async () => {
     const result = await executeAsync({ bookingId });
@@ -30,7 +32,8 @@ const FinishServiceButton = ({ bookingId, isSubscription, onSuccess }: FinishSer
 
     if (result.data?.success) {
         toast.success("Serviço concluído e crédito descontado!");
-        queryClient.invalidateQueries({ queryKey: ["user-membership"] });
+        await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
+        router.refresh();
         onSuccess?.();
     } else {
         toast.info(result.data?.message ?? "Serviço concluído.");

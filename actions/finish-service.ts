@@ -71,6 +71,8 @@ export const finishService = protectedActionClient
 
     revalidatePath("/admin"); // Refresh admin dashboard
     revalidatePath("/bookings"); 
+    revalidatePath("/"); 
+    revalidatePath("/settings"); 
 
     return { success: true, message: "Check-in realizado e crédito descontado." };
 });

@@ -244,7 +244,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     </div>
                     
                     {/* OPTION 2: SUBSCRIPTION */}
-                    {hasMembership && service.name.toLowerCase().includes("corte") && (
+                    {hasMembership && service.name.toLowerCase().includes("corte") && !service.name.toLowerCase().includes("combo") && (
                         <div 
                             className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition-all ${paymentMethod === 'SUBSCRIPTION' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'} ${!hasCredits ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={() => hasCredits && setPaymentMethod('SUBSCRIPTION')}

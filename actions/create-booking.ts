@@ -81,10 +81,13 @@ export const createBooking = protectedActionClient
     }
 
     // Validate Subscription Eligibility for Service Type
-    if (isSubscription && !service.name.toLowerCase().includes("corte")) {
-        returnValidationErrors(inputSchema, {
-            _errors: ["O plano de assinatura é exclusivo para serviços de Corte de Cabelo."],
-        });
+    if (isSubscription) {
+        const name = service.name.toLowerCase();
+        if (!name.includes("corte") || name.includes("combo")) {
+             returnValidationErrors(inputSchema, {
+                _errors: ["O plano de assinatura é exclusivo para serviços de Corte de Cabelo (não inclui combos)."],
+            });
+        }
     }
 
     // Já tem agendamento pra esse horário?

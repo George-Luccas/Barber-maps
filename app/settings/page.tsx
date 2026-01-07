@@ -6,7 +6,9 @@ import { getUserMembership } from "@/actions/get-user-membership";
 import SettingsPlanCard from "./_components/settings-plan-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, Check } from "lucide-react";
+import { Crown, Check, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,14 @@ const SettingsPage = async () => {
         <div>
             <Header />
             <PageContainer>
-                 <h1 className="text-xl font-bold mb-4">Minha Assinatura</h1>
+                 <div className="flex items-center gap-4 mb-4">
+                     <Link href="/">
+                        <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
+                            <ChevronLeft className="size-4" />
+                        </Button>
+                     </Link>
+                     <h1 className="text-xl font-bold">Minha Assinatura</h1>
+                 </div>
                  
                  {/* Current Subscription Status */}
                  {membership ? (

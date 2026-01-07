@@ -74,7 +74,8 @@ export const getDateAvailableTimeSlots = actionClient
             where: { id: barbershopId },
             select: { Barber: true },
           });
-          const count = barbershop?.Barber?.length ?? 0;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const count = (barbershop as any)?.Barber?.length ?? 0;
           totalBarbers = count > 0 ? count : 1;
         }
 

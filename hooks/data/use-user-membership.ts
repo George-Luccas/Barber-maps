@@ -7,7 +7,7 @@ export const useUserMembership = () => {
     return useQuery({
         queryKey: ["user-membership"],
         queryFn: async () => {
-             const result = await getUserMembership({});
+             const result = await getUserMembership();
              return result.data ?? null;
         }
     });

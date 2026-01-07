@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   const plan = await prisma.plan.create({
     data: {
-      name: "Plano Standard",
+      name: "Plano Navalha",
       price: 55.00,
       service_limit: 2,
       description: "Assinatura Mensal: 2 Cortes por mês.",

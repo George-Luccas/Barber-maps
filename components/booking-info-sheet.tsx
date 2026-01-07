@@ -24,6 +24,7 @@ import { Smartphone, X, Loader2 } from "lucide-react";
 import { cancelBooking } from "@/actions/cancel-booking";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
+import FinishServiceButton from "./finish-service-button";
 
 interface BookingInfoSheetProps {
   booking: BookingWithRelations;
@@ -130,9 +131,7 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
         )}
       </div>
 
-import FinishServiceButton from "./finish-service-button";
 
-// ... existing imports
 
       <div className="flex gap-3 border-t px-5 py-6 flex-col">
         <div className="flex gap-3 w-full">

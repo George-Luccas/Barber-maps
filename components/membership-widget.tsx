@@ -18,22 +18,30 @@ const MembershipWidget = () => {
   // Not signed in or no membership
   if (!membership) {
     return (
-        <Card className="rounded-xl border-none bg-gradient-to-r from-violet-600/10 to-indigo-600/10 dark:from-violet-900/20 dark:to-indigo-900/20 mb-4">
-            <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                    <p className="font-bold text-sm flex items-center gap-2">
-                         <Crown className="size-4 text-primary fill-primary/20" />
-                         Seja VIP
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        Economize com o Plano Standard.
-                    </p>
-                </div>
-                <Button size="sm" variant="secondary" className="text-xs h-8 rounded-full" asChild>
-                    <Link href="/settings">Ver Planos</Link>
-                </Button>
-            </CardContent>
-        </Card>
+        <Card className="rounded-xl border-none bg-gradient-to-r from-violet-600/10 to-indigo-600/10 dark:from-violet-900/20 dark:to-indigo-900/20 mb-4 relative overflow-hidden">
+        {/* Background Decoration */}
+       <div className="absolute right-[-20px] top-[-20px] opacity-10 pointer-events-none">
+           <Crown className="w-40 h-40 rotate-12 fill-primary/20 text-primary" />
+       </div>
+       <div className="absolute left-[10px] bottom-[-10px] opacity-10 pointer-events-none">
+           <Crown className="w-20 h-20 -rotate-12 fill-primary/20 text-primary" />
+       </div>
+
+        <CardContent className="p-4 flex items-center justify-between relative z-10">
+            <div className="flex flex-col gap-1">
+                <p className="font-bold text-sm flex items-center gap-2">
+                     <Crown className="size-4 text-primary fill-primary/20" />
+                     Seja VIP
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    Economize com o Plano Navalha.
+                </p>
+            </div>
+            <Button size="sm" variant="secondary" className="text-xs h-8 rounded-full" asChild>
+                <Link href="/settings">Ver Planos</Link>
+            </Button>
+        </CardContent>
+    </Card>
     );
   }
 
@@ -43,17 +51,18 @@ const MembershipWidget = () => {
   return (
     <Card className={`rounded-xl border mb-4 mt-4 overflow-hidden relative ${isPastDue ? 'border-destructive/50 bg-destructive/5' : 'border-primary/50 bg-primary/5'}`}>
        {/* Background Decoration */}
+       {/* Background Decoration */}
        <div className="absolute right-[-20px] top-[-20px] opacity-20 pointer-events-none">
-           <Crown className="w-40 h-40 rotate-12" />
+           <Crown className="w-40 h-40 rotate-12 fill-primary/20 text-primary" />
        </div>
        <div className="absolute left-[10px] bottom-[-10px] opacity-20 pointer-events-none">
-           <Crown className="w-20 h-20 -rotate-12" />
+           <Crown className="w-20 h-20 -rotate-12 fill-primary/20 text-primary" />
        </div>
        <div className="absolute left-[40%] top-[-10px] opacity-10 pointer-events-none">
-           <Crown className="w-12 h-12 rotate-45" />
+           <Crown className="w-12 h-12 rotate-45 fill-primary/20 text-primary" />
        </div>
        <div className="absolute right-[30%] bottom-[10px] opacity-10 pointer-events-none">
-           <Crown className="w-8 h-8 -rotate-6" />
+           <Crown className="w-8 h-8 -rotate-6 fill-primary/20 text-primary" />
        </div>
 
       <CardContent className="p-4">

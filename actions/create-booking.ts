@@ -80,6 +80,13 @@ export const createBooking = protectedActionClient
       });
     }
 
+    // Validate Subscription Eligibility for Service Type
+    if (isSubscription && !service.name.toLowerCase().includes("corte")) {
+        returnValidationErrors(inputSchema, {
+            _errors: ["O plano de assinatura é exclusivo para serviços de Corte de Cabelo."],
+        });
+    }
+
     // Já tem agendamento pra esse horário?
     const existingBooking = await prisma.booking.findFirst({
       where: {

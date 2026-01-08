@@ -5,6 +5,7 @@ import { protectedActionClient } from "@/lib/action-client";
 import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { isPast } from "date-fns";
+import { isServiceEligibleForPlan } from "@/lib/utils";
 
 // This schema is used to validate input from client.
 const inputSchema = z.object({
@@ -82,10 +83,9 @@ export const createBooking = protectedActionClient
 
     // Validate Subscription Eligibility for Service Type
     if (isSubscription) {
-        const name = service.name.toLowerCase();
-        if (!name.includes("corte") || name.includes("combo")) {
+        if (!isServiceEligibleForPlan(service.name)) {
              returnValidationErrors(inputSchema, {
-                _errors: ["O plano de assinatura é exclusivo para serviços de Corte de Cabelo (não inclui combos)."],
+                _errors: ["O plano de assinatura é exclusivo para cortes de cabelo (não inclui combos, barba, etc)."],
             });
         }
     }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isServiceEligibleForPlan } from "@/lib/utils";
 import { BarbershopService, Barbershop, Barber } from "@prisma/client";
 import {
   Sheet,
@@ -244,7 +244,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     </div>
                     
                     {/* OPTION 2: SUBSCRIPTION */}
-                    {hasMembership && service.name.toLowerCase().includes("corte") && !service.name.toLowerCase().includes("combo") && (
+                    {hasMembership && isServiceEligibleForPlan(service.name) && (
                         <div 
                             className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition-all ${paymentMethod === 'SUBSCRIPTION' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'} ${!hasCredits ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={() => hasCredits && setPaymentMethod('SUBSCRIPTION')}

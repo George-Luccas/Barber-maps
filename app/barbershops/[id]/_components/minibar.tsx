@@ -84,16 +84,12 @@ const Minibar = ({ products }: MinibarProps) => {
                         <Card key={product.id} className="overflow-hidden border-primary/10 hover:border-primary/50 transition-colors group">
                             <CardContent className="p-0">
                                 <div className="relative h-[120px] w-full bg-secondary/50 flex items-center justify-center">
-                                    {product.imageUrl ? (
-                                        <Image 
-                                            src={product.imageUrl} 
-                                            alt={product.name} 
-                                            fill 
-                                            className="object-cover group-hover:scale-110 transition-transform duration-300" 
-                                        />
-                                    ) : (
-                                        <CupSoda className="text-muted-foreground/50 size-10" /> // Fallback icon changed
-                                    )}
+                                    <Image 
+                                        src="https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=600&auto=format&fit=crop" 
+                                        alt="Cerveja Geleda" 
+                                        fill 
+                                        className="object-cover group-hover:scale-110 transition-transform duration-300" 
+                                    />
                                 </div>
                                 <div className="p-3">
                                     <h3 className="font-bold text-sm truncate">{product.name}</h3>

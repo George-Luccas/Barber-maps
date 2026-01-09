@@ -19,6 +19,8 @@ import MembershipWidget from "@/components/membership-widget";
 
 export const dynamic = "force-dynamic";
 
+import { BackgroundVideo } from "@/components/ui/background-video";
+
 export default async function Home() {
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();
@@ -39,7 +41,11 @@ export default async function Home() {
   }
 
   return (
-    <div>
+    <div className="relative min-h-screen">
+       <BackgroundVideo 
+          src="/background.mp4" 
+          className="scale-125 transition-transform" // Zoom to potentially hide watermarks and focus on center (panther eye?)
+       />
       <Header />
       <PageContainer>
         <QuickSearch />

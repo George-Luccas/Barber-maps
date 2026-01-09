@@ -44,7 +44,7 @@ export default async function Home() {
     <div className="relative min-h-screen">
        <BackgroundVideo 
           src="/background.mp4" 
-          className="scale-125 transition-transform" // Zoom to potentially hide watermarks and focus on center (panther eye?)
+          className="scale-110 md:scale-125 transition-transform" // Responsive zoom: less on mobile
        />
       <Header />
       <div className="relative z-10">

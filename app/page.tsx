@@ -47,6 +47,7 @@ export default async function Home() {
           className="scale-125 transition-transform" // Zoom to potentially hide watermarks and focus on center (panther eye?)
        />
       <Header />
+      <div className="relative z-10">
       <PageContainer>
         <QuickSearch />
         <MembershipWidget />
@@ -116,6 +117,7 @@ export default async function Home() {
         </PageSectionContent>
       </PageContainer>
       <Footer />
+      </div>
     </div>
   );
 }

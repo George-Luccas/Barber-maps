@@ -35,7 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {/* O ThemeProvider envolve tudo que está DENTRO do body */}
-        <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="dark" themes={["light", "dark", "panther"]}>
           <TanstackQueryProvider>
             {children}
             <Toaster />

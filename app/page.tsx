@@ -45,7 +45,7 @@ export default async function Home() {
        <BackgroundVideo 
           src="/background.mp4" 
           className="scale-100 md:scale-125 transition-transform"
-          videoClassName="object-[25%_center]" // Shifted lateral position to show eye
+          videoClassName="object-[35%_center]" // Shifted lateral position to show eye (10% right)
        />
       <Header />
       <div className="relative z-10">

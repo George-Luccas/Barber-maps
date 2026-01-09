@@ -8,6 +8,8 @@ import { isFuture } from "date-fns";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
+import { authPrisma } from "@/lib/prisma";
+
 const inputSchema = z.object({
   bookingId: z.uuid(),
 });
@@ -71,6 +73,14 @@ export const cancelBooking = protectedActionClient
         cancelledAt: new Date(),
       },
     });
+
+    if (booking.isWelcomeDiscount) {
+        await authPrisma.user.update({
+            where: { id: user.id },
+            data: { welcomeDiscountUsed: false } as any
+        });
+    }
+
     revalidatePath("/");
     revalidatePath("/bookings");
     return cancelledBooking;

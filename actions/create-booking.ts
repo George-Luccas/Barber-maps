@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { isPast } from "date-fns";
 import { isServiceEligibleForPlan } from "@/lib/utils";
 
+import { authPrisma } from "@/lib/prisma";
+
 // This schema is used to validate input from client.
 const inputSchema = z.object({
   serviceId: z.uuid(),
@@ -103,6 +105,17 @@ export const createBooking = protectedActionClient
         _errors: ["Data e hora selecionadas já estão agendadas."],
       });
     }
+
+    // Check for Welcome Discount
+    let isWelcomeDiscount = false;
+    const dbUser = await authPrisma.user.findUnique({
+        where: { id: user.id }
+    });
+
+    if (dbUser?.welcomeDiscountClaimed && !dbUser.welcomeDiscountUsed) {
+        isWelcomeDiscount = true;
+    }
+
     console.log(
       "Creating booking for service",
       serviceId,
@@ -118,7 +131,16 @@ export const createBooking = protectedActionClient
         barbershopId: service.barbershopId,
         barberId: parsedInput.barberId,
         isSubscription: !!isSubscription,
+        isWelcomeDiscount: isWelcomeDiscount,
       },
     });
+
+    if (isWelcomeDiscount) {
+        await authPrisma.user.update({
+            where: { id: user.id },
+            data: { welcomeDiscountUsed: true } as any
+        });
+    }
+
     return booking;
   });

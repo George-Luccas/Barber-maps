@@ -26,8 +26,9 @@ model Barbershop {
   longitude            Float?
   isOpen               Boolean                @default(true)
   aboutUs              String?
+  isSuspended          Boolean                @default(false)
   Barber               Barber[]
-  // user relation removed
+  user                 user?                  @relation(fields: [managerId], references: [id])
   BarbershopProduct    BarbershopProduct[]
   services             BarbershopService[]
   bookings             Booking[]
@@ -59,16 +60,13 @@ model Booking {
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime          @updatedAt @db.Timestamptz(6)
   barberId       String?
+  userName       String?
+  isSubscription Boolean           @default(false)
+  isWelcomeDiscount Boolean        @default(false)
   Barber         Barber?           @relation(fields: [barberId], references: [id])
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  // user relation removed
-  userName       String?           // Denormalized user name for cross-db visibility
-  // displayDate removed per user request to maintain db compatibility
-  // cancelledBy removed per user request
-  isSubscription Boolean           @default(false)
   UsageLog       UsageLog?
-
 }
 
 model FinancialTransaction {
@@ -147,26 +145,6 @@ model BarbershopProduct {
   @@index([barbershopId])
 }
 
-// Auth models moved to prisma/auth.prisma
-
-enum PaymentMethod {
-  MONEY
-  CARD
-  PIX
-  OTHER
-}
-
-enum TransactionType {
-  INCOME
-  EXPENSE
-}
-
-enum UserRole {
-  CLIENT
-  BARBER
-  ADMIN
-}
-
 model Notification {
   id        String   @id @default(uuid())
   userId    String
@@ -184,12 +162,6 @@ model Plan {
   description   String?
   stripePriceId String?
   Subscription  Subscription[]
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  PAST_DUE
-  CANCELED
 }
 
 model Subscription {
@@ -211,6 +183,80 @@ model UsageLog {
   subscriptionId String
   bookingId      String       @unique
   date_used      DateTime     @default(now()) @db.Timestamptz(6)
-  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
   Booking        Booking      @relation(fields: [bookingId], references: [id])
+  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+model account {
+  id         String   @id
+  accountId  String
+  providerId String
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  @@index([userId])
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  userId    String
+
+  @@index([userId])
+}
+
+model user {
+  id            String      @id
+  name          String
+  email         String      @unique
+  emailVerified Boolean     @default(false)
+  image         String?
+  password      String?
+  phone         String?
+  role          UserRole    @default(BARBER)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime
+  welcomeDiscountClaimed Boolean @default(false)
+  welcomeDiscountUsed    Boolean @default(false)
+  phoneExportedAt       DateTime?
+  Barbershop    Barbershop?
+}
+
+model verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  @@index([identifier])
+}
+
+enum PaymentMethod {
+  MONEY
+  CARD
+  PIX
+  OTHER
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum UserRole {
+  CLIENT
+  BARBER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
 }

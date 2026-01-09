@@ -44,7 +44,8 @@ export default async function Home() {
     <div className="relative min-h-screen">
        <BackgroundVideo 
           src="/background.mp4" 
-          className="scale-[0.88] md:scale-125 transition-transform" // Responsive zoom: 88% on mobile as requested
+          className="scale-100 md:scale-125 transition-transform"
+          videoClassName="object-[25%_center]" // Shifted lateral position to show eye
        />
       <Header />
       <div className="relative z-10">

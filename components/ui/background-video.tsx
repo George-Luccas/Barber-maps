@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 interface BackgroundVideoProps {
   src: string;
   poster?: string;
-  className?: string; // Allow custom classes (e.g., opacity)
+  className?: string; // Container class
+  videoClassName?: string; // Direct video class
 }
 
-export const BackgroundVideo = ({ src, poster, className }: BackgroundVideoProps) => {
+export const BackgroundVideo = ({ src, poster, className, videoClassName }: BackgroundVideoProps) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export const BackgroundVideo = ({ src, poster, className }: BackgroundVideoProps
         muted={true} // React requires explicit boolean sometimes
         playsInline
         poster={poster}
-        className="absolute w-full h-full object-cover"
+        className={`absolute w-full h-full object-cover ${videoClassName}`}
         style={{ opacity: 1 }} // Full opacity, let overlay handle darkening
       >
         <source src={src} type="video/mp4" />

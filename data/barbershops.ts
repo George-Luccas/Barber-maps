@@ -97,3 +97,25 @@ export const getBarbershopsWithStories = async () => {
     // User plan: "Se não houver cortes recentes, mostramos a foto de capa."
     return barbershops;
 };
+export const getBarbershopRanking = async () => {
+  const barbershops = await prisma.barbershop.findMany({
+    include: {
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
+    },
+    orderBy: {
+      bookings: {
+        _count: "desc",
+      },
+    },
+    take: 10,
+  });
+
+  return barbershops.map((b) => ({
+    ...b,
+    bookingsCount: b._count.bookings,
+  }));
+};

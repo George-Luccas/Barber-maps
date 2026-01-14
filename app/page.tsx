@@ -4,7 +4,7 @@ import banner from "@/public/banner.png";
 import BookingItem from "@/components/booking-item";
 import Link from "next/link";
 
-import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
+import { getBarbershops, getPopularBarbershops, getBarbershopRanking } from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
 import BarbershopItem from "@/components/barbershop-item";
 import {
@@ -19,6 +19,7 @@ import MembershipWidget from "@/components/membership-widget";
 import { LocationFilter } from "@/components/location-filter";
 import BarbershopStories from "@/components/barbershop-stories";
 import PromotionsCarousel from "@/components/promotions-carousel";
+import BarbershopRanking from "@/components/barbershop-ranking";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ import { BackgroundVideo } from "@/components/ui/background-video";
 export default async function Home() {
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();
+  const rankingBarbershops = await getBarbershopRanking();
   
   // CORREÇÃO: Inicializamos como vazio para o app carregar enquanto
   // resolvemos a conexão com o banco na função getUserBookings.
@@ -62,6 +64,8 @@ export default async function Home() {
 
         <QuickSearch />
         
+        <BarbershopRanking barbershops={rankingBarbershops as any} />
+
         <div className="mt-6">
            <LocationFilter />
         </div>

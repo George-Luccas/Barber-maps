@@ -1,0 +1,12 @@
+Checking for 'Barbearia Polaco' and its owner...
+-----------------------------------------
+Barbershop: Polaco barbearia 
+ID: 2d3f7137-ef6c-4406-a929-a8a96a19583a
+Manager ID: NONE
+This barbershop HAS NO OWNER assigned in the 'managerId' field.
+-----------------------------------------
+Associated Barbers (3):
+- GEORGE LUCCAS  (Email: N/A)
+- Ray (Email: N/A)
+- Adrian (Email: N/A)
+-----------------------------------------

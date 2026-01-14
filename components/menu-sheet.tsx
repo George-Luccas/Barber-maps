@@ -129,7 +129,7 @@ const MenuSheet = () => {
                 className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-neon-purple"
               >
                 <MessageSquare className="size-4" />
-                Desconto WhatsApp
+                Receba Promoções
               </Link>
             </SheetClose>
           </div>

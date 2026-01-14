@@ -37,8 +37,8 @@ const MembershipWidget = () => {
                     Economize com o Plano Navalha.
                 </p>
             </div>
-            <Button size="sm" variant="secondary" className="text-xs h-8 rounded-full" asChild>
-                <Link href="/settings">Ver Planos</Link>
+            <Button size="sm" variant="secondary" className="text-xs h-8 rounded-full cursor-not-allowed opacity-80 hover:bg-secondary" disabled>
+                Em breve
             </Button>
         </CardContent>
     </Card>

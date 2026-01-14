@@ -47,12 +47,10 @@ const WhatsappDiscountPage = () => {
             </div>
           </div>
           
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Ganhe R$ 5,00 de Desconto</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Receba Promoções</h1>
             <p className="text-muted-foreground">
-              Cadastre seu WhatsApp e ganhe um desconto imediato para o seu próximo agendamento.
+              Insira seu número aqui para receber nossas melhores ofertas.
             </p>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
             <div className="space-y-2">

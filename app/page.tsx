@@ -16,6 +16,9 @@ import {
 import Footer from "@/components/footer";
 import QuickSearch from "@/components/quick-search";
 import MembershipWidget from "@/components/membership-widget";
+import { LocationFilter } from "@/components/location-filter";
+import BarbershopStories from "@/components/barbershop-stories";
+import PromotionsCarousel from "@/components/promotions-carousel";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +53,18 @@ export default async function Home() {
       <Header />
       <div className="relative z-10">
       <PageContainer>
+        <div className="pt-5"> 
+          <h2 className="text-xl font-bold mb-3">Destaques</h2>
+          <BarbershopStories />
+        </div>
+        
+        <PromotionsCarousel />
+
         <QuickSearch />
+        
+        <div className="mt-6">
+           <LocationFilter />
+        </div>
         <MembershipWidget />
 
         {/* RADAR BANNER SECTION */}

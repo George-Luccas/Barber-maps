@@ -10,9 +10,6 @@ async function main() {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    include: {
-      account: true
-    }
   });
 
   if (!user) {

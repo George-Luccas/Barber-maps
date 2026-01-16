@@ -34,12 +34,14 @@ const PromotionsCarousel = () => {
     // Use the image of the first promotion as background, or a default fallback
     const bgImage = promotions[0].imageUrl;
 
+    // Duplicate promotions for seamless infinite loop
+    const marqueePromotions = [...promotions, ...promotions, ...promotions, ...promotions];
+
     return (
-        <div className="w-full mt-4 mb-2 px-5">
+        <div className="w-full mt-4 mb-2 px-5 text-center sm:text-left">
             <h2 className="text-sm font-bold uppercase text-muted-foreground mb-3">Avisos & Promoções</h2>
             
             <div className="relative w-full h-16 rounded-xl overflow-hidden border border-neon-purple/50 shadow-lg bg-black">
-                {/* Background Image with Darkness Overlay */}
                 {/* Warning Pattern Background */}
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-zinc-900 to-black overflow-hidden">
                     <div className="absolute inset-0 opacity-[0.03]" 
@@ -54,19 +56,22 @@ const PromotionsCarousel = () => {
                     </div>
                 </div>
 
-                {/* Scrolling Text */}
-                <div className="absolute inset-0 flex items-center overflow-hidden whitespace-nowrap">
-                   <motion.div 
-                        className="flex gap-10 items-center min-w-full"
-                        animate={{ x: ["100%", "-100%"] }}
-                        transition={{ 
-                            repeat: Infinity, 
-                            duration: 20, 
-                            ease: "linear" 
-                        }}
-                   >
-                        {promotions.map((promo, index) => (
-                             <div key={promo.id} className="flex items-center gap-4 text-neon-purple font-bold text-lg uppercase tracking-wider">
+                {/* Scrolling Text CSS Animation */}
+                <div className="absolute inset-0 flex items-center overflow-hidden">
+                   <style jsx>{`
+                       @keyframes marquee {
+                           0% { transform: translateX(0); }
+                           100% { transform: translateX(-50%); }
+                       }
+                       .animate-marquee {
+                           display: flex;
+                           min-width: 200%;
+                           animation: marquee 30s linear infinite;
+                       }
+                   `}</style>
+                   <div className="animate-marquee flex gap-10 items-center">
+                        {marqueePromotions.map((promo, index) => (
+                             <div key={`${promo.id}-${index}`} className="flex items-center gap-4 text-neon-purple font-bold text-lg uppercase tracking-wider shrink-0">
                                 <span>🚨 {promo.title}</span>
                                 {promo.description && <span className="text-white text-sm font-medium normal-case">- {promo.description}</span>}
                                 {promo.linkUrl && (
@@ -77,8 +82,7 @@ const PromotionsCarousel = () => {
                                 <span className="text-gray-500 mx-4">|</span>
                              </div>
                         ))}
-                         {/* Duplicate for seamless loop if needed, though 100% to -100% usually works for simple marquee */}
-                   </motion.div>
+                   </div>
                 </div>
             </div>
         </div>

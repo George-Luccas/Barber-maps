@@ -72,15 +72,29 @@ export const getUserBookings = async () => {
   const userMap = new Map(users.map((u: any) => [u.id, u]));
 
   // 4. Merge Data
-  const confirmedBookings = confirmedBookingsData.map(booking => ({
-    ...booking,
-    user: userMap.get(booking.userId) || null
-  }));
+  const confirmedBookings = confirmedBookingsData.map(booking => {
+    const user = userMap.get(booking.userId) as any;
+    return {
+      ...booking,
+      user: user ? {
+        id: user.id,
+        name: user.name,
+        image: user.image
+      } : null
+    };
+  });
 
-  const finishedBookings = finishedBookingsData.map(booking => ({
-    ...booking,
-    user: userMap.get(booking.userId) || null
-  }));
+  const finishedBookings = finishedBookingsData.map(booking => {
+     const user = userMap.get(booking.userId) as any;
+     return {
+      ...booking,
+      user: user ? {
+        id: user.id,
+        name: user.name,
+        image: user.image
+      } : null
+    };
+  });
 
   return { confirmedBookings, finishedBookings };
 };

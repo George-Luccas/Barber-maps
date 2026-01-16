@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 const Switch = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & { 
+    checked?: boolean
     onCheckedChange?: (checked: boolean) => void 
   }
 >(({ className, checked: controlledChecked, defaultChecked, onCheckedChange, ...props }, ref) => {

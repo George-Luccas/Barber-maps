@@ -10,7 +10,7 @@ async function main() {
   if (users.length === 0) {
     console.log("No users found in database.");
   } else {
-    console.table(users.map(u => ({ id: u.id, name: u.name, email: u.email })));
+    console.table(users.map((u: any) => ({ id: u.id, name: u.name, email: u.email })));
   }
 }
 

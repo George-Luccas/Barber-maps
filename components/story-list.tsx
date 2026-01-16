@@ -5,9 +5,10 @@ import Image from "next/image";
 import { Barbershop, Style } from "@prisma/client";
 import StoryViewer from "./story-viewer";
 
-// Extended Barbershop type to include Style
-interface BarbershopWithStyles extends Barbershop {
+// Extended Barbershop type to include Style and override dailyGoal as number
+interface BarbershopWithStyles extends Omit<Barbershop, 'dailyGoal'> {
   Style: Style[];
+  dailyGoal: number;
 }
 
 interface StoryListProps {

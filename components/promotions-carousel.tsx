@@ -40,14 +40,18 @@ const PromotionsCarousel = () => {
             
             <div className="relative w-full h-16 rounded-xl overflow-hidden border border-neon-purple/50 shadow-lg bg-black">
                 {/* Background Image with Darkness Overlay */}
-                <div className="absolute inset-0">
-                    <Image 
-                        src={bgImage} 
-                        alt="Background" 
-                        fill 
-                        className="object-cover opacity-40 blur-[2px]" 
+                {/* Warning Pattern Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-zinc-900 to-black overflow-hidden">
+                    <div className="absolute inset-0 opacity-[0.03]" 
+                        style={{ 
+                            backgroundImage: "repeating-linear-gradient(45deg, #fff 0, #fff 10px, transparent 10px, transparent 20px)" 
+                        }} 
                     />
-                    <div className="absolute inset-0 bg-black/60" />
+                    <div className="absolute inset-0 flex items-center justify-around opacity-20">
+                         {Array.from({ length: 15 }).map((_, i) => (
+                             <span key={i} className="text-3xl select-none">⚠️</span>
+                         ))}
+                    </div>
                 </div>
 
                 {/* Scrolling Text */}

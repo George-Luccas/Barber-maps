@@ -57,7 +57,7 @@ export const registerWhatsappDiscount = protectedActionClient
         await authPrisma.user.updateMany({
           where: {
             id: {
-              in: contactsToExport.map((u) => u.id),
+              in: contactsToExport.map((u: any) => u.id),
             },
           },
           data: {

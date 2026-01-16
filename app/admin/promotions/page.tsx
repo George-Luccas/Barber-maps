@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Plus, Trash, ExternalLink, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash, ExternalLink, Image as ImageIcon, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { createPromotion, deletePromotion, getPromotions } from "@/app/_actions/promotions";
 import { authClient } from "@/lib/auth-client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -109,9 +110,17 @@ export default function AdminPromotionsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-            <h1 className="text-3xl font-bold">Gerenciar Promoções</h1>
-            <p className="text-muted-foreground">Adicione banners para a página inicial</p>
+        <div className="space-y-4">
+            <Button variant="outline" size="sm" asChild className="mb-4">
+                <Link href="/admin">
+                    <ArrowLeft className="size-4 mr-2" />
+                    Voltar
+                </Link>
+            </Button>
+            <div>
+                <h1 className="text-3xl font-bold">Gerenciar Promoções</h1>
+                <p className="text-muted-foreground">Adicione banners para a página inicial</p>
+            </div>
         </div>
         
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -135,13 +144,37 @@ export default function AdminPromotionsPage() {
                         <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detalhes da promoção..." />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">URL da Imagem</label>
-                        <Input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://..." />
-                        {imageUrl && (
-                            <div className="relative h-32 w-full rounded-md overflow-hidden border">
-                                <Image src={imageUrl} alt="Preview" fill className="object-cover" />
-                            </div>
-                        )}
+                        <label className="text-sm font-medium">Imagem do Banner</label>
+                        <div className="flex flex-col gap-4">
+                            <Input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            setImageUrl(reader.result as string);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }} 
+                            />
+                            {imageUrl && (
+                                <div className="relative h-32 w-full rounded-md overflow-hidden border">
+                                    <Image src={imageUrl} alt="Preview" fill className="object-cover" />
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-2 right-2 h-6 w-6"
+                                        onClick={() => setImageUrl("")}
+                                    >
+                                        <Trash className="size-3" />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Link de Redirecionamento (Opcional)</label>

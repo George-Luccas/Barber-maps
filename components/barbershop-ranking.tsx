@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import { motion } from "framer-motion";
 import { Crown, TrendingUp } from "lucide-react";
 import Image from "next/image";
@@ -12,9 +14,10 @@ interface BarbershopWithBookings extends Barbershop {
 
 interface BarbershopRankingProps {
   barbershops: BarbershopWithBookings[];
+  city?: string;
 }
 
-const BarbershopRanking = ({ barbershops }: BarbershopRankingProps) => {
+const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
   const top3 = barbershops.slice(0, 3);
   const others = barbershops.slice(3);
 
@@ -88,17 +91,30 @@ const BarbershopRanking = ({ barbershops }: BarbershopRankingProps) => {
     </motion.div>
   );
 
+  const [positions, setPositions] = useState<{top: string, left: string}[]>([]);
+
+  useEffect(() => {
+    // Generate random positions only on the client
+    const newPositions = Array.from({ length: 15 }).map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+    }));
+    setPositions(newPositions);
+  }, []);
+
+  if (barbershops.length === 0) return null;
+
   return (
-    <div className="relative py-4 sm:py-8 overflow-hidden">
-      {/* Integrated Decorative Crowns (Outlines) */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {[...Array(5)].map((_, i) => (
+    <div className="relative p-5">
+      {/* Background Crowns - Client side only positions */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {positions.map((pos, i) => (
           <motion.div
             key={i}
-            className="absolute hidden sm:block" // Hide deep decor on mobile for performance/clutter
+            className="absolute hidden sm:block"
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              top: pos.top,
+              left: pos.left,
             }}
             animate={{
               y: [0, -30, 0],
@@ -121,7 +137,9 @@ const BarbershopRanking = ({ barbershops }: BarbershopRankingProps) => {
 
       <div className="flex items-center gap-2 px-4 sm:px-5 mb-4 sm:mb-6 relative z-10">
         <TrendingUp className="text-neon-purple w-4 h-4 sm:w-5 sm:h-5" />
-        <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">Barbe-Ranking</h2>
+        <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">
+          {city ? `Ranking em ${city}` : "Barbe-Ranking Global"}
+        </h2>
       </div>
 
       <div className="relative z-10 px-4 sm:px-5 space-y-4 sm:space-y-8">

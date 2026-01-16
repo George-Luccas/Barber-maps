@@ -27,4 +27,11 @@ export const auth = betterAuth({
         await sendPasswordResetEmail(data.user.email, data.token);
     },
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+      },
+    },
+  },
 });

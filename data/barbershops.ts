@@ -84,6 +84,11 @@ export const getBarbershopsWithStories = async () => {
         },
         include: {
            Style: {
+               where: {
+                   createdAt: {
+                       gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                   }
+               },
                orderBy: {
                    createdAt: 'desc'
                },
@@ -95,10 +100,22 @@ export const getBarbershopsWithStories = async () => {
     // Filter out barbershops without styles if we strictly want work photos, 
     // or keep them to show cover photo as story.
     // User plan: "Se não houver cortes recentes, mostramos a foto de capa."
-    return barbershops;
+    return barbershops.map(barbershop => ({
+        ...barbershop,
+        dailyGoal: Number(barbershop.dailyGoal)
+    }));
 };
-export const getBarbershopRanking = async () => {
+export const getBarbershopRanking = async (city?: string) => {
+  const where: any = {};
+  if (city) {
+    where.city = {
+      contains: city,
+      mode: "insensitive",
+    };
+  }
+
   const barbershops = await prisma.barbershop.findMany({
+    where,
     include: {
       _count: {
         select: {
@@ -116,6 +133,7 @@ export const getBarbershopRanking = async () => {
 
   return barbershops.map((b) => ({
     ...b,
+    dailyGoal: Number(b.dailyGoal),
     bookingsCount: b._count.bookings,
   }));
 };

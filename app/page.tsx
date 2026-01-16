@@ -25,10 +25,18 @@ export const dynamic = "force-dynamic";
 
 import { BackgroundVideo } from "@/components/ui/background-video";
 
-export default async function Home() {
+interface HomeProps {
+  searchParams: Promise<{
+    city?: string;
+    search?: string;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { city } = await searchParams;
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();
-  const rankingBarbershops = await getBarbershopRanking();
+  const rankingBarbershops = await getBarbershopRanking(city);
   
   // CORREÇÃO: Inicializamos como vazio para o app carregar enquanto
   // resolvemos a conexão com o banco na função getUserBookings.
@@ -64,7 +72,7 @@ export default async function Home() {
 
         <QuickSearch />
         
-        <BarbershopRanking barbershops={rankingBarbershops as any} />
+        <BarbershopRanking barbershops={rankingBarbershops as any} city={city} />
 
         <div className="mt-6">
            <LocationFilter />

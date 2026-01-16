@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getPromotions } from "@/app/_actions/promotions";
-import { Card, CardContent } from "./ui/card";
-import Link from "next/link";
+import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 
 interface Promotion {
@@ -21,8 +20,7 @@ const PromotionsCarousel = () => {
     useEffect(() => {
         const fetchPromotions = async () => {
              try {
-                 const data = await getPromotions(true); // Active only
-                 // Adapt Prisma type if needed, but for now strict matches
+                 const data = await getPromotions(true);
                  setPromotions(data);
              } catch (error) {
                  console.error("Failed to fetch promotions", error);
@@ -33,42 +31,51 @@ const PromotionsCarousel = () => {
 
     if (promotions.length === 0) return null;
 
+    // Use the image of the first promotion as background, or a default fallback
+    const bgImage = promotions[0].imageUrl;
+
     return (
-        <div className="w-full mt-4 mb-2">
-            <h2 className="text-sm font-bold uppercase text-muted-foreground mb-3 px-5">Promoções Imperdíveis</h2>
+        <div className="w-full mt-4 mb-2 px-5">
+            <h2 className="text-sm font-bold uppercase text-muted-foreground mb-3">Avisos & Promoções</h2>
             
-            <div className="flex gap-4 overflow-x-auto px-5 pb-4 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory">
-                 {promotions.map((promo) => (
-                     <div key={promo.id} className="min-w-[85%] sm:min-w-[350px] snap-center">
-                         <div className="relative h-[180px] w-full rounded-2xl overflow-hidden border border-neon-purple/20 shadow-lg group">
-                            <Image 
-                                src={promo.imageUrl} 
-                                alt={promo.title} 
-                                fill 
-                                className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                            />
-                            
-                            {/* Overlay Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col justify-end">
-                                <h3 className="text-lg font-bold text-white leading-tight mb-1">{promo.title}</h3>
-                                {promo.description && (
-                                    <p className="text-xs text-gray-300 line-clamp-2 mb-2">{promo.description}</p>
-                                )}
-                                
+            <div className="relative w-full h-16 rounded-xl overflow-hidden border border-neon-purple/50 shadow-lg bg-black">
+                {/* Background Image with Darkness Overlay */}
+                <div className="absolute inset-0">
+                    <Image 
+                        src={bgImage} 
+                        alt="Background" 
+                        fill 
+                        className="object-cover opacity-40 blur-[2px]" 
+                    />
+                    <div className="absolute inset-0 bg-black/60" />
+                </div>
+
+                {/* Scrolling Text */}
+                <div className="absolute inset-0 flex items-center overflow-hidden whitespace-nowrap">
+                   <motion.div 
+                        className="flex gap-10 items-center min-w-full"
+                        animate={{ x: ["100%", "-100%"] }}
+                        transition={{ 
+                            repeat: Infinity, 
+                            duration: 20, 
+                            ease: "linear" 
+                        }}
+                   >
+                        {promotions.map((promo, index) => (
+                             <div key={promo.id} className="flex items-center gap-4 text-neon-purple font-bold text-lg uppercase tracking-wider">
+                                <span>🚨 {promo.title}</span>
+                                {promo.description && <span className="text-white text-sm font-medium normal-case">- {promo.description}</span>}
                                 {promo.linkUrl && (
-                                    <a 
-                                        href={promo.linkUrl} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="self-start text-[10px] font-bold bg-neon-purple text-white px-3 py-1 rounded-full flex items-center gap-1 hover:bg-neon-purple/80 transition-colors"
-                                    >
-                                        Saiba Mais <ExternalLink className="size-3" />
-                                    </a>
+                                     <a href={promo.linkUrl} target="_blank" className="bg-neon-purple/20 text-xs px-2 py-1 rounded hover:bg-neon-purple/40 transition">
+                                         Ver Mais
+                                     </a>
                                 )}
-                            </div>
-                         </div>
-                     </div>
-                 ))}
+                                <span className="text-gray-500 mx-4">|</span>
+                             </div>
+                        ))}
+                         {/* Duplicate for seamless loop if needed, though 100% to -100% usually works for simple marquee */}
+                   </motion.div>
+                </div>
             </div>
         </div>
     );

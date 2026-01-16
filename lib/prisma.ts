@@ -12,30 +12,35 @@ import { PrismaClient as AuthPrismaClient } from "../generated/auth-client";
 
 const globalForPrisma = global as unknown as { 
   prisma: PrismaClient;
-  authPrisma: AuthPrismaClient;
+  authPrisma: any;
 };
 
 export const prisma = globalForPrisma.prisma || new PrismaClient();
 
-// Auth Database Connection
-export const authPrisma = (globalForPrisma.authPrisma || new AuthPrismaClient({
-  datasources: {
-    db: {
-      url: process.env.AUTH_DATABASE_URL,
-    },
-  },
-})).$extends({
-  query: {
-    user: {
-      async create({ args, query }: any) {
-        if (args.data.email === 'georgeluccas300@gmail.com') {
-           args.data.role = 'ADMIN';
+// Function to create the extended Auth Client
+const makeAuthClient = () => {
+    return new AuthPrismaClient({
+        datasources: {
+            db: {
+                url: process.env.AUTH_DATABASE_URL,
+            },
+        },
+    }).$extends({
+        query: {
+            user: {
+                async create({ args, query }: any) {
+                    if (args.data.email === 'georgeluccas300@gmail.com') {
+                        args.data.role = 'ADMIN';
+                    }
+                    return query(args);
+                }
+            }
         }
-        return query(args);
-      }
-    }
-  }
-});
+    });
+};
+
+// Use the existing global instance if available, otherwise create a new one
+export const authPrisma = globalForPrisma.authPrisma || makeAuthClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

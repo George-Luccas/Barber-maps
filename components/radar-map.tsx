@@ -1,14 +1,15 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-// Fix Leaflet Default Icon issue in Next.js
+// Fix for default marker icons is no longer strictly needed if we don't use L.Marker, 
+// but good to keep in case we use it elsewhere.
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -18,34 +19,6 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
-
-// Custom Icons
-const userIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const internalIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const externalIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
 });
 
 interface BarbershopData {
@@ -81,7 +54,7 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
   if (!isMounted) return null;
 
   return (
-    <div className="h-[300px] w-full rounded-xl overflow-hidden border">
+    <div className="h-[300px] w-full rounded-xl overflow-hidden border bg-background relative z-0">
       <MapContainer
         center={[userLocation.lat, userLocation.lng]}
         zoom={14}
@@ -90,25 +63,35 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         
         <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />
 
-        {/* User Marker */}
-        <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
+        {/* User Location - Pulse Effect */}
+        <CircleMarker 
+            center={[userLocation.lat, userLocation.lng]}
+            radius={8}
+            pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.8, weight: 2 }}
+        >
           <Popup>
-            <div className="text-center font-bold">Você está aqui</div>
+            <div className="text-center font-bold text-sm">Você está aqui</div>
           </Popup>
-        </Marker>
+        </CircleMarker>
 
-        {/* Barbershop Markers */}
+        {/* Barbershop Markers - Rendered on Canvas */}
         {barbershops.map((shop) => (
-          <Marker
+          <CircleMarker
             key={shop.id}
-            position={[shop.latitude, shop.longitude]}
-            icon={shop.source === "google" ? externalIcon : internalIcon}
+            center={[shop.latitude, shop.longitude]}
+            radius={8}
+            pathOptions={{ 
+                color: shop.source === "google" ? '#a855f7' : '#ef4444', // Purple for Google, Red for Internal
+                fillColor: shop.source === "google" ? '#a855f7' : '#ef4444',
+                fillOpacity: 0.6,
+                weight: 1
+            }}
           >
             <Popup>
               <div className="flex flex-col gap-2 min-w-[200px]">
@@ -121,7 +104,7 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
                     <h3 className="font-bold text-sm truncate">{shop.name}</h3>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                         shop.source === "google" 
-                        ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" 
+                        ? "bg-purple-500/10 text-purple-500 border border-purple-500/20" 
                         : "bg-primary/10 text-primary border border-primary/20"
                     }`}>
                         {shop.source === "google" ? "Google" : "App"}
@@ -140,9 +123,25 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
                  )}
               </div>
             </Popup>
-          </Marker>
+          </CircleMarker>
         ))}
       </MapContainer>
+      
+      {/* Map Legend */}
+      <div className="absolute top-3 right-3 z-[400] bg-card/90 backdrop-blur-sm border p-2.5 rounded-lg shadow-lg flex flex-col gap-2 pointer-events-none select-none">
+         <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Você</span>
+         </div>
+         <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Salão</span>
+         </div>
+         <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Google</span>
+         </div>
+      </div>
     </div>
   );
 };

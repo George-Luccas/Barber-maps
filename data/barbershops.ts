@@ -11,14 +11,19 @@ export const getBarbershops = async (props?: GetBarbershopsProps) => {
   const where: any = {};
   if (props?.city) {
       where.city = {
-          contains: props.city,
+          contains: props.city.trim(),
           mode: "insensitive",
       };
   }
-  if (props?.state) where.state = props.state;
+  if (props?.state) {
+      where.state = {
+          contains: props.state.trim(),
+          mode: "insensitive",
+      };
+  }
   if (props?.search) {
       where.name = {
-        contains: props.search,
+        contains: props.search.trim(),
         mode: "insensitive",
       };
   }
@@ -109,7 +114,7 @@ export const getBarbershopRanking = async (city?: string) => {
   const where: any = {};
   if (city) {
     where.city = {
-      contains: city,
+      contains: city.trim(),
       mode: "insensitive",
     };
   }

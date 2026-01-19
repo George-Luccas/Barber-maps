@@ -1,4 +1,31 @@
 
-Total Barbershops: 2
-With State: 0
-With City: 0
+Total Barbershops: 5
+With State: 5
+With City: 5
+[
+  {
+    "name": "George the lux",
+    "city": "Cuiabá",
+    "state": "MT"
+  },
+  {
+    "name": "Polaco barbearia ",
+    "city": "Cuiabá",
+    "state": "MT"
+  },
+  {
+    "name": "adrian Pacheco Barber Shop",
+    "city": "Cuiabá",
+    "state": "MT"
+  },
+  {
+    "name": "George Luccas  Barber Shop",
+    "city": "Cuiabá",
+    "state": "MT"
+  },
+  {
+    "name": "Bárbaros barbearia",
+    "city": "Florianópolis",
+    "state": "SC"
+  }
+]

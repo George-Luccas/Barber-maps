@@ -1,14 +1,13 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BarbershopItem from "@/components/barbershop-item";
-import { getBarbershops, getBarbershopsByServiceName } from "@/data/barbershops";
+import { getBarbershops } from "@/data/barbershops";
 import {
   PageContainer,
   PageSectionContent,
   PageSectionTitle,
 } from "@/components/ui/page";
-
-import { LocationFilter } from "@/components/location-filter";
+import { LocationFilter } from "../_components/location-filter";
 
 interface BarbershopsPageProps {
   searchParams: Promise<{
@@ -20,37 +19,37 @@ interface BarbershopsPageProps {
 
 const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
   const { search, city, state } = await searchParams;
-  
-  // We need to fetch data based on filters. 
-  // If there is a search term, we generally use getBarbershopsByServiceName, 
-  // but we want to filter that result by city/state if provided.
-  // Alternatively, we use getBarbershops and filter by everything.
-  // I will update getBarbershops in data/barbershops.ts to handle 'search' (name) as well, 
-  // so we can use a single function.
-  
-  // For now, I'll assume getBarbershops works with city/state.
-  // I also need to handle the search term manually or update the function.
-  // Let's rely on a unified getBarbershops function.
-  // I need to update data/barbershops.ts first.
-  
+
   const barbershops = await getBarbershops({ 
-      city, 
-      state, 
-      search // Pass search param if I update the function to accept it
+    search,
+    city: city === "all" ? undefined : city,
+    state: state === "all" ? undefined : state,
   });
-  
+
   return (
     <div>
       <Header />
       <PageContainer>
         <PageSectionContent>
           <PageSectionTitle>
-            Resultados {search ? `para "${search}"` : "da busca"}
+             {search ? `Resultados para "${search}"` : "Barbearias"}
           </PageSectionTitle>
           
           <LocationFilter />
 
-          {/* This will be replaced after I refetch the data properly */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {barbershops.map((barbershop) => (
+              <div key={barbershop.id} className="w-full">
+                <BarbershopItem barbershop={barbershop} />
+              </div>
+            ))}
+          </div>
+
+          {barbershops.length === 0 && (
+            <div className="text-center text-gray-400 mt-10">
+              <p>Nenhuma barbearia encontrada com os filtros selecionados.</p>
+            </div>
+          )}
         </PageSectionContent>
       </PageContainer>
       <Footer />

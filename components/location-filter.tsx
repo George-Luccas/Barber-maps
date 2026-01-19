@@ -27,13 +27,9 @@ export const LocationFilter = () => {
     useEffect(() => {
         const fetchLocations = async () => {
             const data = await getLocations();
-            // Cast to any because Prisma types might be lagging in the editor
-            const locationsTyped = data as unknown as Location[];
-            setLocations(locationsTyped);
-            
-            // Extract unique states
-            const states = Array.from(new Set(locationsTyped.map(l => l.state).filter(Boolean))) as string[];
-            setAvailableStates(states.sort());
+            // data is now { states: LocationOption[], cities: Record<string, LocationOption[]> }
+            const states = data.states.map(s => s.value);
+            setAvailableStates(states);
         };
         fetchLocations();
     }, []);

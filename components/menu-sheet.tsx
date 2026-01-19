@@ -12,7 +12,7 @@ import {
   SheetDescription,
 } from "./ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare, Crown } from "lucide-react";
+import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare, Crown, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
@@ -105,6 +105,17 @@ const MenuSheet = () => {
                 Início
               </Link>
             </SheetClose>
+            {isLoggedIn && (
+              <SheetClose asChild>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-3 px-5 py-3 text-sm font-medium"
+                >
+                  <User className="size-4" />
+                  Meu Perfil
+                </Link>
+              </SheetClose>
+            )}
             <SheetClose asChild>
               <Link
                 href="/bookings"

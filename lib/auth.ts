@@ -31,10 +31,10 @@ export const auth = betterAuth({
     },
   },
   password: {
-    hash: async (password) => {
+    hash: async (password: string) => {
       return await hash(password, 10);
     },
-    verify: async (password, hash) => {
+    verify: async (password: string, hash: string) => {
       return await compare(password, hash);
     }, 
   },

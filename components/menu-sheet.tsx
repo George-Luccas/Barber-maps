@@ -148,17 +148,16 @@ const MenuSheet = () => {
               </Link>
             </SheetClose>
 
-            {(session?.user as any)?.role === "ADMIN" && (
-               <SheetClose asChild>
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-500"
-                >
-                  <Crown className="size-4" />
-                  Painel Administrativo
-                </Link>
-              </SheetClose>
-            )}
+            {/* FORCE SHOW ADMIN LINK FOR DEBUGGING */}
+            <SheetClose asChild>
+            <Link
+                href="/admin"
+                className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-red-500"
+            >
+                <Crown className="size-4" />
+                Painel Administrativo
+            </Link>
+            </SheetClose>
           </div>
 
           <div className="border-border border-b" />

@@ -148,8 +148,8 @@ const MenuSheet = () => {
               </Link>
             </SheetClose>
 
-            {/* DEBUG: Role is visible above, this link respects it */}
-            {(session?.user as any)?.role === "ADMIN" && (
+            {/* DEBUG: Role Check Temporarily Disabled */}
+            {/* {(session?.user as any)?.role === "ADMIN" && ( */}
                 <SheetClose asChild>
                 <Link
                     href="/admin"
@@ -159,7 +159,12 @@ const MenuSheet = () => {
                     Painel Administrativo
                 </Link>
                 </SheetClose>
-            )}
+            {/* )} */}
+            
+            {/* DEEP DEBUG */}
+             <div className="px-5 py-2 text-[10px] text-gray-500 font-mono break-all leading-tight">
+                Debug: {JSON.stringify(session?.user)}
+             </div>
           </div>
 
           <div className="border-border border-b" />

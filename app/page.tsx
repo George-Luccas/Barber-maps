@@ -113,6 +113,30 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         </Link>
 
+        {/* FEEDBACK BANNER */}
+        <Link href="/feedback" className="block px-5 mt-6">
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700/50 p-6 flex items-center justify-between hover:border-neon-purple/50 transition-colors group">
+            <div className="flex flex-col gap-2 relative z-10">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <span className="text-2xl">💡</span>
+                Central de Melhorias
+              </h2>
+              <p className="text-sm text-gray-400">
+                Tem alguma <span className="text-neon-purple font-semibold">dica</span>, <span className="text-neon-purple font-semibold">sugestão</span> ou <span className="text-neon-purple font-semibold">crítica</span>?
+                <br />
+                Queremos ouvir você para evoluir a plataforma!
+              </p>
+              <div className="mt-2 text-xs font-bold text-neon-purple uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Enviar Feedback <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </div>
+            {/* Background Decoration */}
+             <div className="absolute right-[-10px] bottom-[-20px] opacity-10 group-hover:opacity-20 transition-opacity rotate-[-12deg]">
+               <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+        </Link>
+
         {/* Agora esta parte está protegida e não quebra o app */}
         {confirmedBookings.length > 0 && (
           <PageSectionContent>

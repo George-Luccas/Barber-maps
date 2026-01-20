@@ -226,6 +226,7 @@ model user {
   welcomeDiscountUsed    Boolean @default(false)
   phoneExportedAt       DateTime?
   Barbershop    Barbershop?
+  PlatformFeedback PlatformFeedback[]
 }
 
 model verification {
@@ -272,4 +273,20 @@ model Promotion {
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model PlatformFeedback {
+  id        String       @id @default(uuid())
+  userId    String?
+  type      FeedbackType @default(OTHER)
+  message   String
+  createdAt DateTime     @default(now())
+  user      user?        @relation(fields: [userId], references: [id])
+}
+
+enum FeedbackType {
+  BUG
+  SUGGESTION
+  COMPLAIMENT
+  OTHER
 }

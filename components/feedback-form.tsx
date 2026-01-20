@@ -55,7 +55,8 @@ export function FeedbackForm() {
             toast.success("Feedback enviado com sucesso! Obrigado.");
             form.reset();
         } else {
-            toast.error("Erro ao enviar feedback. Tente novamente.");
+            // Show the actual error message returned from server for debugging
+            toast.error(`Erro: ${result.error || "Erro ao enviar feedback. Tente novamente."}`);
         }
     } catch (error) {
         console.error(error);

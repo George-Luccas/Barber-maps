@@ -8,6 +8,11 @@ import { revalidatePath } from "next/cache";
 
 export async function submitFeedback(data: { type: string; message: string }) {
     try {
+        // Safe check for DB URL to debug connection issues
+        if (!process.env.DATABASE_URL) {
+            throw new Error("DATABASE_URL is not defined");
+        }
+
         let userId: string | null = null;
         try {
             const session = await auth.api.getSession({
@@ -17,6 +22,8 @@ export async function submitFeedback(data: { type: string; message: string }) {
         } catch (authError) {
              console.error("Auth session check failed, proceeding as anonymous:", authError);
         }
+
+        console.log(`Submitting feedback for user: ${userId || 'anonymous'}, type: ${data.type}`);
 
         await prisma.platformFeedback.create({
             data: {
@@ -29,8 +36,9 @@ export async function submitFeedback(data: { type: string; message: string }) {
         return { success: true };
     } catch (error) {
         console.error("FULL ERROR DETAILS:", JSON.stringify(error, null, 2));
-        console.error("Error message:", (error as Error).message);
-        return { success: false, error: "Failed to submit feedback" };
+        const errorMessage = (error as Error).message || "Unknown error occurred";
+        console.error("Error message:", errorMessage);
+        return { success: false, error: errorMessage };
     }
 }
 

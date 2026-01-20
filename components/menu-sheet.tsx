@@ -70,6 +70,10 @@ const MenuSheet = () => {
                   <span className="text-muted-foreground text-sm">
                     {session.user.email}
                   </span>
+                  {/* DEBUG: Show Role */}
+                  <span className="text-[10px] text-neon-purple font-mono">
+                    Role: {(session.user as any).role || "Sem role"}
+                  </span>
                 </div>
               </div>
             ) : (

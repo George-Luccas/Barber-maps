@@ -1,5 +1,6 @@
 // Data Access Layer
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 interface GetBarbershopsProps {
   city?: string;
@@ -8,67 +9,99 @@ interface GetBarbershopsProps {
 }
 
 export const getBarbershops = async (props?: GetBarbershopsProps) => {
-  const where: any = {};
-  if (props?.city) {
-      where.city = {
-          contains: props.city.trim(),
-          mode: "insensitive",
-      };
-  }
-  if (props?.state) {
-      where.state = {
-          contains: props.state.trim(),
-          mode: "insensitive",
-      };
-  }
-  if (props?.search) {
-      where.name = {
-        contains: props.search.trim(),
-        mode: "insensitive",
-      };
-  }
+    const cacheKey = ["barbershops", JSON.stringify(props)];
+    
+    return await unstable_cache(
+        async () => {
+             const where: any = {};
+            if (props?.city) {
+                where.city = {
+                    contains: props.city.trim(),
+                    mode: "insensitive",
+                };
+            }
+            if (props?.state) {
+                where.state = {
+                    contains: props.state.trim(),
+                    mode: "insensitive",
+                };
+            }
+            if (props?.search) {
+                where.name = {
+                    contains: props.search.trim(),
+                    mode: "insensitive",
+                };
+            }
 
-  const barbershops = await prisma.barbershop.findMany({
-    where,
-  });
-  return barbershops;
+            const barbershops = await prisma.barbershop.findMany({
+                where,
+            });
+            return barbershops;
+        },
+        cacheKey,
+        {
+            revalidate: 3600, // 1 hour
+            tags: ["barbershops"]
+        }
+    )();
 };
 
 export const getAvailableLocations = async () => {
-   const barbershops = await prisma.barbershop.findMany({
-    select: {
-      city: true,
-      state: true,
-    },
-    distinct: ['city', 'state'],
-   });
-   return barbershops.filter(b => b.city && b.state);
+    // Cache available locations as they rarely change
+    return await unstable_cache(
+        async () => {
+            const barbershops = await prisma.barbershop.findMany({
+                select: {
+                city: true,
+                state: true,
+                },
+                distinct: ['city', 'state'],
+            });
+            return barbershops.filter(b => b.city && b.state);
+        },
+        ["available-locations"],
+        { revalidate: 86400 } // 24 hours
+    )();
 };
 
 export const getPopularBarbershops = async () => {
-  const popularBarbershops = await prisma.barbershop.findMany({
-    orderBy: {
-      name: "desc",
-    },
-  });
-  return popularBarbershops;
+  return await unstable_cache(
+      async () => {
+        const popularBarbershops = await prisma.barbershop.findMany({
+            orderBy: {
+            name: "desc",
+            },
+        });
+        return popularBarbershops;
+      },
+      ["popular-barbershops"],
+      { revalidate: 3600 }
+  )();
 };
 
 export const getBarbershopById = async (id: string) => {
-  const barbershop = await prisma.barbershop.findUnique({
-    where: { id },
-    include: {
-      services: true,
-      Style: true,
-      BarbershopProduct: true,
-      Barber: true,
-    },
-  });
-  return barbershop;
+    // Ideally this could be cached too, but booking availability needs to be fresh.
+    // We will cache independent of booking slots for now.
+    return await unstable_cache(
+        async () => {
+            const barbershop = await prisma.barbershop.findUnique({
+                where: { id },
+                include: {
+                services: true,
+                Style: true,
+                BarbershopProduct: true,
+                Barber: true,
+                },
+            });
+            return barbershop;
+        },
+        [`barbershop-${id}`],
+        { revalidate: 3600 }
+    )();
 };
 
 export const getBarbershopsByServiceName = async (serviceName: string) => {
-  const barbershops = await prisma.barbershop.findMany({
+  return await prisma.barbershop.findMany({
     where: {
       services: {
         some: {
@@ -80,65 +113,74 @@ export const getBarbershopsByServiceName = async (serviceName: string) => {
       },
     },
   });
-  return barbershops;
 };
 export const getBarbershopsWithStories = async () => {
-    const barbershops = await prisma.barbershop.findMany({
-        orderBy: {
-            name: "asc", 
+    // Stories update often, cache for less time or not at all? Let's cache for 1 hour.
+    return await unstable_cache(
+        async () => {
+            const barbershops = await prisma.barbershop.findMany({
+                orderBy: {
+                    name: "asc", 
+                },
+                include: {
+                    Style: {
+                        where: {
+                            createdAt: {
+                                gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                            }
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        take: 5 
+                    }
+                },
+                take: 10 // Limit stories to 10 barbershops for now
+            });
+            return barbershops.map(barbershop => ({
+                ...barbershop,
+                dailyGoal: Number(barbershop.dailyGoal)
+            }));
         },
-        include: {
-           Style: {
-               where: {
-                   createdAt: {
-                       gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                   }
-               },
-               orderBy: {
-                   createdAt: 'desc'
-               },
-               take: 5 
-           }
-        },
-        take: 10 // Limit stories to 10 barbershops for now
-    });
-    // Filter out barbershops without styles if we strictly want work photos, 
-    // or keep them to show cover photo as story.
-    // User plan: "Se não houver cortes recentes, mostramos a foto de capa."
-    return barbershops.map(barbershop => ({
-        ...barbershop,
-        dailyGoal: Number(barbershop.dailyGoal)
-    }));
+        ["barbershops-stories"],
+        { revalidate: 3600 }
+    )();
 };
 export const getBarbershopRanking = async (city?: string) => {
-  const where: any = {};
-  if (city) {
-    where.city = {
-      contains: city.trim(),
-      mode: "insensitive",
-    };
-  }
+    return await unstable_cache(
+        async () => {
+            const where: any = {};
+            if (city) {
+                where.city = {
+                contains: city.trim(),
+                mode: "insensitive",
+                };
+            }
 
-  const barbershops = await prisma.barbershop.findMany({
-    where,
-    include: {
-      _count: {
-        select: {
-          bookings: true,
+            const barbershops = await prisma.barbershop.findMany({
+                where,
+                include: {
+                _count: {
+                    select: {
+                    bookings: true,
+                    },
+                },
+                },
+                orderBy: {
+                bookings: {
+                    _count: "desc",
+                },
+                },
+                take: 10,
+            });
+
+            return barbershops.map((b) => ({
+                ...b,
+                dailyGoal: Number(b.dailyGoal),
+                bookingsCount: b._count.bookings,
+            }));
         },
-      },
-    },
-    orderBy: {
-      bookings: {
-        _count: "desc",
-      },
-    },
-    take: 10,
-  });
-
-  return barbershops.map((b) => ({
-    ...b,
-    dailyGoal: Number(b.dailyGoal),
-    bookingsCount: b._count.bookings,
-  }));
+        ["barbershop-ranking", city || "all"], // Cache key depends on city
+        { revalidate: 3600 }
+    )();
 };

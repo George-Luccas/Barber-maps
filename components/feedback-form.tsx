@@ -28,9 +28,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  type: z.enum(["BUG", "SUGGESTION", "COMPLAIMENT", "OTHER"], {
-    required_error: "Selecione o tipo de feedback.",
-  }),
+  type: z.enum(["BUG", "SUGGESTION", "COMPLAIMENT", "OTHER"]),
   message: z.string().min(10, {
     message: "A mensagem deve ter pelo menos 10 caracteres.",
   }).max(1000, {

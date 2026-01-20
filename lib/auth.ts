@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { authPrisma } from "./prisma";
 import { sendPasswordResetEmail } from "./email";
+import { hash, compare } from "bcryptjs";
 // import removed: emailPassword not needed
 
 export const auth = betterAuth({
@@ -9,6 +10,8 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   timeout: 30000, // Increase connection timeout
+  baseURL: process.env.NEXT_PUBLIC_APP_URL, 
+  basePath: "/api/auth",
   trustedOrigins: [
     "https://*.vercel.app", // Allow all Vercel subdomains (Preview & Prod)
     "https://barber-maps.vercel.app",
@@ -26,6 +29,14 @@ export const auth = betterAuth({
         // data object likely contains { user, url, token }
         await sendPasswordResetEmail(data.user.email, data.token);
     },
+  },
+  password: {
+    hash: async (password) => {
+      return await hash(password, 10);
+    },
+    verify: async (password, hash) => {
+      return await compare(password, hash);
+    }, 
   },
   user: {
     additionalFields: {

@@ -51,7 +51,8 @@ export const auth = betterAuth({
             ...session,
             user: {
                 ...session.user,
-                // @ts-expect-error - role exists in prisma type but might not be inferred here
+                // role exists in prisma user type
+
                 role: user.role
             }
         }

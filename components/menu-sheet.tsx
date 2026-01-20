@@ -70,10 +70,6 @@ const MenuSheet = () => {
                   <span className="text-muted-foreground text-sm">
                     {session.user.email}
                   </span>
-                  {/* DEBUG: Show Role */}
-                  <span className="text-[10px] text-neon-purple font-mono">
-                    Role: {(session.user as any).role || "Sem role"}
-                  </span>
                 </div>
               </div>
             ) : (
@@ -148,8 +144,8 @@ const MenuSheet = () => {
               </Link>
             </SheetClose>
 
-            {/* DEBUG: Role Check Temporarily Disabled */}
-            {/* {(session?.user as any)?.role === "ADMIN" && ( */}
+            {/* Painel Administrativo - Apenas Admins */}
+            {(session?.user as any)?.role === "ADMIN" && (
                 <SheetClose asChild>
                 <Link
                     href="/admin"
@@ -159,12 +155,7 @@ const MenuSheet = () => {
                     Painel Administrativo
                 </Link>
                 </SheetClose>
-            {/* )} */}
-            
-            {/* DEEP DEBUG */}
-             <div className="px-5 py-2 text-[10px] text-gray-500 font-mono break-all leading-tight">
-                Debug: {JSON.stringify(session?.user)}
-             </div>
+            )}
           </div>
 
           <div className="border-border border-b" />

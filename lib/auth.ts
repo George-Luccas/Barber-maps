@@ -45,4 +45,16 @@ export const auth = betterAuth({
       },
     },
   },
+  callbacks: {
+    async session({ session, user }) {
+        return {
+            ...session,
+            user: {
+                ...session.user,
+                // @ts-expect-error - role exists in prisma type but might not be inferred here
+                role: user.role
+            }
+        }
+    }
+  }
 });

@@ -30,6 +30,9 @@ export default function RootLayout({
   return (
     // O suppressHydrationWarning deve ficar aqui na tag <html>
     <html lang="pt-br" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body
         className={`${plusJakartaSans.variable} ${merriweather.variable} antialiased`}
         suppressHydrationWarning

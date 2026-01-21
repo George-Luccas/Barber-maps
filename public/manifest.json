@@ -1,0 +1,17 @@
+{
+  "short_name": "BarberMaps",
+  "name": "Barber Maps: Agendamentos",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000",
+  "description": "Os melhores agendamentos na palma da sua mão."
+}

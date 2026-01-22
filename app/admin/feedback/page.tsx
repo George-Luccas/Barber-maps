@@ -17,6 +17,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { DeleteFeedbackButton } from "@/components/admin/delete-feedback-button";
+import { ExportPdfButton } from "@/components/admin/export-pdf-button";
 
 export const dynamic = 'force-dynamic'; // Ensure realtime data
 
@@ -47,9 +49,12 @@ export default async function AdminFeedbackPage() {
     <>
       <Header />
       <div className="container mx-auto py-10 px-4 space-y-8">
-        <div>
-            <h1 className="text-3xl font-bold tracking-tight">Relatório de Feedbacks</h1>
-            <p className="text-muted-foreground">Visualize e gerencie os comentários dos usuários.</p>
+        <div className="flex items-center justify-between">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Relatório de Feedbacks</h1>
+                <p className="text-muted-foreground">Visualize e gerencie os comentários dos usuários.</p>
+            </div>
+            <ExportPdfButton data={feedbacks} />
         </div>
 
         {/* Metrics */}
@@ -87,12 +92,13 @@ export default async function AdminFeedbackPage() {
                             <TableHead>Tipo</TableHead>
                             <TableHead>Usuário</TableHead>
                             <TableHead>Mensagem</TableHead>
+                            <TableHead className="w-[100px]">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {feedbacks.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
+                                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
                                     Nenhum feedback encontrado.
                                 </TableCell>
                             </TableRow>
@@ -114,6 +120,9 @@ export default async function AdminFeedbackPage() {
                                 </TableCell>
                                 <TableCell className="max-w-md break-words">
                                     {item.message}
+                                </TableCell>
+                                <TableCell>
+                                    <DeleteFeedbackButton id={item.id} />
                                 </TableCell>
                             </TableRow>
                         ))}

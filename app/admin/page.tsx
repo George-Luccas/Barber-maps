@@ -9,7 +9,8 @@ import {
   DollarSign, 
   BarChart3, 
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -57,6 +58,14 @@ export default function AdminDashboard() {
       href: "/admin/analytics", // Placeholder route
       color: "text-pink-500",
       bgColor: "bg-pink-500/10"
+    },
+    {
+      title: "Feedbacks",
+      description: "Sugestões e bugs reportados",
+      icon: MessageSquare,
+      href: "/admin/feedback",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10"
     },
     {
       title: "Configurações",

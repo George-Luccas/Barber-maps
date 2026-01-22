@@ -25,11 +25,22 @@ export async function submitFeedback(data: { type: string; message: string }) {
 
         console.log(`Submitting feedback for user: ${userId || 'anonymous'}, type: ${data.type}`);
 
+        if (userId) {
+            const userExists = await prisma.user.findUnique({
+                where: { id: userId }
+            });
+
+            if (!userExists) {
+                console.error(`Session valid but User ID ${userId} not found in DB.`);
+                throw new Error("Usuário da sessão não encontrado. Por favor, faça login novamente.");
+            }
+        }
+
         await prisma.platformFeedback.create({
             data: {
-                type: data.type as any, // Cast to enum
+                type: data.type as any,
                 message: data.message,
-                userId: userId || null,
+                userId: userId,
             }
         });
 
@@ -80,5 +91,29 @@ export async function getFeedbacks() {
     } catch (error) {
         console.error("Error fetching feedbacks:", error);
         return [];
+    }
+}
+
+export async function deleteFeedback(id: string) {
+    try {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        await prisma.platformFeedback.delete({
+            where: {
+                id
+            }
+        });
+        
+        revalidatePath("/admin/feedback");
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting feedback:", error);
+        return { success: false, error: "Failed to delete feedback" };
     }
 }

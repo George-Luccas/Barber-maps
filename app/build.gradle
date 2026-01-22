@@ -21,11 +21,11 @@ plugins {
 }
 
 def twaManifest = [
-    applicationId: 'com.barbermaps.app',
+    applicationId: 'br.com.barbermaps.twa',
     hostName: 'barbermaps.com.br', // The domain being opened in the TWA.
     launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
     name: 'Barber Maps', // The application name.
-    launcherName: 'barbberMaps', // The name shown on the Android Launcher.
+    launcherName: 'BarberMaps', // The name shown on the Android Launcher.
     themeColor: '#000000', // The color used for the status bar.
     themeColorDark: '#000000', // The color used for the dark status bar.
     navigationColor: '#000000', // The color used for the navigation bar.
@@ -52,9 +52,9 @@ def twaManifest = [
 
 android {
     compileSdkVersion 36
-    namespace "com.barbermaps.app"
+    namespace "br.com.barbermaps.twa"
     defaultConfig {
-        applicationId "com.barbermaps.app"
+        applicationId "br.com.barbermaps.twa"
         minSdkVersion 21
         targetSdkVersion 35
         versionCode 1
@@ -76,12 +76,12 @@ android {
             // The URL the Web Manifest for the Progressive Web App that the TWA points to. This
             // is used by Chrome OS and Meta Quest to open the Web version of the PWA instead of
             // the TWA, as it will probably give a better user experience for non-mobile devices.
-            resValue "string", "webManifestUrl", 'http://localhost:3000/manifest.json'
+            resValue "string", "webManifestUrl", 'https://barbermaps.com.br/manifest.json'
         
 
         
             // This is used by Meta Quest.
-            resValue "string", "fullScopeUrl", 'http://localhost:3000/'
+            resValue "string", "fullScopeUrl", 'https://barbermaps.com.br/'
         
 
         

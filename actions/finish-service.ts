@@ -48,7 +48,7 @@ export const finishService = protectedActionClient
          return { message: "Crédito já foi descontado para este agendamento." };
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
         // Decrement Balance
         await tx.subscription.update({
             where: { id: subscription.id },

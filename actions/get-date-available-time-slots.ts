@@ -81,7 +81,7 @@ export const getDateAvailableTimeSlots = actionClient
 
         // Count bookings per time slot
         const occupiedCount: Record<string, number> = {};
-        bookings.forEach((booking) => {
+        bookings.forEach((booking: any) => {
           const slot = timeFormatter.format(booking.date);
           occupiedCount[slot] = (occupiedCount[slot] || 0) + 1;
         });

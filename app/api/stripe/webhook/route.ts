@@ -1,4 +1,4 @@
-import { authPrisma, prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import z from "zod";
@@ -84,7 +84,7 @@ export const POST = async (request: Request) => {
     });
     
     if (metadata.appliedDiscount === "500") {
-      await authPrisma.user.update({
+      await prisma.user.update({
         where: { id: metadata.userId },
         data: { welcomeDiscountUsed: true } as any,
       });

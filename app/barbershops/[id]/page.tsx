@@ -10,10 +10,18 @@ import CopyButton from "./_components/copy-button";
 import BarbershopMap from "@/components/barbershop-map";
 import { Badge } from "@/components/ui/badge";
 import Minibar from "./_components/minibar";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getLoyaltyCard } from "@/app/_actions/loyalty";
+import { LoyaltyCard } from "@/components/loyalty-card";
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   const { id } = await params;
   const barbershop = await getBarbershopById(id);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
 
   if (!barbershop) {
     notFound();
@@ -109,6 +117,18 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
         <div className="py-6">
           <div className="bg-border h-px w-full" />
         </div>
+
+        {/* Loyalty Card */}
+        {session?.user && (
+            <div className="px-5 pb-6">
+                <LoyaltyCard 
+                    currentPoints={loyaltyCard?.currentPoints || 0}
+                    freeCuts={loyaltyCard?.freeCuts || 0}
+                    tier={loyaltyCard?.tier || "BRONZE"}
+                    totalLifetimePoints={loyaltyCard?.totalLifetimePoints || 0}
+                />
+            </div>
+        )}
 
         {/* Serviços */}
         <div className="flex flex-col gap-3 px-5">

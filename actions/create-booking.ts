@@ -7,7 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { isPast } from "date-fns";
 import { isServiceEligibleForPlan } from "@/lib/utils";
 
-import { authPrisma } from "@/lib/prisma";
+// import { authPrisma } from "@/lib/prisma"; // Removed
+import { incrementLoyalty } from "@/app/_actions/loyalty";
 
 // This schema is used to validate input from client.
 const inputSchema = z.object({
@@ -108,7 +109,7 @@ export const createBooking = protectedActionClient
 
     // Check for Welcome Discount
     let isWelcomeDiscount = false;
-    const dbUser = await authPrisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
         where: { id: user.id }
     });
 
@@ -136,11 +137,14 @@ export const createBooking = protectedActionClient
     });
 
     if (isWelcomeDiscount) {
-        await authPrisma.user.update({
+        await prisma.user.update({
             where: { id: user.id },
             data: { welcomeDiscountUsed: true } as any
         });
     }
+
+    // Increment loyalty card immediately
+    await incrementLoyalty(booking.id);
 
     return booking;
   });

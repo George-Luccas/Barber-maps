@@ -1,12 +1,12 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { authPrisma } from "./prisma";
+import { prisma } from "./prisma";
 import { sendPasswordResetEmail } from "./email";
 import { hash, compare } from "bcryptjs";
 // import removed: emailPassword not needed
 
 export const auth = betterAuth({
-  database: prismaAdapter(authPrisma, {
+  database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
   timeout: 30000, // Increase connection timeout

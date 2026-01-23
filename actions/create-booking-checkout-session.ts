@@ -3,7 +3,7 @@
 import { protectedActionClient } from "@/lib/action-client";
 import z from "zod";
 import Stripe from "stripe";
-import { authPrisma, prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { returnValidationErrors } from "next-safe-action";
 import { isPast } from "date-fns";
 
@@ -55,7 +55,7 @@ export const createBookingCheckoutSession = protectedActionClient
     }
 
 
-    const dbUser = (await authPrisma.user.findUnique({
+    const dbUser = (await prisma.user.findUnique({
       where: { id: user.id },
     })) as any;
 

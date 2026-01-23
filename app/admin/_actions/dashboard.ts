@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma, authPrisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
 // --- Barbershops ---
@@ -36,7 +36,7 @@ export async function deleteBarbershop(id: string) {
 
 // --- Users ---
 export async function getAdminUsers(limit = 50) {
-    const users = await authPrisma.user.findMany({
+    const users = await prisma.user.findMany({
         take: limit,
         orderBy: { createdAt: "desc" },
         select: {
@@ -84,7 +84,7 @@ export async function getAdminFinancials() {
 // --- Analytics ---
 export async function getAdminAnalytics() {
     const totalBookings = await prisma.booking.count();
-    const totalUsers = await authPrisma.user.count();
+    const totalUsers = await prisma.user.count();
     const totalBarbershops = await prisma.barbershop.count();
 
     const topBarbershops = await prisma.barbershop.findMany({

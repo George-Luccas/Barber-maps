@@ -16,7 +16,7 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
   return (
     <Link
       href={`/barbershops/${barbershop.id}`}
-      className="relative min-h-[200px] min-w-[290px] rounded-xl group transition-all duration-300 hover:scale-[1.02] border border-transparent dark:hover:border-neon-purple dark:hover:shadow-neon-purple/40"
+      className="block relative w-full h-[180px] rounded-xl group transition-all duration-300 hover:scale-[1.02] border border-transparent dark:hover:border-neon-purple dark:hover:shadow-neon-purple/40 overflow-hidden"
     >
       <div className="absolute top-0 left-0 z-10 h-full w-full rounded-lg bg-linear-to-t from-black to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
       <Image

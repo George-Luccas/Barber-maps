@@ -37,6 +37,7 @@ model Barbershop {
   FinancialTransaction FinancialTransaction[]
   StockItem            StockItem[]
   Style                Style[]
+  LoyaltyCards         LoyaltyCard[]
 }
 
 model BarbershopService {
@@ -45,6 +46,7 @@ model BarbershopService {
   description  String
   imageUrl     String
   priceInCents Int
+  points       Int        @default(10) // New field for Loyalty 2.0
   barbershopId String
   deletedAt    DateTime?
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
@@ -57,6 +59,7 @@ model Booking {
   barbershopId   String
   serviceId      String
   userId         String
+  status         BookingStatus     @default(CONFIRMED)
   date           DateTime          @db.Timestamptz(6)
   cancelledAt    DateTime?         @db.Timestamptz(6)
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
@@ -189,26 +192,38 @@ model UsageLog {
   Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 }
 
-model account {
-  id         String   @id
-  accountId  String
-  providerId String
-  userId     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  @@index([userId])
+  @@map("account")
 }
 
-model session {
+model Session {
   id        String   @id
   expiresAt DateTime
   token     String   @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
   userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@map("session")
 }
 
 model user {
@@ -221,23 +236,31 @@ model user {
   phone         String?
   role          UserRole    @default(BARBER)
   createdAt     DateTime    @default(now())
-  updatedAt     DateTime
+  updatedAt     DateTime    @updatedAt
   welcomeDiscountClaimed Boolean @default(false)
   welcomeDiscountUsed    Boolean @default(false)
   phoneExportedAt       DateTime?
+  
+  accounts      Account[]
+  sessions      Session[]
+  
   Barbershop    Barbershop?
   PlatformFeedback PlatformFeedback[]
+  LoyaltyCards     LoyaltyCard[]
+
+  @@map("user") // Optional: map to "user" table if you want to keep lowercase table names like in auth.prisma, or stick to default. Auth prisma used @@map("user"). Let's keep it consistent if possible, though strict PascalCase is standard in Prisma. The auth.prisma had @@map("user"). schema.prisma has model user (lowercase). Let's keep model user as is but ensure relationships are correct.
 }
 
-model verification {
+model Verification {
   id         String   @id
   identifier String
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime
+  updatedAt  DateTime @updatedAt
 
   @@index([identifier])
+  @@map("verification")
 }
 
 enum PaymentMethod {
@@ -289,4 +312,36 @@ enum FeedbackType {
   SUGGESTION
   COMPLAIMENT
   OTHER
+}
+
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum LoyaltyTier {
+  BRONZE
+  SILVER
+  GOLD
+}
+
+model LoyaltyCard {
+  id                String      @id @default(uuid())
+  userId            String
+  barbershopId      String
+  completedCuts     Int         @default(0) // Deprecated: Will be migrated to currentPoints
+  currentPoints     Int         @default(0) // New: Points progress (Target 100)
+  totalLifetimePoints Int       @default(0) // New: Total points ever earned
+  freeCuts          Int         @default(0)
+  tier              LoyaltyTier @default(BRONZE)
+  createdAt         DateTime    @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  user       user       @relation(fields: [userId], references: [id])
+  barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, barbershopId])
 }

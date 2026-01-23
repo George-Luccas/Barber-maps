@@ -40,7 +40,7 @@ export const getBarbershops = async (props?: GetBarbershopsProps) => {
         },
         cacheKey,
         {
-            revalidate: 3600, // 1 hour
+            revalidate: 1, // Force refresh
             tags: ["barbershops"]
         }
     )();

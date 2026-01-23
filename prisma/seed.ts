@@ -1,12 +1,6 @@
-import 'dotenv/config';
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 
-import { Pool } from "pg";
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function seedDatabase() {
   try {
@@ -80,6 +74,7 @@ async function seedDatabase() {
         name: "Corte de Cabelo",
         description: "Estilo personalizado com as últimas tendências.",
         price: 60.0,
+        points: 10,
         imageUrl:
           "https://utfs.io/f/0ddfbd26-a424-43a0-aaf3-c3f1dc6be6d1-1kgxo7.png",
       },
@@ -87,6 +82,7 @@ async function seedDatabase() {
         name: "Barba",
         description: "Modelagem completa para destacar sua masculinidade.",
         price: 40.0,
+        points: 5,
         imageUrl:
           "https://utfs.io/f/e6bdffb6-24a9-455b-aba3-903c2c2b5bde-1jo6tu.png",
       },
@@ -94,6 +90,7 @@ async function seedDatabase() {
         name: "Pézinho",
         description: "Acabamento perfeito para um visual renovado.",
         price: 35.0,
+        points: 2,
         imageUrl:
           "https://utfs.io/f/8a457cda-f768-411d-a737-cdb23ca6b9b5-b3pegf.png",
       },
@@ -101,6 +98,7 @@ async function seedDatabase() {
         name: "Sobrancelha",
         description: "Expressão acentuada com modelagem precisa.",
         price: 20.0,
+        points: 2,
         imageUrl:
           "https://utfs.io/f/2118f76e-89e4-43e6-87c9-8f157500c333-b0ps0b.png",
       },
@@ -108,6 +106,7 @@ async function seedDatabase() {
         name: "Massagem",
         description: "Relaxe com uma massagem revigorante.",
         price: 50.0,
+        points: 5,
         imageUrl:
           "https://utfs.io/f/c4919193-a675-4c47-9f21-ebd86d1c8e6a-4oen2a.png",
       },
@@ -115,6 +114,7 @@ async function seedDatabase() {
         name: "Hidratação",
         description: "Hidratação profunda para cabelo e barba.",
         price: 25.0,
+        points: 5,
         imageUrl:
           "https://utfs.io/f/8a457cda-f768-411d-a737-cdb23ca6b9b5-b3pegf.png",
       },
@@ -149,6 +149,7 @@ async function seedDatabase() {
             name: service.name,
             description: service.description,
             priceInCents: service.price * 100,
+            points: service.points,
             barbershop: {
               connect: {
                 id: barbershop.id,

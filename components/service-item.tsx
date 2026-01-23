@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { formatCurrency, isServiceEligibleForPlan } from "@/lib/utils";
@@ -33,6 +34,7 @@ interface ServiceItemProps {
 }
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+  const router = useRouter();
   const [selectedBarberId, setSelectedBarberId] = useState<string | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
@@ -99,6 +101,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedTime(undefined);
     setSelectedBarberId(undefined);
     setPaymentMethod("MONEY"); // Reset
+    
+    router.refresh();
   };
 
   const isOpen = barbershop.isOpen ?? true;

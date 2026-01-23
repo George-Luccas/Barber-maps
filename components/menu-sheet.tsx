@@ -12,7 +12,7 @@ import {
   SheetDescription,
 } from "./ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare, Crown, User } from "lucide-react";
+import { MenuIcon, Home, CalendarDays, LogOut, LogIn, MapPin, MessageSquare, Crown, User, Gift } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
@@ -132,6 +132,15 @@ const MenuSheet = () => {
               >
                 <Crown className="size-4 text-primary" />
                 Planos e Assinatura
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                href="/loyalty"
+                className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-emerald-500"
+              >
+                <Gift className="size-4" />
+                Minha Fidelidade
               </Link>
             </SheetClose>
             <SheetClose asChild>

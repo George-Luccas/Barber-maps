@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { protectedActionClient } from "@/lib/action-client";
-import { authPrisma, prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { sendContactsExportEmail } from "@/lib/email";
 
 const inputSchema = z.object({
@@ -13,7 +13,7 @@ export const registerWhatsappDiscount = protectedActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { phone }, ctx: { user } }) => {
     // Verificar se o usuário já resgatou o desconto
-    const dbUser = (await authPrisma.user.findUnique({
+    const dbUser = (await prisma.user.findUnique({
       where: { id: user.id },
     })) as any;
 
@@ -22,7 +22,7 @@ export const registerWhatsappDiscount = protectedActionClient
     }
 
     // Verificar se o número já existe (requisito: sem repetir números)
-    const existingPhone = await authPrisma.user.findFirst({
+    const existingPhone = await prisma.user.findFirst({
       where: {
         phone: phone,
       },
@@ -33,7 +33,7 @@ export const registerWhatsappDiscount = protectedActionClient
     }
 
     // Atualizar o usuário com o telefone e marcar o desconto como resgatado
-    await authPrisma.user.update({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         phone: phone,
@@ -42,7 +42,7 @@ export const registerWhatsappDiscount = protectedActionClient
     });
 
     // Lógica de exportação automática (100 contatos)
-    const contactsToExport = await authPrisma.user.findMany({
+    const contactsToExport = await prisma.user.findMany({
       where: {
         phone: { not: null },
         phoneExportedAt: null,
@@ -54,7 +54,7 @@ export const registerWhatsappDiscount = protectedActionClient
         await sendContactsExportEmail(contactsToExport);
 
         // Marcar como exportado
-        await authPrisma.user.updateMany({
+        await prisma.user.updateMany({
           where: {
             id: {
               in: contactsToExport.map((u: any) => u.id),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Button } from "./ui/button";
@@ -32,6 +33,7 @@ interface BookingInfoSheetProps {
 }
 
 const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
+  const router = useRouter();
   const status = getBookingStatus(booking.date, booking.cancelledAt);
   const { executeAsync: executeCancelBooking, isPending: isCancelling } =
     useAction(cancelBooking);
@@ -51,6 +53,7 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
 
     toast.success("Agendamento cancelado com sucesso!");
     onClose();
+    router.refresh();
   };
 
   return (

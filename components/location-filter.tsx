@@ -20,19 +20,54 @@ export const LocationFilter = () => {
     const [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
     
     // Available data
+
+    // Available data
     const [locations, setLocations] = useState<Location[]>([]);
     const [availableStates, setAvailableStates] = useState<string[]>([]);
-    // const [availableCities, setAvailableCities] = useState<string[]>([]); // We don't need this list anymore for the input
+    const [availableCities, setAvailableCities] = useState<string[]>([]);
+    const [allCitiesData, setAllCitiesData] = useState<Record<string, {value: string; label: string}[]>>({});
 
     useEffect(() => {
         const fetchLocations = async () => {
             const data = await getLocations();
-            // data is now { states: LocationOption[], cities: Record<string, LocationOption[]> }
             const states = data.states.map(s => s.value);
             setAvailableStates(states);
+            setAllCitiesData(data.cities);
         };
         fetchLocations();
     }, []);
+
+    useEffect(() => {
+        if (selectedState && selectedState !== "all" && allCitiesData[selectedState]) {
+            setAvailableCities(allCitiesData[selectedState].map(c => c.value));
+        } else {
+            setAvailableCities([]);
+        }
+    }, [selectedState, allCitiesData]);
+
+    const handleSelectCity = (city: string) => {
+        const newCity = selectedCity === city ? "" : city;
+        setSelectedCity(newCity);
+        
+        // Auto apply filter when city is selected
+        const params = new URLSearchParams(searchParams.toString());
+        
+        if (selectedState && selectedState !== "all") {
+            params.set("state", selectedState);
+        }
+
+        if (newCity && newCity !== "all") {
+             params.set("city", newCity);
+        } else {
+             params.delete("city");
+        }
+
+        if (window.location.pathname !== "/barbershops") {
+             router.push(`/barbershops?${params.toString()}`);
+        } else {
+             router.push(`?${params.toString()}`);
+        }
+    }
 
     const handleApplyFilter = () => {
         const params = new URLSearchParams(searchParams.toString());
@@ -86,8 +121,14 @@ export const LocationFilter = () => {
                                     if (selectedState === state) {
                                         setSelectedState("all");
                                         setSelectedCity("");
+                                        // Clear params if deselected
+                                        const params = new URLSearchParams(searchParams.toString());
+                                        params.delete("state");
+                                        params.delete("city");
+                                        router.push(`?${params.toString()}`);
                                     } else {
                                         setSelectedState(state);
+                                        setSelectedCity(""); // Reset city when state changes
                                     }
                                 }}
                                 className={selectedState === state ? "bg-neon-purple hover:bg-neon-purple/80" : ""}
@@ -98,21 +139,22 @@ export const LocationFilter = () => {
                     </div>
                 </div>
 
-                {/* City Input - Only visible if state is selected */}
-                {selectedState !== "all" && (
+                {/* City Selection - Only visible if state is selected */}
+                {selectedState !== "all" && availableCities.length > 0 && (
                      <div className="animate-in fade-in slide-in-from-top-2">
-                        <label className="text-sm text-muted-foreground mb-2 block">Digite a Cidade:</label>
-                        <div className="flex gap-2">
-                             <input 
-                                 type="text"
-                                 placeholder="Ex: São Paulo"
-                                 value={selectedCity === "all" ? "" : selectedCity}
-                                 onChange={(e) => setSelectedCity(e.target.value)}
-                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                             />
-                             <Button onClick={handleApplyFilter}>
-                                 Buscar
-                             </Button>
+                        <label className="text-sm text-muted-foreground mb-2 block">Selecione a Cidade:</label>
+                        <div className="flex flex-wrap gap-2">
+                             {availableCities.map(city => (
+                                <Button 
+                                    key={city} 
+                                    variant={selectedCity === city ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => handleSelectCity(city)}
+                                    className={selectedCity === city ? "bg-primary hover:bg-primary/90" : ""}
+                                >
+                                    {city}
+                                </Button>
+                            ))}
                         </div>
                      </div>
                 )}

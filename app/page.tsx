@@ -20,9 +20,15 @@ import { LocationFilter } from "@/components/location-filter";
 import BarbershopStories from "@/components/barbershop-stories";
 import PromotionsCarousel from "@/components/promotions-carousel";
 import BarbershopRanking from "@/components/barbershop-ranking";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getUserLoyaltyCards } from "@/app/_actions/loyalty";
+import { PremiumLoyaltyCard } from "@/components/loyalty/premium-card";
+import { Gift } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+import { Button } from "@/components/ui/button";
 import { BackgroundVideo } from "@/components/ui/background-video";
 
 interface HomeProps {
@@ -41,6 +47,8 @@ export default async function Home({ searchParams }: HomeProps) {
   // CORREÇÃO: Inicializamos como vazio para o app carregar enquanto
   // resolvemos a conexão com o banco na função getUserBookings.
   let confirmedBookings: any[] = []; 
+  let loyaltyCards: any[] = [];
+  let session: any = null;
 
   try {
     // Tentamos buscar os agendamentos reais
@@ -48,8 +56,17 @@ export default async function Home({ searchParams }: HomeProps) {
     if (data && data.confirmedBookings) {
       confirmedBookings = data.confirmedBookings;
     }
+
+    session = await auth.api.getSession({
+        headers: await headers(),
+    });
+    
+    if (session?.user) {
+        loyaltyCards = await getUserLoyaltyCards(session.user.id);
+    }
+    
   } catch (error) {
-    console.error("Erro ao carregar agendamentos:", error);
+    console.error("Erro ao carregar dados do usuário:", error);
     // Se der erro, o app continua rodando com a lista vazia
   }
 
@@ -136,6 +153,50 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           </div>
         </Link>
+        
+        {/* LOYALTY SECTION - ALWAYS VISIBLE */}
+        <PageSectionContent>
+            <div className="flex items-center justify-between mb-3">
+                <PageSectionTitle>Minha Fidelidade</PageSectionTitle>
+                <Link href="/loyalty" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                    Ver tudo <Gift className="size-3" />
+                </Link>
+            </div>
+            
+            {loyaltyCards.length > 0 ? (
+                <PageSectionScroller>
+                    {loyaltyCards.map((card) => (
+                        <div key={card.id} className="min-w-[300px]">
+                             <Link href={`/barbershops/${card.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
+                                {card.barbershop.name}
+                             </Link>
+                            <PremiumLoyaltyCard 
+                                barbershopName={card.barbershop.name}
+                                barbershopImage={card.barbershop.imageUrl}
+                                currentPoints={card.currentPoints}
+                                tier={card.tier}
+                                totalLifetimePoints={card.totalLifetimePoints}
+                                userName={session?.user?.name || "Cliente"}
+                                userAvatar={session?.user?.image || undefined}
+                                freeCuts={card.freeCuts}
+                            />
+                        </div>
+                    ))}
+                </PageSectionScroller>
+            ) : (
+                <div className="w-full flex justify-center py-4">
+                    <PremiumLoyaltyCard 
+                        barbershopName="Sua Barbearia Favorita"
+                        currentPoints={0}
+                        tier="BRONZE"
+                        totalLifetimePoints={0}
+                        userName={session?.user?.name || "Visitante"}
+                        userAvatar={session?.user?.image || undefined}
+                        freeCuts={0}
+                    />
+                </div>
+            )}
+        </PageSectionContent>
 
         {/* Agora esta parte está protegida e não quebra o app */}
         {confirmedBookings.length > 0 && (

@@ -8,7 +8,8 @@ import { isFuture } from "date-fns";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
-import { authPrisma } from "@/lib/prisma";
+// import { authPrisma } from "@/lib/prisma"; // Removed
+import { decrementLoyalty } from "@/app/_actions/loyalty";
 
 const inputSchema = z.object({
   bookingId: z.uuid(),
@@ -75,11 +76,14 @@ export const cancelBooking = protectedActionClient
     });
 
     if (booking.isWelcomeDiscount) {
-        await authPrisma.user.update({
+        await prisma.user.update({
             where: { id: user.id },
             data: { welcomeDiscountUsed: false } as any
         });
     }
+
+    // Decrement loyalty card immediately
+    await decrementLoyalty(booking.id);
 
     revalidatePath("/");
     revalidatePath("/bookings");

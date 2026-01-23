@@ -7,7 +7,7 @@ import {
   PageSectionContent,
   PageSectionTitle,
 } from "@/components/ui/page";
-import { LocationFilter } from "../_components/location-filter";
+import { LocationFilter } from "@/components/location-filter";
 
 interface BarbershopsPageProps {
   searchParams: Promise<{
@@ -37,7 +37,7 @@ const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
           
           <LocationFilter />
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {barbershops.map((barbershop) => (
               <div key={barbershop.id} className="w-full">
                 <BarbershopItem barbershop={barbershop} />

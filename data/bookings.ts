@@ -15,7 +15,7 @@ export type BookingWithRelations = Prisma.BookingGetPayload<{
 };
 
 // Helper to separate Booking data from Auth data
-import { authPrisma } from "@/lib/prisma";
+// import { authPrisma } from "@/lib/prisma"; // Removed
 
 export const getUserBookings = async () => {
   const session = await auth.api.getSession({
@@ -62,8 +62,7 @@ export const getUserBookings = async () => {
   ]);
 
   // 3. Fetch Users from Auth DB
-  // @ts-ignore
-  const users = await authPrisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       id: { in: Array.from(userIds) }
     }

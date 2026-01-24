@@ -1,5 +1,5 @@
 
-import { authPrisma } from "./lib/prisma";
+import { prisma } from "./lib/prisma";
 import { hash } from "bcryptjs";
 
 async function main() {
@@ -11,7 +11,7 @@ async function main() {
   // Find user (case insensitive search if possible, but distinct names usually work)
   // Using findFirst since name isn't unique constraint, email is.
   // But request asked by name.
-  const user = await authPrisma.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       name: {
         contains: targetName,
@@ -33,7 +33,7 @@ async function main() {
   console.log("Password hashed.");
 
   // Update user
-  await authPrisma.user.update({
+  await prisma.user.update({
     where: { id: user.id },
     data: {
       password: hashedPassword
@@ -49,5 +49,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await authPrisma.$disconnect();
+    await prisma.$disconnect();
   });

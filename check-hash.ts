@@ -1,9 +1,9 @@
 
 import "dotenv/config";
-import { authPrisma } from "./lib/prisma";
+import { prisma } from "./lib/prisma";
 
 async function main() {
-  const user = await authPrisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email: "george@barbermaps.com" }
   });
   console.log("Current Password Hash:", user?.password);
@@ -11,4 +11,4 @@ async function main() {
 
 main()
   .catch(console.error)
-  .finally(() => authPrisma.$disconnect());
+  .finally(() => prisma.$disconnect());

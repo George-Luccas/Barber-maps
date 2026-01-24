@@ -14,7 +14,7 @@ export async function getAdminBarbershops() {
     }
   });
 
-  return barbershops.map(b => ({
+  return barbershops.map((b: any) => ({
     ...b,
     dailyGoal: Number(b.dailyGoal), // Convert Decimal
     bookingsCount: b._count.bookings
@@ -112,7 +112,7 @@ export async function getAdminAnalytics() {
         totalBookings,
         totalUsers,
         totalBarbershops,
-        topBarbershops: topBarbershops.map(b => ({...b, bookingsCount: b._count.bookings, dailyGoal: Number(b.dailyGoal)})),
+        topBarbershops: topBarbershops.map((b: any) => ({...b, bookingsCount: b._count.bookings, dailyGoal: Number(b.dailyGoal)})),
         recentBookings
     }
 }

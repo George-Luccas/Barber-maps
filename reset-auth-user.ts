@@ -1,13 +1,13 @@
 
 import "dotenv/config";
-import { authPrisma } from "./lib/prisma";
+import { prisma } from "./lib/prisma";
 
 async function main() {
   const email = "georgeluccas300@gmail.com";
   console.log(`Deleting user with email: ${email}`);
   
   try {
-      await authPrisma.user.delete({
+      await prisma.user.delete({
         where: { email }
       });
       console.log("✅ User deleted successfully.");
@@ -18,4 +18,4 @@ async function main() {
 
 main()
   .catch(console.error)
-  .finally(() => authPrisma.$disconnect());
+  .finally(() => prisma.$disconnect());

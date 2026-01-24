@@ -28,7 +28,7 @@ export async function getLocations(): Promise<AvailableLocations> {
   const statesMap = new Map<string, string>()
   const citiesMap = new Map<string, Set<string>>()
 
-  barbershops.forEach((shop: any) => {
+  barbershops.forEach((shop: { city: string | null; state: string | null }) => {
     if (!shop.city || !shop.state) return
 
     const city = shop.city.trim()

@@ -180,6 +180,7 @@ export default async function Home({ searchParams }: HomeProps) {
                                     userName={session?.user?.name || "Cliente"}
                                     userAvatar={session?.user?.image || undefined}
                                     freeCuts={card.freeCuts}
+                                    transactions={card.transactions}
                                 />
                             </Link>
                         </div>

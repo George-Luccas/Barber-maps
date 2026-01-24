@@ -40,7 +40,41 @@ export async function getUserLoyaltyCards(userId: string) {
                 }
             }
         });
-        return cards;
+
+        // Enrich with history (Last 5 completed bookings)
+        const cardsWithHistory = await Promise.all(cards.map(async (card) => {
+            const lastBookings = await prisma.booking.findMany({
+                where: {
+                    userId,
+                    barbershopId: card.barbershopId,
+                    status: "COMPLETED" // Only completed bookings give points
+                },
+                take: 5,
+                orderBy: {
+                    date: 'desc'
+                },
+                include: {
+                    service: {
+                        select: {
+                            name: true,
+                            points: true
+                        }
+                    }
+                }
+            });
+
+            return {
+                ...card,
+                transactions: lastBookings.map(booking => ({
+                    id: booking.id,
+                    serviceName: booking.service.name,
+                    points: booking.service.points || 10,
+                    date: booking.date
+                }))
+            };
+        }));
+
+        return cardsWithHistory;
     } catch (error) {
         console.error("Error fetching user loyalty cards:", error);
         return [];

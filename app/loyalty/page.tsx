@@ -78,6 +78,7 @@ export default async function LoyaltyPage() {
                     userName={session?.user?.name || "Cliente"}
                     userAvatar={session?.user?.image || undefined}
                     freeCuts={card.freeCuts}
+                    transactions={card.transactions}
                 />
               </div>
             ))}

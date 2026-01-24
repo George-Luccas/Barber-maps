@@ -1,9 +1,9 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { PageContainer, PageSectionTitle } from "@/components/ui/page";
+import { PageContainer } from "@/components/ui/page";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getUserLoyaltyCards } from "@/app/_actions/loyalty";
+import { getUserLoyaltyCards, getSystemServices } from "@/app/_actions/loyalty";
 import { PremiumLoyaltyCard } from "@/components/loyalty/premium-card";
 import { LoyaltyExplanation } from "@/components/loyalty-explanation";
 import { Gift, ChevronLeft } from "lucide-react";
@@ -36,6 +36,7 @@ export default async function LoyaltyPage() {
   }
 
   const loyaltyCards = await getUserLoyaltyCards(session.user.id);
+  const systemServices = await getSystemServices();
 
   return (
     <div className="min-h-screen bg-background pb-10">
@@ -65,7 +66,6 @@ export default async function LoyaltyPage() {
               <div key={card.id} className="flex flex-col gap-2 w-full">
                 <Link href={`/barbershops/${card.barbershopId}`} className="hover:opacity-90 transition-opacity text-center">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                         {/* We could add generic avatar if image missing or use pure text */}
                         <span className="font-semibold text-sm">{card.barbershop.name}</span>
                     </div>
                 </Link>
@@ -92,7 +92,7 @@ export default async function LoyaltyPage() {
         )}
         
         <div className="mt-10 pt-10 border-t">
-             <LoyaltyExplanation />
+             <LoyaltyExplanation services={systemServices} />
         </div>
       </PageContainer>
       <div className="pt-10"></div>

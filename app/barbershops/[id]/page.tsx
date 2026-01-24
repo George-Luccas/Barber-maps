@@ -16,6 +16,7 @@ import { getLoyaltyCard } from "@/app/_actions/loyalty";
 import { LoyaltyCard } from "@/components/loyalty-card";
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
+  // Force rebuild to sync Prisma Client with new DB schema
   const { id } = await params;
   const barbershop = await getBarbershopById(id);
   const session = await auth.api.getSession({

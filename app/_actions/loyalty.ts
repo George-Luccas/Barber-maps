@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { LoyaltyTier } from "@prisma/client";
+import { calculateServicePoints } from "@/lib/loyalty-points";
 
 // Constants
 const POINTS_FOR_REWARD = 100;
@@ -119,7 +120,9 @@ export async function incrementLoyalty(bookingId: string) {
             update: {}
         });
 
-        const pointsEarned = booking.service.points || 10; // Default to 10 if null
+        // Calculate points dynamically based on global rules (Combo 20pts, etc.)
+        // We use priceInCents / 100 to get decimal price if needed by logic
+        const pointsEarned = calculateServicePoints(booking.service.name, booking.service.priceInCents / 100);
 
         // Calculate new state
         let currentPoints = card.currentPoints + pointsEarned;
@@ -165,6 +168,7 @@ export async function incrementLoyalty(bookingId: string) {
         revalidatePath("/bookings"); 
         revalidatePath(`/barbershops/${booking.barbershopId}`);
         revalidatePath("/"); 
+        revalidatePath("/loyalty"); // Ensure loyalty page updates
 
         return { success: true, pointsEarned, totalLifetimePoints };
 
@@ -194,6 +198,9 @@ export async function decrementLoyalty(bookingId: string) {
 
         if (!card) return;
 
+        // Revert using same logic if possible, or static points. 
+        // Ideally should store awarded points in booking to revert specific amount.
+        // For now, using static service points or 10.
         const pointsToRevert = booking.service.points || 10;
 
         let currentPoints = card.currentPoints - pointsToRevert;
@@ -237,8 +244,31 @@ export async function decrementLoyalty(bookingId: string) {
         revalidatePath("/bookings"); 
         revalidatePath(`/barbershops/${booking.barbershopId}`);
         revalidatePath("/"); 
+        revalidatePath("/loyalty");
 
     } catch (error) {
         console.error("Error decrementing loyalty:", error);
+    }
+}
+
+export async function getSystemServices() {
+    try {
+        // Fetch unique services by name to avoid duplicates in the list
+        // and get their default points.
+        const services = await prisma.barbershopService.findMany({
+            distinct: ['name'], // Only one entry per service name
+            select: {
+                name: true,
+                points: true
+            },
+            orderBy: {
+                points: 'desc' // Order by highest value
+            }
+        });
+        
+        return services;
+    } catch (error) {
+        console.error("Error fetching system services:", error);
+        return [];
     }
 }

@@ -79,6 +79,7 @@ export default async function LoyaltyPage() {
                     userAvatar={session?.user?.image || undefined}
                     freeCuts={card.freeCuts}
                     transactions={card.transactions}
+                    enableFlip={true}
                 />
               </div>
             ))}

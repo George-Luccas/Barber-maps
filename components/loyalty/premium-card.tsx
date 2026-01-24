@@ -24,6 +24,7 @@ interface PremiumLoyaltyCardProps {
     userAvatar?: string;
     freeCuts: number;
     transactions?: Transaction[];
+    enableFlip?: boolean;
 }
 
 export function PremiumLoyaltyCard({ 
@@ -34,7 +35,8 @@ export function PremiumLoyaltyCard({
     userName = "Cliente",
     userAvatar,
     freeCuts,
-    transactions = []
+    transactions = [],
+    enableFlip = false
 }: PremiumLoyaltyCardProps) {
     
     const [isFlipped, setIsFlipped] = React.useState(false);
@@ -54,8 +56,12 @@ export function PremiumLoyaltyCard({
 
     return (
         <div 
-            className="w-full h-full min-h-[320px] cursor-pointer group perspective-1000" 
+            className={cn(
+                "w-full h-full min-h-[320px] group perspective-1000",
+                enableFlip ? "cursor-pointer" : "cursor-default" 
+            )} 
             onClick={(e) => {
+                if (!enableFlip) return; // Let the event bubble up (e.g., to Link)
                 e.preventDefault();
                 e.stopPropagation();
                 setIsFlipped(!isFlipped);

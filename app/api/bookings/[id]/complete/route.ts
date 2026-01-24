@@ -4,10 +4,10 @@ import { incrementLoyalty } from "@/app/_actions/loyalty";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
 
     if (!bookingId) {
       return NextResponse.json(

@@ -66,7 +66,7 @@ export function LoyaltyExplanation() {
         </p>
         
         {/* Visual Example */}
-        <div className="opacity-90 pointer-events-none select-none grayscale-[0.2]">
+        <div className="flex justify-center opacity-100 mt-4">
             <LoyaltyCard 
                 currentPoints={0}
                 freeCuts={0}

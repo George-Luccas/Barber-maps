@@ -164,25 +164,27 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
             
             {loyaltyCards.length > 0 ? (
-                <PageSectionScroller>
+                <div className="flex flex-col gap-4 w-full">
                     {loyaltyCards.map((card) => (
-                        <div key={card.id} className="min-w-[300px]">
-                             <Link href={`/barbershops/${card.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
+                        <div key={card.id} className="w-full">
+                             <Link href={`/barbershops/${card.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors text-center">
                                 {card.barbershop.name}
                              </Link>
-                            <PremiumLoyaltyCard 
-                                barbershopName={card.barbershop.name}
-                                barbershopImage={card.barbershop.imageUrl}
-                                currentPoints={card.currentPoints}
-                                tier={card.tier}
-                                totalLifetimePoints={card.totalLifetimePoints}
-                                userName={session?.user?.name || "Cliente"}
-                                userAvatar={session?.user?.image || undefined}
-                                freeCuts={card.freeCuts}
-                            />
+                            <Link href="/loyalty" className="block cursor-pointer hover:opacity-95 transition-opacity">
+                                <PremiumLoyaltyCard 
+                                    barbershopName={card.barbershop.name}
+                                    barbershopImage={card.barbershop.imageUrl}
+                                    currentPoints={card.currentPoints}
+                                    tier={card.tier}
+                                    totalLifetimePoints={card.totalLifetimePoints}
+                                    userName={session?.user?.name || "Cliente"}
+                                    userAvatar={session?.user?.image || undefined}
+                                    freeCuts={card.freeCuts}
+                                />
+                            </Link>
                         </div>
                     ))}
-                </PageSectionScroller>
+                </div>
             ) : (
                 <div className="w-full flex justify-center py-4">
                     <PremiumLoyaltyCard 

@@ -47,10 +47,25 @@ export function LoyaltyCard({ currentPoints, freeCuts, tier = "BRONZE", totalLif
 
     return (
         <Card className={cn(
-            "border-0 overflow-hidden relative transition-all duration-300 shadow-xl",
+            "border-0 overflow-hidden relative transition-all duration-300",
             "bg-gradient-to-br",
             config.bgColor,
-        )}>
+            // Pulsing Aura Effect - Stronger constant glow for visibility
+            `shadow-[0_0_20px_rgba(var(--pulsing-color),0.6)]`,
+        )}
+        style={{
+            // @ts-ignore - Custom CSS variable for dynamic color
+            "--pulsing-color": tier === "GOLD" ? "250, 204, 21" : tier === "SILVER" ? "203, 213, 225" : "245, 158, 11" 
+        }}
+        >
+             {/* Dynamic Pulsing Aura Overlay - Always active */}
+             <div className={cn(
+                "absolute inset-0 opacity-40 animate-pulse z-0",
+                "bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]",
+                tier === "GOLD" ? "from-yellow-500/50 via-transparent to-transparent" : 
+                tier === "SILVER" ? "from-slate-100/40 via-transparent to-transparent" :
+                "from-amber-500/50 via-transparent to-transparent"
+             )} />
              {/* Background Decoration */}
              <div className="absolute top-0 right-0 p-3 opacity-20 rotate-12 translate-x-4 -translate-y-4">
                 <Icon size={140} className={config.color} />

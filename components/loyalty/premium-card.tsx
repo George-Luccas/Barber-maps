@@ -41,7 +41,25 @@ export function PremiumLoyaltyCard({
     const currentTierIdx = tiers.findIndex(t => t.id === tier);
 
     return (
-        <Card className="w-full max-w-[350px] mx-auto overflow-hidden border-0 bg-transparent shadow-2xl relative group">
+        <Card 
+            className={cn(
+                "w-full overflow-hidden border-0 bg-transparent shadow-2xl relative group transition-all duration-300",
+                `shadow-[0_0_30px_rgba(var(--pulsing-color),0.4)] hover:shadow-[0_0_50px_rgba(var(--pulsing-color),0.6)]`
+            )}
+            style={{
+                // @ts-ignore
+                "--pulsing-color": tier === "GOLD" ? "250, 204, 21" : tier === "SILVER" ? "203, 213, 225" : "217, 119, 6"
+            }}
+        >
+            {/* Pulsing Aura Internal Overlay */}
+            <div className={cn(
+                "absolute inset-0 opacity-30 animate-pulse z-0 pointer-events-none",
+                "bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]",
+                tier === "GOLD" ? "from-yellow-500/40 via-transparent to-transparent" : 
+                tier === "SILVER" ? "from-slate-100/30 via-transparent to-transparent" :
+                "from-amber-600/40 via-transparent to-transparent"
+             )} />
+
             {/* Main Background - Dark Luxury Texture */}
             <div className="absolute inset-0 bg-[#0a0a0a] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-[#050505] to-black z-0"></div>
             
@@ -53,7 +71,7 @@ export function PremiumLoyaltyCard({
                 {/* Header: Logo & Title */}
                 <div className="flex flex-col items-center text-center gap-2">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)]">
-                        <MapPin className="text-black fill-current" size={24} />
+                        <Crown className="text-black fill-current" size={24} />
                     </div>
                     <div className="flex flex-col">
                         <h2 className="text-yellow-500 font-serif tracking-widest text-lg font-bold">BARBERMAPS</h2>

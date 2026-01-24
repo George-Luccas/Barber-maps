@@ -19,6 +19,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   // Force rebuild to sync Prisma Client with new DB schema
   const { id } = await params;
   const barbershop = await getBarbershopById(id);
+  /* EMERGENCY DISABLE: Auth causing potential 500 or Loyalty issues. Restoring later.
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -28,6 +29,9 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   } catch (error) {
       console.error("Failed to fetch loyalty card:", error);
   }
+  */
+  const session = null; 
+  const loyaltyCard = null;
 
   if (!barbershop) {
     notFound();
@@ -124,7 +128,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
           <div className="bg-border h-px w-full" />
         </div>
 
-        {/* Loyalty Card */}
+        {/* Loyalty Card - DISABLED FOR DEBUG
         {session?.user && (
             <div className="px-5 pb-6">
                 <LoyaltyCard 
@@ -135,6 +139,7 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
                 />
             </div>
         )}
+        */}
 
         {/* Serviços */}
         <div className="flex flex-col gap-3 px-5">

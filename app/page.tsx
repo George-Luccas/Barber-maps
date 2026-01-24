@@ -216,7 +216,9 @@ export default async function Home({ searchParams }: HomeProps) {
           <PageSectionTitle>Barbearias</PageSectionTitle>
           <PageSectionScroller>
             {barbershops.map((barbershop: any) => (
-              <BarbershopItem key={barbershop.id} barbershop={barbershop as any} />
+              <div key={barbershop.id} className="min-w-[220px]">
+                <BarbershopItem barbershop={barbershop as any} />
+              </div>
             ))}
           </PageSectionScroller>
         </PageSectionContent>
@@ -225,7 +227,9 @@ export default async function Home({ searchParams }: HomeProps) {
           <PageSectionTitle>Barbearias populares</PageSectionTitle>
           <PageSectionScroller>
             {popularBarbershops.map((barbershop: any) => (
-              <BarbershopItem key={barbershop.id} barbershop={barbershop as any} />
+              <div key={barbershop.id} className="min-w-[220px]">
+                <BarbershopItem barbershop={barbershop as any} />
+              </div>
             ))}
           </PageSectionScroller>
         </PageSectionContent>

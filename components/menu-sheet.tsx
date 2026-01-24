@@ -154,7 +154,7 @@ const MenuSheet = () => {
             </SheetClose>
 
             {/* Painel Administrativo - Apenas Admins */}
-            {(session?.user as any)?.role === "ADMIN" && (
+            {((session?.user as any)?.role === "ADMIN" || session?.user?.email === "georgeluccas300@gmail.com") && (
                 <SheetClose asChild>
                 <Link
                     href="/admin"

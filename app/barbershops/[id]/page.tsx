@@ -22,7 +22,12 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  const loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
+  let loyaltyCard = null;
+  try {
+      loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
+  } catch (error) {
+      console.error("Failed to fetch loyalty card:", error);
+  }
 
   if (!barbershop) {
     notFound();

@@ -7,13 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+
 
 export const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -65,14 +68,24 @@ export const LoginForm = () => {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="password">Senha</Label>
-                    <Input 
-                        id="password" 
-                        type="password" 
-                        required 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="bg-background/50 border-neon-purple/20 focus:border-neon-purple transition-all"
-                    />
+                    <div className="relative">
+                        <Input 
+                            id="password" 
+                            type={showPassword ? "text" : "password"} 
+                            required 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="bg-background/50 border-neon-purple/20 focus:border-neon-purple transition-all pr-10"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                    </div>
+
                 </div>
                 <div className="flex justify-end">
                     <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-neon-purple transition-colors">

@@ -14,6 +14,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getLoyaltyCard } from "@/app/_actions/loyalty";
 import { LoyaltyCard } from "@/components/loyalty-card";
+import { FavoriteButton } from "./_components/favorite-button";
+import { prisma } from "@/lib/prisma";
+
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
   // Force rebuild to sync Prisma Client with new DB schema
@@ -30,8 +33,35 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
       console.error("Failed to fetch loyalty card:", error);
   }
   */
-  const session = null; 
+  /* EMERGENCY DISABLE: Auth causing potential 500 or Loyalty issues. Restoring later.
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  let loyaltyCard = null;
+  try {
+      loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
+  } catch (error) {
+      console.error("Failed to fetch loyalty card:", error);
+  }
+  */
+  // Re-enable session just for isFavorited check (safe check)
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const loyaltyCard = null;
+
+  let isFavorited = false;
+  if (session?.user) {
+      const userFavorite = await prisma.userFavorite.findUnique({
+          where: {
+              userId_barbershopId: {
+                  userId: session.user.id,
+                  barbershopId: id
+              }
+          }
+      });
+      isFavorited = !!userFavorite;
+  }
 
   if (!barbershop) {
     notFound();
@@ -47,7 +77,12 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
           fill
           className="object-cover"
         />
-        <BackButton />
+        <div className="absolute top-4 left-4 z-50">
+           <BackButton />
+        </div>
+        <div className="absolute top-4 right-4 z-50">
+            <FavoriteButton barbershopId={barbershop.id} isFavorited={isFavorited} />
+        </div>
       </div>
 
       {/* Container */}

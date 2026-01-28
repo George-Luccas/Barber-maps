@@ -27,10 +27,24 @@ export const getBarbershops = async (props?: GetBarbershopsProps) => {
                 };
             }
             if (props?.search) {
-                where.name = {
-                    contains: props.search.trim(),
-                    mode: "insensitive",
-                };
+                 where.OR = [
+                    {
+                        name: {
+                            contains: props.search.trim(),
+                            mode: "insensitive",
+                        },
+                    },
+                    {
+                        services: {
+                            some: {
+                                name: {
+                                    contains: props.search.trim(),
+                                    mode: "insensitive",
+                                },
+                            },
+                        },
+                    },
+                ];
             }
 
             const barbershops = await prisma.barbershop.findMany({

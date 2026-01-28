@@ -31,17 +31,25 @@ export async function getLocations(): Promise<AvailableLocations> {
   barbershops.forEach((shop: { city: string | null; state: string | null }) => {
     if (!shop.city || !shop.state) return
 
-    const city = shop.city.trim()
-    const state = shop.state.trim()
+    // Normalize: Remove extra spaces, Title Case
+    const normalize = (str: string) => {
+        return str.trim().toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    const cityRaw = shop.city.trim()
+    const stateRaw = shop.state.trim()
+    
+    const cityFormatted = normalize(cityRaw)
+    const stateFormatted = stateRaw.toUpperCase() // States usually uppercase (MT, SP)
 
     // Add state
-    statesMap.set(state, state)
+    statesMap.set(stateFormatted, stateFormatted)
 
     // Add city to state
-    if (!citiesMap.has(state)) {
-      citiesMap.set(state, new Set())
+    if (!citiesMap.has(stateFormatted)) {
+      citiesMap.set(stateFormatted, new Set())
     }
-    citiesMap.get(state)?.add(city)
+    citiesMap.get(stateFormatted)?.add(cityFormatted)
   })
 
   // Format states

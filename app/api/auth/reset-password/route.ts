@@ -40,13 +40,13 @@ export async function POST(req: Request) {
         });
 
         // Update Account (Better Auth credential provider)
-        // Check if there is a credential account
         const userWithId = await prisma.user.findUnique({ where: { email }, select: { id: true } });
         if (userWithId) {
+            // Update ALL accounts for this user that have a password field.
+            // This covers "credential", "email", or any other provider ID that might store a password.
             await prisma.account.updateMany({
                 where: { 
                     userId: userWithId.id,
-                    providerId: "credential" // Common provider ID for email/pass in Better Auth
                 },
                 data: {
                     password: hashedPassword

@@ -83,6 +83,28 @@ export async function GET(req: Request) {
         } catch(e: any) {
             results.hashing.generationError = e.message;
         }
+
+        // 3. Test Session Creation (Write Access)
+        try {
+            const dummySessionId = "debug-" + Date.now();
+            await prisma.session.create({
+                data: {
+                    id: dummySessionId,
+                    token: dummySessionId,
+                    userId: user.id,
+                    expiresAt: new Date(Date.now() + 10000),
+                    ipAddress: "127.0.0.1",
+                    userAgent: "DebugProbe"
+                }
+            });
+            results.db.sessionCreate = "Success";
+            
+            await prisma.session.delete({ where: { id: dummySessionId } });
+            results.db.sessionDelete = "Success";
+        } catch (e: any) {
+             results.db.sessionError = e.message;
+             results.db.sessionStack = e.stack;
+        }
     }
 
   } catch (error: any) {

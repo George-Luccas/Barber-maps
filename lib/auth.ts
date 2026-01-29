@@ -30,7 +30,7 @@ export const auth = betterAuth({
           const hashedPassword = await hash(password, 10);
           return hashedPassword;
         },
-        verify: async (password: string, hash: string) => {
+        verify: async ({ password, hash }: { password: string, hash: string }) => {
           console.log("[DEBUG] Verifying password. Hash length:", hash?.length);
           try {
               const isValid = await compare(password, hash);

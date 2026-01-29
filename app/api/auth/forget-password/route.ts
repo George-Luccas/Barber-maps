@@ -57,6 +57,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ status: true });
     } catch (error) {
         console.error("Erro no forget-password manual:", error);
-        return NextResponse.json({ message: "Erro interno do servidor" }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        return NextResponse.json({ message: "Erro interno: " + errorMessage }, { status: 500 });
     }
 }

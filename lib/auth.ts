@@ -48,14 +48,18 @@ export const auth = betterAuth({
   },
   callbacks: {
     async session({ session, user }: { session: any, user: any }) {
-        return {
-            ...session,
-            user: {
-                ...session.user,
-                // role exists in prisma user type
-
-                role: user.role
+        try {
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    role: user.role || "BARBER" // Ensure role fallback
+                }
             }
+        } catch (error) {
+            console.error("[CRITICAL] Session callback failed:", error);
+            // Fallback to basic session to avoid 500
+            return session;
         }
     }
   },

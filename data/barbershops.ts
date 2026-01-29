@@ -92,7 +92,7 @@ export const getBarbershopById = async (id: string) => {
 };
 
 export const getBarbershopsByServiceName = async (serviceName: string) => {
-  return await prisma.barbershop.findMany({
+  const barbershops = await prisma.barbershop.findMany({
     where: {
       services: {
         some: {
@@ -104,6 +104,10 @@ export const getBarbershopsByServiceName = async (serviceName: string) => {
       },
     },
   });
+  return barbershops.map(barbershop => ({
+    ...barbershop,
+    dailyGoal: Number(barbershop.dailyGoal)
+  }));
 };
 export const getBarbershopsWithStories = async () => {
     // Stories update often, cache for less time or not at all? Let's cache for 1 hour.

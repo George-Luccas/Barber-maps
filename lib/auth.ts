@@ -14,6 +14,8 @@ export const auth = betterAuth({
   basePath: "/api/auth",
     "https://*.vercel.app", 
     "https://barber-maps.vercel.app",
+    "https://barbermaps.com.br",
+    "https://www.barbermaps.com.br",
     "http://localhost:3000",
     "http://localhost:3001",
     "https://*", // Allow any HTTPS domain (Custom Domains)

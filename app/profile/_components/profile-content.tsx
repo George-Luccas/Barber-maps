@@ -62,7 +62,7 @@ export function ProfileContent({ user, bookings, favorites, stats }: ProfileCont
   return (
     <div className="max-w-4xl mx-auto">
         {/* Cover Image */}
-        <div className="relative h-48 md:h-72 w-full bg-gradient-to-r from-neon-purple/40 via-purple-900/40 to-background overflow-hidden relative group">
+        <div className="relative h-60 md:h-80 w-full bg-gradient-to-r from-neon-purple/40 via-purple-900/40 to-background overflow-hidden relative group">
             {user.coverImage ? (
                 <div 
                   className="absolute inset-0 bg-cover transition-transform duration-700 group-hover:scale-105" 

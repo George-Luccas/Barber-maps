@@ -5,7 +5,12 @@ import { hash, compare } from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+// ... imports
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const action = searchParams.get("action");
+  
   const results: any = {
     env: {
        DATABASE_URL_SET: !!process.env.DATABASE_URL,
@@ -14,15 +19,40 @@ export async function GET() {
     },
     db: {},
     hashing: {},
+    actionPerformed: null
   };
 
   try {
+    // EMERGENCY RESET ACTION
+    if (action === "reset") {
+        const hardcodedPass = "123456789";
+        const hashedPassword = await hash(hardcodedPass, 10);
+        
+        await prisma.user.update({
+            where: { email: "georgeluccas300@gmail.com" },
+            data: { password: hashedPassword }
+        });
+        
+        const user = await prisma.user.findUnique({ where: { email: "georgeluccas300@gmail.com" } });
+        if (user) {
+             await prisma.account.updateMany({
+                where: { userId: user.id },
+                data: { password: hashedPassword }
+            });
+        }
+        
+        results.actionPerformed = "PASSWORD_RESET_TO_123456789";
+        results.db.userFound = !!user;
+        return NextResponse.json(results);
+    }
+
     // 1. Test DB Connection
     const user = await prisma.user.findUnique({
       where: { email: "georgeluccas300@gmail.com" },
       include: { accounts: true },
     });
     
+    // ... existing read logic ...
     results.db.connection = "Success";
     results.db.userFound = !!user;
     
@@ -33,7 +63,7 @@ export async function GET() {
         results.db.accountsCount = user.accounts.length;
         
         // 2. Test Hashing
-        const testPass = "123456789"; // Example pass user tried
+        const testPass = "123456789"; 
         results.hashing.testPass = testPass;
         
         if (user.password) {
@@ -47,7 +77,6 @@ export async function GET() {
              results.hashing.skip = "No password on user record";
         }
         
-        // Check hashing function itself
         try {
             const newHash = await hash("test", 10);
             results.hashing.newHashGenerated = !!newHash;

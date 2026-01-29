@@ -65,10 +65,9 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
 
   try {
-    await resend.emails.send({
-      to: email, // In production, this must work. In Resend free tier, might be restricted? Usually sends to verified email.
-      // Assuming 'onboarding@resend.dev' for free tier testing if domain not verified.
-      // Let's use the same sender as the other function for consistency/safety.
+    console.log(`[DEBUG] Attempting to send reset email to: ${email} with token: ${token}`);
+    const { data, error } = await resend.emails.send({
+      to: email, 
       from: "BarberMaps Security <onboarding@resend.dev>",
       subject: "Recuperação de Senha - BarberMaps",
       html: `
@@ -79,9 +78,14 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
         <p>Se você não solicitou isso, ignore este e-mail.</p>
       `,
     });
-    console.log(`Reset email sent to ${email}`);
+    
+    if (error) {
+        console.error("[DEBUG] Resend API Error:", error);
+    } else {
+        console.log(`[DEBUG] Reset email sent successfully. ID: ${data?.id}`);
+    }
   } catch (error) {
-    console.error("Error sending reset email:", error);
+    console.error("[DEBUG] Unexpected error sending reset email:", error);
     throw error;
   }
 };

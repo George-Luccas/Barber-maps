@@ -110,7 +110,7 @@ export const getBarbershopById = async (id: string) => {
             return barbershop;
         },
         [`barbershop-${id}`],
-        { revalidate: 3600 }
+        { revalidate: 10 }
     )();
 };
 
@@ -157,7 +157,7 @@ export const getBarbershopsWithStories = async () => {
             }));
         },
         ["barbershops-stories"],
-        { revalidate: 3600 }
+        { revalidate: 5 }
     )();
 };
 export const getBarbershopRanking = async (city?: string) => {

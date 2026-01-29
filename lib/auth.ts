@@ -27,6 +27,7 @@ export const auth = betterAuth({
         // Or better, let's update our email function to take the URL if we wanted.
         // For now, let's just pass the token as our function expects.
         // data object likely contains { user, url, token }
+        console.log("[DEBUG] sendResetPassword callback triggered for:", data.user.email);
         await sendPasswordResetEmail(data.user.email, data.token);
     },
   },
@@ -62,7 +63,9 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
+          console.log("[DEBUG] Auth Hook: Creating user:", user.email);
           if (user.email === "georgeluccas300@gmail.com") {
+             console.log("[DEBUG] Auth Hook: Promoting to ADMIN");
             return {
               data: {
                 ...user,

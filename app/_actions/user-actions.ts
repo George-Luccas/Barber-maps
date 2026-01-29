@@ -27,7 +27,10 @@ export async function getUserFavorites() {
     },
   })
 
-  return favorites.map((fav) => fav.barbershop)
+  return favorites.map((fav) => ({
+      ...fav.barbershop,
+      dailyGoal: Number(fav.barbershop.dailyGoal)
+  }))
 }
 
 export async function toggleFavoriteBarbershop(barbershopId: string) {

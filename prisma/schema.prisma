@@ -242,6 +242,9 @@ model user {
   welcomeDiscountClaimed Boolean @default(false)
   welcomeDiscountUsed    Boolean @default(false)
   phoneExportedAt       DateTime?
+
+  imagePosition         String   @default("center")
+  coverImagePosition    String   @default("center")
   
   accounts      Account[]
   sessions      Session[]

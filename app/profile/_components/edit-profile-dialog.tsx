@@ -20,10 +20,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { updateUserProfile } from "@/app/_actions/user-actions"
 import { toast } from "sonner"
 import { Loader2, Settings } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const formSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
   phone: z.string().optional(),
+  imagePosition: z.string().optional(),
+  coverImagePosition: z.string().optional(),
 })
 
 interface EditProfileDialogProps {
@@ -32,6 +35,8 @@ interface EditProfileDialogProps {
     phone?: string | null
     image?: string | null
     coverImage?: string | null
+    imagePosition?: string
+    coverImagePosition?: string
   }
 }
 
@@ -46,6 +51,8 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
     defaultValues: {
       name: user.name,
       phone: user.phone || "",
+      imagePosition: user.imagePosition || "center",
+      coverImagePosition: user.coverImagePosition || "center",
     },
   })
 
@@ -93,6 +100,8 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
         phone: values.phone,
         image: selectedImage,
         coverImage: selectedCoverImage,
+        imagePosition: values.imagePosition,
+        coverImagePosition: values.coverImagePosition,
       })
       toast.success("Perfil atualizado com sucesso!")
       setOpen(false)
@@ -112,7 +121,7 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
             <span className="hidden sm:inline">Editar Perfil</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Editar Perfil</DialogTitle>
           <DialogDescription>
@@ -154,7 +163,12 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
                     {selectedImage && (
                         <div className="size-12 rounded-full overflow-hidden border border-border">
                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+                            <img 
+                                src={selectedImage} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover" 
+                                style={{ objectPosition: form.watch("imagePosition") }}
+                            />
                         </div>
                     )}
                     <Input 
@@ -167,13 +181,43 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
                 </div>
             </div>
 
+            <FormField
+              control={form.control}
+              name="imagePosition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Posição da Foto de Perfil</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a posição" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="center">Centralizado</SelectItem>
+                      <SelectItem value="top">Topo</SelectItem>
+                      <SelectItem value="bottom">Baixo</SelectItem>
+                      <SelectItem value="left">Esquerda</SelectItem>
+                      <SelectItem value="right">Direita</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="space-y-2">
                 <Label htmlFor="coverImage">Foto de Capa</Label>
                 <div className="flex items-center gap-4">
                     {selectedCoverImage && (
                         <div className="h-12 w-20 rounded-md overflow-hidden border border-border">
                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={selectedCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                            <img 
+                                src={selectedCoverImage} 
+                                alt="Cover Preview" 
+                                className="w-full h-full object-cover" 
+                                style={{ objectPosition: form.watch("coverImagePosition") }}
+                            />
                         </div>
                     )}
                     <Input 
@@ -185,6 +229,32 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
                     />
                 </div>
             </div>
+
+            <FormField
+              control={form.control}
+              name="coverImagePosition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Posição da Capa</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a posição" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="center">Centralizado</SelectItem>
+                      <SelectItem value="top">Topo</SelectItem>
+                      <SelectItem value="bottom">Baixo</SelectItem>
+                      <SelectItem value="left">Esquerda</SelectItem>
+                      <SelectItem value="right">Direita</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <p className="text-xs text-muted-foreground">Recomendado: 1MB máx.</p>
 
             <DialogFooter>

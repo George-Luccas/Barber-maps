@@ -27,6 +27,8 @@ interface ProfileContentProps {
     coverImage?: string | null;
     phone?: string | null;
     createdAt: Date;
+    imagePosition?: string;
+    coverImagePosition?: string;
   };
   bookings: {
     confirmed: any[];
@@ -62,7 +64,13 @@ export function ProfileContent({ user, bookings, favorites, stats }: ProfileCont
         {/* Cover Image */}
         <div className="relative h-48 md:h-72 w-full bg-gradient-to-r from-neon-purple/40 via-purple-900/40 to-background overflow-hidden relative group">
             {user.coverImage ? (
-                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url('${user.coverImage}')` }}></div>
+                <div 
+                  className="absolute inset-0 bg-cover transition-transform duration-700 group-hover:scale-105" 
+                  style={{ 
+                    backgroundImage: `url('${user.coverImage}')`,
+                    backgroundPosition: user.coverImagePosition || "center"
+                  }}
+                ></div>
             ) : (
                 <div className="absolute inset-0 bg-[url('/banner.png')] bg-cover bg-center opacity-30 transition-transform duration-700 group-hover:scale-105"></div>
             )}
@@ -87,7 +95,12 @@ export function ProfileContent({ user, bookings, favorites, stats }: ProfileCont
                 {/* Avatar */}
                 <div className="relative group">
                     <Avatar className="size-32 md:size-40 border-4 border-background shadow-xl ring-2 ring-transparent group-hover:ring-neon-purple/50 transition-all duration-300">
-                        <AvatarImage src={user.image ?? ""} alt={user.name} className="object-cover" />
+                        <AvatarImage 
+                          src={user.image ?? ""} 
+                          alt={user.name} 
+                          className="object-cover"
+                          style={{ objectPosition: user.imagePosition || "center" }} 
+                        />
                         <AvatarFallback className="text-4xl bg-muted">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     {/* Only show photo edit via the main Edit Profile dialog for now to keep it simple, or add a dedicated button here that opens the dialog */}

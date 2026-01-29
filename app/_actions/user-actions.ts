@@ -78,6 +78,8 @@ const updateUserSchema = z.object({
   phone: z.string().optional().nullable(),
   image: z.string().optional().nullable(), // Base64 string or URL
   coverImage: z.string().optional().nullable(), // Base64 string or URL
+  imagePosition: z.string().optional(),
+  coverImagePosition: z.string().optional(),
 })
 
 export async function updateUserProfile(data: z.infer<typeof updateUserSchema>) {
@@ -100,6 +102,8 @@ export async function updateUserProfile(data: z.infer<typeof updateUserSchema>) 
       phone: validatedData.phone,
       ...(validatedData.image && { image: validatedData.image }),
       ...(validatedData.coverImage && { coverImage: validatedData.coverImage }),
+      ...(validatedData.imagePosition && { imagePosition: validatedData.imagePosition }),
+      ...(validatedData.coverImagePosition && { coverImagePosition: validatedData.coverImagePosition }),
     },
   })
 

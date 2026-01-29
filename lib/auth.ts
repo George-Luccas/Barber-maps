@@ -25,32 +25,27 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
+    password: {
+        hash: async (password: string) => {
+          const hashedPassword = await hash(password, 10);
+          return hashedPassword;
+        },
+        verify: async (password: string, hash: string) => {
+          console.log("[DEBUG] Verifying password. Hash length:", hash?.length);
+          try {
+              const isValid = await compare(password, hash);
+              console.log("[DEBUG] Password valid?", isValid);
+              return isValid;
+          } catch (e) {
+              console.error("[DEBUG] Error verifying password:", e);
+              return false;
+          }
+        }, 
+    },
     async sendResetPassword(data) {
-        // data.url is the link better-auth generated (e.g. /reset-password?token=...)
-        // But our email function manually constructs it. Let's pass the token.
-        // Or better, let's update our email function to take the URL if we wanted.
-        // For now, let's just pass the token as our function expects.
-        // data object likely contains { user, url, token }
         console.log("[DEBUG] sendResetPassword callback triggered for:", data.user.email);
         await sendPasswordResetEmail(data.user.email, data.token);
     },
-  },
-  password: {
-    hash: async (password: string) => {
-      const hashedPassword = await hash(password, 10);
-      return hashedPassword;
-    },
-    verify: async (password: string, hash: string) => {
-      console.log("[DEBUG] Verifying password. Hash length:", hash?.length);
-      try {
-          const isValid = await compare(password, hash);
-          console.log("[DEBUG] Password valid?", isValid);
-          return isValid;
-      } catch (e) {
-          console.error("[DEBUG] Error verifying password:", e);
-          return false;
-      }
-    }, 
   },
   user: {
     additionalFields: {

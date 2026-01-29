@@ -57,7 +57,6 @@ export const auth = betterAuth({
       coverImagePosition: { type: "string" },
     },
   },
-  /*
   callbacks: {
     async session({ session, user }: { session: any, user: any }) {
         try {
@@ -94,5 +93,4 @@ export const auth = betterAuth({
       },
     },
   },
-  */
 });

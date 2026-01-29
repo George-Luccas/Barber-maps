@@ -46,7 +46,10 @@ export const getBarbershops = async (props?: GetBarbershopsProps) => {
     const barbershops = await prisma.barbershop.findMany({
         where,
     });
-    return barbershops;
+    return barbershops.map(barbershop => ({
+        ...barbershop,
+        dailyGoal: Number(barbershop.dailyGoal)
+    }));
 };
 
 export const getAvailableLocations = async () => {
@@ -67,7 +70,10 @@ export const getPopularBarbershops = async () => {
         name: "desc",
         },
     });
-    return popularBarbershops;
+    return popularBarbershops.map(barbershop => ({
+        ...barbershop,
+        dailyGoal: Number(barbershop.dailyGoal)
+    }));
 };
 
 export const getBarbershopById = async (id: string) => {

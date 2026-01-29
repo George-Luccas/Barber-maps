@@ -39,6 +39,21 @@ export async function POST(req: Request) {
             }
         });
 
+        // Update Account (Better Auth credential provider)
+        // Check if there is a credential account
+        const userWithId = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+        if (userWithId) {
+            await prisma.account.updateMany({
+                where: { 
+                    userId: userWithId.id,
+                    providerId: "credential" // Common provider ID for email/pass in Better Auth
+                },
+                data: {
+                    password: hashedPassword
+                }
+            });
+        }
+
         // Delete Verification (Consume token)
         await prisma.verification.delete({
             where: { id: verification.id }

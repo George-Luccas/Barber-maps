@@ -16,6 +16,7 @@ import { getLoyaltyCard } from "@/app/_actions/loyalty";
 import { LoyaltyCard } from "@/components/loyalty-card";
 import { FavoriteButton } from "./_components/favorite-button";
 import { prisma } from "@/lib/prisma";
+import { BarbershopGallery } from "@/components/barbershop-gallery";
 
 
 const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
@@ -128,34 +129,12 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
         {/* Galeria */}
         <div className="flex flex-col gap-3 px-5">
           <PageSectionTitle>Galeria</PageSectionTitle>
-          <div className="flex gap-4 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden">
-            {barbershop.photos.map((photo, index) => (
-              <div
-                key={`photo-${index}`}
-                className="relative h-[150px] w-[150px] shrink-0 overflow-hidden rounded-xl"
-              >
-                <Image
-                  src={photo}
-                  fill
-                  className="object-cover"
-                  alt={`Foto da barbearia ${index + 1}`}
-                />
-              </div>
-            ))}
-            {barbershop.Style.map((style) => (
-              <div
-                key={style.id}
-                className="relative h-[150px] w-[150px] shrink-0 overflow-hidden rounded-xl"
-              >
-                <Image
-                  src={style.imageUrl}
-                  fill
-                  className="object-cover"
-                  alt={style.name}
-                />
-              </div>
-            ))}
-          </div>
+          <BarbershopGallery 
+            photos={[
+                ...barbershop.photos.map((url) => ({ url, alt: `Foto da barbearia ${barbershop.name}` })),
+                ...barbershop.Style.map((style) => ({ url: style.imageUrl, alt: style.name }))
+            ]} 
+          />
         </div>
 
         {/* Divider */}

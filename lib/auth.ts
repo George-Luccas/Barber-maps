@@ -12,12 +12,12 @@ export const auth = betterAuth({
   timeout: 30000, // Increase connection timeout
   baseURL: process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"), 
   basePath: "/api/auth",
-  trustedOrigins: [
-    "https://*.vercel.app", // Allow all Vercel subdomains (Preview & Prod)
+    "https://*.vercel.app", 
     "https://barber-maps.vercel.app",
     "http://localhost:3000",
-    "*", // Emergency fallback: Trust all origins to unblock development
-  ],
+    "http://localhost:3001",
+    "https://*", // Allow any HTTPS domain (Custom Domains)
+    "*", // Emergency fallback
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,

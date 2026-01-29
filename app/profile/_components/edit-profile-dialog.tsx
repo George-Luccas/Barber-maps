@@ -21,6 +21,7 @@ import { updateUserProfile } from "@/app/_actions/user-actions"
 import { toast } from "sonner"
 import { Loader2, Settings } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
 
 const formSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
@@ -38,6 +39,21 @@ interface EditProfileDialogProps {
     imagePosition?: string
     coverImagePosition?: string
   }
+}
+
+// Helper to extract Y percentage from string like "center 50%" or "top" (0%) or "bottom" (100%) or "center" (50%)
+function parsePositionToNumber(pos?: string | null): number {
+    if (!pos) return 50;
+    if (pos === "top") return 0;
+    if (pos === "bottom") return 100;
+    if (pos === "center") return 50;
+    
+    // Check for "center X%"
+    const match = pos.match(/(\d+)%/);
+    if (match) {
+        return parseInt(match[1], 10);
+    }
+    return 50;
 }
 
 export function EditProfileDialog({ user }: EditProfileDialogProps) {
@@ -186,21 +202,25 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
               name="imagePosition"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Posição da Foto de Perfil</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a posição" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="center">Centralizado</SelectItem>
-                      <SelectItem value="top">Topo</SelectItem>
-                      <SelectItem value="bottom">Baixo</SelectItem>
-                      <SelectItem value="left">Esquerda</SelectItem>
-                      <SelectItem value="right">Direita</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel className="flex justify-between">
+                    Posição Vertical da Foto de Perfil
+                    <span className="text-xs text-muted-foreground">{parsePositionToNumber(field.value)}%</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Slider 
+                      min={0} 
+                      max={100} 
+                      step={1} 
+                      defaultValue={[parsePositionToNumber(field.value)]}
+                      onValueChange={(vals) => {
+                          // We are controlling vertical position primarily (Y axis)
+                          // X is usually centered. value "center" means "50% 50%" or just "center"
+                          // We will store as "center [Y]%"
+                          const yPos = vals[0];
+                          field.onChange(`center ${yPos}%`);
+                      }}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -235,21 +255,22 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
               name="coverImagePosition"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Posição da Capa</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a posição" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="center">Centralizado</SelectItem>
-                      <SelectItem value="top">Topo</SelectItem>
-                      <SelectItem value="bottom">Baixo</SelectItem>
-                      <SelectItem value="left">Esquerda</SelectItem>
-                      <SelectItem value="right">Direita</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel className="flex justify-between">
+                    Posição Vertical da Capa
+                    <span className="text-xs text-muted-foreground">{parsePositionToNumber(field.value)}%</span>
+                  </FormLabel>
+                  <FormControl>
+                     <Slider 
+                      min={0} 
+                      max={100} 
+                      step={1} 
+                      defaultValue={[parsePositionToNumber(field.value)]}
+                      onValueChange={(vals) => {
+                          const yPos = vals[0];
+                          field.onChange(`center ${yPos}%`);
+                      }}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

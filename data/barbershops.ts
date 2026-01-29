@@ -1,6 +1,6 @@
 // Data Access Layer
 import { prisma } from "@/lib/prisma";
-import { unstable_cache } from "next/cache";
+
 
 interface GetBarbershopsProps {
   city?: string;
@@ -9,88 +9,65 @@ interface GetBarbershopsProps {
 }
 
 export const getBarbershops = async (props?: GetBarbershopsProps) => {
-    const cacheKey = ["barbershops", JSON.stringify(props)];
-    
-    return await unstable_cache(
-        async () => {
-             const where: any = {};
-            if (props?.city) {
-                where.city = {
-                    contains: props.city.trim(),
+    const where: any = {};
+    if (props?.city) {
+        where.city = {
+            contains: props.city.trim(),
+            mode: "insensitive",
+        };
+    }
+    if (props?.state) {
+        where.state = {
+            contains: props.state.trim(),
+            mode: "insensitive",
+        };
+    }
+    if (props?.search) {
+            where.OR = [
+            {
+                name: {
+                    contains: props.search.trim(),
                     mode: "insensitive",
-                };
-            }
-            if (props?.state) {
-                where.state = {
-                    contains: props.state.trim(),
-                    mode: "insensitive",
-                };
-            }
-            if (props?.search) {
-                 where.OR = [
-                    {
+                },
+            },
+            {
+                services: {
+                    some: {
                         name: {
                             contains: props.search.trim(),
                             mode: "insensitive",
                         },
                     },
-                    {
-                        services: {
-                            some: {
-                                name: {
-                                    contains: props.search.trim(),
-                                    mode: "insensitive",
-                                },
-                            },
-                        },
-                    },
-                ];
-            }
+                },
+            },
+        ];
+    }
 
-            const barbershops = await prisma.barbershop.findMany({
-                where,
-            });
-            return barbershops;
-        },
-        cacheKey,
-        {
-            revalidate: 1, // Force refresh
-            tags: ["barbershops"]
-        }
-    )();
+    const barbershops = await prisma.barbershop.findMany({
+        where,
+    });
+    return barbershops;
 };
 
 export const getAvailableLocations = async () => {
     // Cache available locations as they rarely change
-    return await unstable_cache(
-        async () => {
-            const barbershops = await prisma.barbershop.findMany({
-                select: {
-                city: true,
-                state: true,
-                },
-                distinct: ['city', 'state'],
-            });
-            return barbershops.filter(b => b.city && b.state);
+    const barbershops = await prisma.barbershop.findMany({
+        select: {
+        city: true,
+        state: true,
         },
-        ["available-locations"],
-        { revalidate: 86400 } // 24 hours
-    )();
+        distinct: ['city', 'state'],
+    });
+    return barbershops.filter(b => b.city && b.state);
 };
 
 export const getPopularBarbershops = async () => {
-  return await unstable_cache(
-      async () => {
-        const popularBarbershops = await prisma.barbershop.findMany({
-            orderBy: {
-            name: "desc",
-            },
-        });
-        return popularBarbershops;
-      },
-      ["popular-barbershops"],
-      { revalidate: 3600 }
-  )();
+    const popularBarbershops = await prisma.barbershop.findMany({
+        orderBy: {
+        name: "desc",
+        },
+    });
+    return popularBarbershops;
 };
 
 export const getBarbershopById = async (id: string) => {

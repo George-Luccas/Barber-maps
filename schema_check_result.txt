@@ -1,4 +1,0 @@
-Starting schema check...
-User found.
-User keys: id, name, email, emailVerified, image, coverImage, password, phone, role, createdAt, updatedAt, welcomeDiscountClaimed, welcomeDiscountUsed, phoneExportedAt
-coverImage field exists in returned object.

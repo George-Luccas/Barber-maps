@@ -88,7 +88,13 @@ export const getBarbershopById = async (id: string) => {
         Barber: true,
         },
     });
-    return barbershop;
+
+    if (!barbershop) return null;
+
+    return {
+        ...barbershop,
+        dailyGoal: Number(barbershop.dailyGoal)
+    };
 };
 
 export const getBarbershopsByServiceName = async (serviceName: string) => {

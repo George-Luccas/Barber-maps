@@ -46,6 +46,7 @@ export const auth = betterAuth({
       },
     },
   },
+  /* 
   callbacks: {
     async session({ session, user }: { session: any, user: any }) {
         try {
@@ -82,4 +83,5 @@ export const auth = betterAuth({
       },
     },
   },
+  */
 });

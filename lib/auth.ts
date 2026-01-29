@@ -53,7 +53,7 @@ export const auth = betterAuth({
                 ...session,
                 user: {
                     ...session.user,
-                    role: user.role || "BARBER" // Ensure role fallback
+                    role: user?.role || "BARBER" // Ensure role fallback
                 }
             }
         } catch (error) {

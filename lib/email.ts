@@ -1,16 +1,28 @@
-import { Resend } from "resend";
+import nodemailer from 'nodemailer';
 
-const getResend = () => {
-    if (!process.env.RESEND_API_KEY) {
-        return null; // Handle missing key gracefully
+const getTransporter = () => {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        return null;
     }
-    return new Resend(process.env.RESEND_API_KEY);
-}
+
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+};
 
 export const sendContactsExportEmail = async (users: any[]) => {
-  const resend = getResend();
-  if (!resend) {
-    console.error("RESEND_API_KEY is not set");
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.error("SMTP credentials are not set");
     return;
   }
 
@@ -35,15 +47,15 @@ export const sendContactsExportEmail = async (users: any[]) => {
   const csvContent = header + rows;
 
   try {
-    await resend.emails.send({
-      from: "BarberMaps Export <onboarding@resend.dev>",
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"BarberMaps" <barbermapsmt@gmail.com>',
       to: exportEmail,
       subject: "Exportação de Contatos - BarberMaps",
-      text: `Olá,\n\nSegue em anexo a lista com 100 novos contatos coletados.\n\nTotal: ${users.length} contatos.`,
+      text: `Olá,\n\nSegue em anexo a lista com ${users.length} novos contatos coletados.`,
       attachments: [
         {
           filename: "contatos_barbermaps.csv",
-          content: Buffer.from(csvContent).toString("base64"),
+          content: csvContent, // Nodemailer handles string content implies utf-8
         },
       ],
     });
@@ -56,9 +68,9 @@ export const sendContactsExportEmail = async (users: any[]) => {
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resend = getResend();
-  if (!resend) {
-     console.error("RESEND_API_KEY is not set. Cannot send password reset email.");
+  const transporter = getTransporter();
+  if (!transporter) {
+     console.error("SMTP credentials are not set. Cannot send password reset email.");
      return;
   }
 
@@ -66,24 +78,27 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 
   try {
     console.log(`[DEBUG] Attempting to send reset email to: ${email} with token: ${token}`);
-    const { data, error } = await resend.emails.send({
+    
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"BarberMaps Security" <barbermapsmt@gmail.com>',
       to: email, 
-      from: "BarberMaps Security <onboarding@resend.dev>",
       subject: "Recuperação de Senha - BarberMaps",
       html: `
-        <h1>Recuperação de Senha</h1>
-        <p>Você solicitou a redefinição de sua senha.</p>
-        <p>Clique no link abaixo para criar uma nova senha:</p>
-        <a href="${resetLink}">Redefinir Senha</a>
-        <p>Se você não solicitou isso, ignore este e-mail.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #333;">Recuperação de Senha</h1>
+            <p style="font-size: 16px; color: #555;">Você solicitou a redefinição de sua senha.</p>
+            <p style="font-size: 16px; color: #555;">Clique no link abaixo para criar uma nova senha:</p>
+            <div style="margin: 20px 0;">
+                <a href="${resetLink}" style="background-color: #0070f3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Redefinir Senha</a>
+            </div>
+            <p style="font-size: 14px; color: #777;">Se você não solicitou isso, ignore este e-mail.</p>
+            <p style="font-size: 12px; color: #999; margin-top: 30px;">BarberMaps Team</p>
+        </div>
       `,
     });
     
-    if (error) {
-        console.error("[DEBUG] Resend API Error:", error);
-    } else {
-        console.log(`[DEBUG] Reset email sent successfully. ID: ${data?.id}`);
-    }
+    console.log(`[DEBUG] Reset email sent successfully to ${email}`);
+
   } catch (error) {
     console.error("[DEBUG] Unexpected error sending reset email:", error);
     throw error;

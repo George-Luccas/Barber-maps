@@ -1,45 +1,57 @@
 
-import { Resend } from "resend";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 import fs from "fs";
 
 dotenv.config();
 
 async function main() {
-    const log = (msg: string) => fs.appendFileSync("email_test_result.txt", msg + "\n");
+    const log = (msg: string) => {
+        console.log(msg);
+        fs.appendFileSync("email_test_result.txt", msg + "\n");
+    };
     
-    log("Testing Resend API Key...");
+    log("Testing Gmail SMTP via Nodemailer...");
     
-    if (!process.env.RESEND_API_KEY) {
-        log("No RESEND_API_KEY found in environment.");
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        log("SMTP credentials missing in environment.");
         return;
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    // Use the user's email if possible, but I'll use the one I found in codebase
-    // "georgeluccas300@gmail.com" matches the admin check.
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false, 
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+
     const testEmail = "georgeluccas300@gmail.com"; 
 
-    log(`Attempting to send email to ${testEmail} using onboarding@resend.dev...`);
+    log(`Attempting to send email to ${testEmail} from ${process.env.SMTP_USER}...`);
 
     try {
-        const data = await resend.emails.send({
-            from: "BarberMaps Test <onboarding@resend.dev>",
+        const info = await transporter.sendMail({
+            from: process.env.SMTP_FROM || `"BarberMaps Test" <${process.env.SMTP_USER}>`,
             to: testEmail,
-            subject: "Teste de Envio de Email - BarberMaps",
-            html: "<p>Se você recebeu este email, a configuração do Resend está funcionando corretamente!</p>",
+            subject: "Teste de Envio de Email - Gmail SMTP",
+            html: "<p>Se você recebeu este email, a configuração do Gmail SMTP está funcionando corretamente!</p>",
         });
 
-        if (data.error) {
-             log("Data Error: " + JSON.stringify(data.error));
-        } else {
-             log("Email sent successfully!");
-             log("Response ID: " + data.data?.id);
-        }
-       
+        log("Email sent successfully!");
+        log("Message ID: " + info.messageId);
+        
     } catch (error) {
         log("Failed to send email.");
-        log("Error details: " + JSON.stringify(error));
+        log("Error details: " + JSON.stringify(error, null, 2));
+        if (error instanceof Error) {
+            log("Error message: " + error.message);
+        }
     }
 }
 

@@ -24,6 +24,7 @@ interface ProfileContentProps {
     name: string;
     email: string;
     image?: string | null;
+    coverImage?: string | null;
     phone?: string | null;
     createdAt: Date;
   };
@@ -60,7 +61,13 @@ export function ProfileContent({ user, bookings, favorites, stats }: ProfileCont
     <div className="max-w-4xl mx-auto">
         {/* Cover Image */}
         <div className="relative h-48 md:h-72 w-full bg-gradient-to-r from-neon-purple/40 via-purple-900/40 to-background overflow-hidden relative group">
-            <div className="absolute inset-0 bg-[url('/banner.png')] bg-cover bg-center opacity-30 transition-transform duration-700 group-hover:scale-105"></div>
+            {user.coverImage ? (
+                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url('${user.coverImage}')` }}></div>
+            ) : (
+                <div className="absolute inset-0 bg-[url('/banner.png')] bg-cover bg-center opacity-30 transition-transform duration-700 group-hover:scale-105"></div>
+            )}
+            
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
             
             {/* 
             <Button 

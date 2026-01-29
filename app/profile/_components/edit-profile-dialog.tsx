@@ -31,6 +31,7 @@ interface EditProfileDialogProps {
     name: string
     phone?: string | null
     image?: string | null
+    coverImage?: string | null
   }
 }
 
@@ -38,6 +39,7 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedCoverImage, setSelectedCoverImage] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,6 +68,23 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
     }
   }
 
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 1024 * 1024) { // 1MB limit
+        toast.error("A imagem deve ter no máximo 1MB.")
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setSelectedCoverImage(base64String)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true)
     try {
@@ -73,6 +92,7 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
         name: values.name,
         phone: values.phone,
         image: selectedImage,
+        coverImage: selectedCoverImage,
       })
       toast.success("Perfil atualizado com sucesso!")
       setOpen(false)
@@ -145,8 +165,27 @@ export function EditProfileDialog({ user }: EditProfileDialogProps) {
                         className="cursor-pointer"
                     />
                 </div>
-                <p className="text-xs text-muted-foreground">Recomendado: 1MB máx.</p>
             </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="coverImage">Foto de Capa</Label>
+                <div className="flex items-center gap-4">
+                    {selectedCoverImage && (
+                        <div className="h-12 w-20 rounded-md overflow-hidden border border-border">
+                             {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={selectedCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <Input 
+                        id="coverImage" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleCoverImageChange}
+                        className="cursor-pointer"
+                    />
+                </div>
+            </div>
+            <p className="text-xs text-muted-foreground">Recomendado: 1MB máx.</p>
 
             <DialogFooter>
               <Button type="submit" disabled={loading}>

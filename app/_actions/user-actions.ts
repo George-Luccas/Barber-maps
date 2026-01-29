@@ -76,7 +76,8 @@ export async function toggleFavoriteBarbershop(barbershopId: string) {
 const updateUserSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
   phone: z.string().optional().nullable(),
-  image: z.string().optional().nullable(), // Base64 string
+  image: z.string().optional().nullable(), // Base64 string or URL
+  coverImage: z.string().optional().nullable(), // Base64 string or URL
 })
 
 export async function updateUserProfile(data: z.infer<typeof updateUserSchema>) {
@@ -98,6 +99,7 @@ export async function updateUserProfile(data: z.infer<typeof updateUserSchema>) 
       name: validatedData.name,
       phone: validatedData.phone,
       ...(validatedData.image && { image: validatedData.image }),
+      ...(validatedData.coverImage && { coverImage: validatedData.coverImage }),
     },
   })
 

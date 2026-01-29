@@ -233,6 +233,7 @@ model user {
   email         String      @unique
   emailVerified Boolean     @default(false)
   image         String?
+  coverImage    String?
   password      String?
   phone         String?
   role          UserRole    @default(BARBER)

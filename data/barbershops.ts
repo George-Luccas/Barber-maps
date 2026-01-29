@@ -149,40 +149,34 @@ export const getBarbershopsWithStories = async () => {
     }));
 };
 export const getBarbershopRanking = async (city?: string) => {
-    return await unstable_cache(
-        async () => {
-            const where: any = {};
-            if (city) {
-                where.city = {
-                contains: city.trim(),
-                mode: "insensitive",
-                };
-            }
+    const where: any = {};
+    if (city) {
+        where.city = {
+        contains: city.trim(),
+        mode: "insensitive",
+        };
+    }
 
-            const barbershops = await prisma.barbershop.findMany({
-                where,
-                include: {
-                _count: {
-                    select: {
-                    bookings: true,
-                    },
-                },
-                },
-                orderBy: {
-                bookings: {
-                    _count: "desc",
-                },
-                },
-                take: 10,
-            });
-
-            return barbershops.map((b) => ({
-                ...b,
-                dailyGoal: Number(b.dailyGoal),
-                bookingsCount: b._count.bookings,
-            }));
+    const barbershops = await prisma.barbershop.findMany({
+        where,
+        include: {
+        _count: {
+            select: {
+            bookings: true,
+            },
         },
-        ["barbershop-ranking", city || "all"], // Cache key depends on city
-        { revalidate: 3600 }
-    )();
+        },
+        orderBy: {
+        bookings: {
+            _count: "desc",
+        },
+        },
+        take: 10,
+    });
+
+    return barbershops.map((b) => ({
+        ...b,
+        dailyGoal: Number(b.dailyGoal),
+        bookingsCount: b._count.bookings,
+    }));
 };

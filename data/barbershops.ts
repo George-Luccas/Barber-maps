@@ -96,22 +96,16 @@ export const getPopularBarbershops = async () => {
 export const getBarbershopById = async (id: string) => {
     // Ideally this could be cached too, but booking availability needs to be fresh.
     // We will cache independent of booking slots for now.
-    return await unstable_cache(
-        async () => {
-            const barbershop = await prisma.barbershop.findUnique({
-                where: { id },
-                include: {
-                services: true,
-                Style: true,
-                BarbershopProduct: true,
-                Barber: true,
-                },
-            });
-            return barbershop;
+    const barbershop = await prisma.barbershop.findUnique({
+        where: { id },
+        include: {
+        services: true,
+        Style: true,
+        BarbershopProduct: true,
+        Barber: true,
         },
-        [`barbershop-${id}`],
-        { revalidate: 10 }
-    )();
+    });
+    return barbershop;
 };
 
 export const getBarbershopsByServiceName = async (serviceName: string) => {
@@ -130,35 +124,29 @@ export const getBarbershopsByServiceName = async (serviceName: string) => {
 };
 export const getBarbershopsWithStories = async () => {
     // Stories update often, cache for less time or not at all? Let's cache for 1 hour.
-    return await unstable_cache(
-        async () => {
-            const barbershops = await prisma.barbershop.findMany({
-                orderBy: {
-                    name: "asc", 
-                },
-                include: {
-                    Style: {
-                        where: {
-                            createdAt: {
-                                gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                            }
-                        },
-                        orderBy: {
-                            createdAt: 'desc'
-                        },
-                        take: 5 
+    const barbershops = await prisma.barbershop.findMany({
+        orderBy: {
+            name: "asc", 
+        },
+        include: {
+            Style: {
+                where: {
+                    createdAt: {
+                        gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
                     }
                 },
-                take: 10 // Limit stories to 10 barbershops for now
-            });
-            return barbershops.map(barbershop => ({
-                ...barbershop,
-                dailyGoal: Number(barbershop.dailyGoal)
-            }));
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: 5 
+            }
         },
-        ["barbershops-stories"],
-        { revalidate: 5 }
-    )();
+        take: 10 // Limit stories to 10 barbershops for now
+    });
+    return barbershops.map(barbershop => ({
+        ...barbershop,
+        dailyGoal: Number(barbershop.dailyGoal)
+    }));
 };
 export const getBarbershopRanking = async (city?: string) => {
     return await unstable_cache(

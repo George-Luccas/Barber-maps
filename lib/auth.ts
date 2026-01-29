@@ -33,10 +33,19 @@ export const auth = betterAuth({
   },
   password: {
     hash: async (password: string) => {
-      return await hash(password, 10);
+      const hashedPassword = await hash(password, 10);
+      return hashedPassword;
     },
     verify: async (password: string, hash: string) => {
-      return await compare(password, hash);
+      console.log("[DEBUG] Verifying password. Hash length:", hash?.length);
+      try {
+          const isValid = await compare(password, hash);
+          console.log("[DEBUG] Password valid?", isValid);
+          return isValid;
+      } catch (e) {
+          console.error("[DEBUG] Error verifying password:", e);
+          return false;
+      }
     }, 
   },
   user: {
@@ -44,9 +53,10 @@ export const auth = betterAuth({
       role: {
         type: "string",
       },
+      imagePosition: { type: "string" },
+      coverImagePosition: { type: "string" },
     },
   },
-  /* 
   callbacks: {
     async session({ session, user }: { session: any, user: any }) {
         try {
@@ -83,5 +93,4 @@ export const auth = betterAuth({
       },
     },
   },
-  */
 });

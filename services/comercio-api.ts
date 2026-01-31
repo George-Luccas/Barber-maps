@@ -1,8 +1,11 @@
 const API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL;
 const API_KEY = process.env.COMERCIO_API_KEY;
 
-if (!API_URL || !API_KEY) {
-  console.warn("⚠️ Configurações da API do Comercio (URL ou KEY) estão ausentes no .env");
+// Runtime check to prevent crashes and infinite loading due to missing environment variables
+const isConfigured = !!(API_URL && API_KEY && !API_URL.includes("undefined") && API_URL !== "http://localhost:3000/api/external/v1");
+
+if (!isConfigured) {
+  console.error("❌ CRITICAL: Comercio API internal configuration is missing or invalid. Check NEXT_PUBLIC_COMERCIO_API_URL and COMERCIO_API_KEY.");
 }
 
 // --- Tipos Atualizados ---
@@ -78,6 +81,7 @@ const headers = {
 
 export const comercioApi = {
   getShop: async (id: string): Promise<Barbershop | null> => {
+    if (!isConfigured) return null;
     try {
       // Revalidate em 60s para manter dados frescos
       const res = await fetch(`${API_URL}/shops/${id}`, { headers, next: { revalidate: 60 } });
@@ -90,6 +94,7 @@ export const comercioApi = {
   },
 
   getShopServices: async (id: string): Promise<{ services: Service[], barbers: Barber[] }> => {
+    if (!isConfigured) return { services: [], barbers: [] };
     try {
       const res = await fetch(`${API_URL}/shops/${id}/services`, { headers, cache: 'no-store' });
       if (!res.ok) throw new Error(`Erro ao buscar serviços: ${res.statusText}`);
@@ -101,6 +106,7 @@ export const comercioApi = {
   },
 
   getAvailability: async (shopId: string, date: string): Promise<string[]> => {
+    if (!isConfigured) return [];
     try {
       const res = await fetch(`${API_URL}/shops/${shopId}/availability?date=${date}`, { headers, cache: 'no-store' });
       if (!res.ok) throw new Error(`Erro ao buscar disponibilidade: ${res.statusText}`);
@@ -113,6 +119,7 @@ export const comercioApi = {
   },
 
   getShops: async (params?: { search?: string; city?: string }): Promise<Barbershop[]> => {
+    if (!isConfigured) return [];
     try {
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append("search", params.search);
@@ -128,6 +135,7 @@ export const comercioApi = {
   },
 
   createBooking: async (payload: CreateBookingPayload) => {
+    if (!isConfigured) throw new Error("API não configurada corretamente.");
     const res = await fetch(`${API_URL}/bookings`, {
       method: "POST",
       headers,

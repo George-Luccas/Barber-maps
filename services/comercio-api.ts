@@ -1,18 +1,21 @@
-const API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL;
+// Normalize API_URL to remove trailing slash if present
+const RAW_API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL;
+const API_URL = RAW_API_URL?.endsWith("/") ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 const API_KEY = process.env.COMERCIO_API_KEY;
 
 // Runtime check to prevent crashes and infinite loading due to missing environment variables
-// Triggering redeploy after user added environment variables to Vercel
 const isConfigured = !!(
   API_URL && 
   API_KEY && 
-  API_URL.startsWith("http") && // Protocol is mandatory for fetch
+  API_URL.startsWith("http") && 
   !API_URL.includes("undefined") && 
   API_URL !== "http://localhost:3000/api/external/v1"
 );
 
 if (!isConfigured) {
   console.error("❌ CRITICAL: Comercio API internal configuration is missing or invalid. Check NEXT_PUBLIC_COMERCIO_API_URL (must start with https://) and COMERCIO_API_KEY.");
+} else {
+  console.log(`✅ Comercio API configured with URL: ${API_URL}`);
 }
 
 // --- Tipos Atualizados ---
@@ -90,12 +93,15 @@ export const comercioApi = {
   getShop: async (id: string): Promise<Barbershop | null> => {
     if (!isConfigured) return null;
     try {
-      // Revalidate em 60s para manter dados frescos
-      const res = await fetch(`${API_URL}/shops/${id}`, { headers, next: { revalidate: 60 } });
-      if (!res.ok) throw new Error(`Erro ao buscar loja: ${res.statusText}`);
+      const url = `${API_URL}/shops/${id}`;
+      const res = await fetch(url, { headers, next: { revalidate: 60 } });
+      if (!res.ok) {
+        console.error(`❌ API error at ${url}: ${res.status} ${res.statusText}`);
+        return null;
+      }
       return await res.json();
     } catch (error) {
-      console.error("API Error (getShop):", error);
+      console.error("API Exception (getShop):", error);
       return null;
     }
   },
@@ -103,11 +109,15 @@ export const comercioApi = {
   getShopServices: async (id: string): Promise<{ services: Service[], barbers: Barber[] }> => {
     if (!isConfigured) return { services: [], barbers: [] };
     try {
-      const res = await fetch(`${API_URL}/shops/${id}/services`, { headers, cache: 'no-store' });
-      if (!res.ok) throw new Error(`Erro ao buscar serviços: ${res.statusText}`);
+      const url = `${API_URL}/shops/${id}/services`;
+      const res = await fetch(url, { headers, cache: 'no-store' });
+      if (!res.ok) {
+        console.error(`❌ API error at ${url}: ${res.status} ${res.statusText}`);
+        return { services: [], barbers: [] };
+      }
       return await res.json();
     } catch (error) {
-      console.error("API Error (getShopServices):", error);
+      console.error("API Exception (getShopServices):", error);
       return { services: [], barbers: [] };
     }
   },

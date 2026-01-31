@@ -55,10 +55,10 @@ async function main() {
   }
 
   // 5. Verify results
-  console.log(`Found ${testShop.Style.length} stories for test shop.`);
+  console.log(`Found ${testShop.styles.length} stories for test shop.`);
   
-  const hasOld = testShop.Style.some(s => s.name === "Old Cut");
-  const hasNew = testShop.Style.some(s => s.name === "New Cut");
+  const hasOld = testShop.styles.some(s => s.name === "Old Cut");
+  const hasNew = testShop.styles.some(s => s.name === "New Cut");
 
   if (hasOld) {
     console.error("FAILURE: Old story was found!");

@@ -80,8 +80,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     date.setHours(hours, minutes);
     
     const result = await executeCreateBooking({
-      date,
       serviceId: service.id,
+      barbershopId: barbershop.id,
+      date,
       barberId: selectedBarberId,
       isSubscription: paymentMethod === "SUBSCRIPTION",
     });

@@ -1,6 +1,5 @@
 // Data Access Layer
-import { prisma } from "@/lib/prisma";
-
+import { comercioApi } from "@/services/comercio-api";
 
 interface GetBarbershopsProps {
   city?: string;
@@ -9,167 +8,93 @@ interface GetBarbershopsProps {
 }
 
 export const getBarbershops = async (props?: GetBarbershopsProps) => {
-    const where: any = {};
-    if (props?.city) {
-        where.city = {
-            contains: props.city.trim(),
-            mode: "insensitive",
-        };
-    }
-    if (props?.state) {
-        where.state = {
-            contains: props.state.trim(),
-            mode: "insensitive",
-        };
-    }
-    if (props?.search) {
-            where.OR = [
-            {
-                name: {
-                    contains: props.search.trim(),
-                    mode: "insensitive",
-                },
-            },
-            {
-                services: {
-                    some: {
-                        name: {
-                            contains: props.search.trim(),
-                            mode: "insensitive",
-                        },
-                    },
-                },
-            },
-        ];
-    }
-
-    const barbershops = await prisma.barbershop.findMany({
-        where,
+    // API supports search and city. State logic might be simulated via search or ignored if API doesn't support state.
+    const shops = await comercioApi.getShops({
+        search: props?.search,
+        city: props?.city
     });
-    return barbershops.map(barbershop => ({
-        ...barbershop,
-        dailyGoal: Number(barbershop.dailyGoal)
+    
+    // Map to expected format (adding defaults for missing fields)
+    return shops.map(shop => ({
+        ...shop,
+        dailyGoal: 0 // Default as API doesn't return this yet
     }));
 };
 
 export const getAvailableLocations = async () => {
-    // Cache available locations as they rarely change
-    const barbershops = await prisma.barbershop.findMany({
-        select: {
-        city: true,
-        state: true,
-        },
-        distinct: ['city', 'state'],
+    // Fetch all shops and extract unique cities
+    // Note: This is less efficient than SQL DISTINCT but necessary without a dedicated API endpoint
+    const shops = await comercioApi.getShops();
+    const uniqueLocations = new Set<string>();
+    const locations: { city: string; state: string }[] = [];
+
+    shops.forEach(shop => {
+        if (shop.city) {
+            const key = `${shop.city}`;
+            if (!uniqueLocations.has(key)) {
+                uniqueLocations.add(key);
+                locations.push({ city: shop.city, state: "SP" }); // Defaulting state if not in API, or need to request backend to add it
+            }
+        }
     });
-    return barbershops.filter(b => b.city && b.state);
+
+    return locations;
 };
 
 export const getPopularBarbershops = async () => {
-    const popularBarbershops = await prisma.barbershop.findMany({
-        orderBy: {
-        name: "desc",
-        },
-    });
-    return popularBarbershops.map(barbershop => ({
-        ...barbershop,
-        dailyGoal: Number(barbershop.dailyGoal)
+    const shops = await comercioApi.getShops();
+    // API doesn't have ranking yet, so return first 10
+    return shops.slice(0, 10).map(shop => ({
+        ...shop,
+        dailyGoal: 0
     }));
 };
 
 export const getBarbershopById = async (id: string) => {
-    // Ideally this could be cached too, but booking availability needs to be fresh.
-    // We will cache independent of booking slots for now.
-    const barbershop = await prisma.barbershop.findUnique({
-        where: { id },
-        include: {
-        services: true,
-        Style: true,
-        BarbershopProduct: true,
-        Barber: true,
-        },
-    });
-
-    if (!barbershop) return null;
+    const shop = await comercioApi.getShop(id);
+    if (!shop) return null;
+    
+    // Helper to get services (needed for compatibility with old callers expecting full tree)
+    // Note: Old callers might expect services nested, but getShop API returns simple shop. 
+    // Usually callers use getShopServices separately now, but for safety:
+    const { services, barbers } = await comercioApi.getShopServices(id);
 
     return {
-        ...barbershop,
-        dailyGoal: Number(barbershop.dailyGoal)
+        ...shop,
+        services, 
+        Barber: barbers,
+        Style: shop.styles || [],
+        BarbershopProduct: shop.products || [],
+        dailyGoal: 0
     };
 };
 
 export const getBarbershopsByServiceName = async (serviceName: string) => {
-  const barbershops = await prisma.barbershop.findMany({
-    where: {
-      services: {
-        some: {
-          name: {
-            contains: serviceName,
-            mode: "insensitive",
-          },
-        },
-      },
-    },
-  });
-  return barbershops.map(barbershop => ({
-    ...barbershop,
-    dailyGoal: Number(barbershop.dailyGoal)
-  }));
+   // API currently searches generally. We'll use general search.
+   const shops = await comercioApi.getShops({ search: serviceName });
+   return shops.map(shop => ({
+        ...shop,
+        dailyGoal: 0
+    }));
 };
+
 export const getBarbershopsWithStories = async () => {
-    // Stories update often, cache for less time or not at all? Let's cache for 1 hour.
-    const barbershops = await prisma.barbershop.findMany({
-        orderBy: {
-            name: "asc", 
-        },
-        include: {
-            Style: {
-                where: {
-                    createdAt: {
-                        gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                    }
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                },
-                take: 5 
-            }
-        },
-        take: 10 // Limit stories to 10 barbershops for now
-    });
-    return barbershops.map(barbershop => ({
-        ...barbershop,
-        dailyGoal: Number(barbershop.dailyGoal)
+    // API doesn't support stories yet. Return empty or basic list.
+    const shops = await comercioApi.getShops();
+    return shops.slice(0, 10).map(shop => ({
+        ...shop,
+        Style: shop.styles || [], // Use styles as stories substitute
+        dailyGoal: 0
     }));
 };
+
 export const getBarbershopRanking = async (city?: string) => {
-    const where: any = {};
-    if (city) {
-        where.city = {
-        contains: city.trim(),
-        mode: "insensitive",
-        };
-    }
-
-    const barbershops = await prisma.barbershop.findMany({
-        where,
-        include: {
-        _count: {
-            select: {
-            bookings: true,
-            },
-        },
-        },
-        orderBy: {
-        bookings: {
-            _count: "desc",
-        },
-        },
-        take: 10,
-    });
-
-    return barbershops.map((b) => ({
-        ...b,
-        dailyGoal: Number(b.dailyGoal),
-        bookingsCount: b._count.bookings,
-    }));
+   // Ranking not supported in API. Return list.
+   const shops = await comercioApi.getShops({ city });
+   return shops.map(shop => ({
+       ...shop,
+       dailyGoal: 0,
+       bookingsCount: 0 // API doesn't expose booking counts
+   }));
 };
+

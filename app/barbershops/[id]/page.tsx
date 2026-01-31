@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Smartphone } from "lucide-react";
-import { getBarbershopById } from "@/data/barbershops";
+// import { getBarbershopById } from "@/data/barbershops"; // OLD
+import { comercioApi } from "@/services/comercio-api"; // NEW
 import { PageSectionTitle } from "@/components/ui/page";
 import Footer from "@/components/footer";
 import ServiceItem from "@/components/service-item";
@@ -12,39 +13,35 @@ import { Badge } from "@/components/ui/badge";
 import Minibar from "./_components/minibar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getLoyaltyCard } from "@/app/_actions/loyalty";
-import { LoyaltyCard } from "@/components/loyalty-card";
+// import { getLoyaltyCard } from "@/app/_actions/loyalty";
+// import { LoyaltyCard } from "@/components/loyalty-card";
 import { FavoriteButton } from "./_components/favorite-button";
 import { prisma } from "@/lib/prisma";
 import { BarbershopGallery } from "@/components/barbershop-gallery";
 
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
-  // Force rebuild to sync Prisma Client with new DB schema
+const BarbershopPage = async ({ params }: PageProps) => {
   const { id } = await params;
-  const barbershop = await getBarbershopById(id);
-  /* EMERGENCY DISABLE: Auth causing potential 500 or Loyalty issues. Restoring later.
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  let loyaltyCard = null;
-  try {
-      loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
-  } catch (error) {
-      console.error("Failed to fetch loyalty card:", error);
+  
+  // --- MIGRAÇÃO API ---
+  const barbershop = await comercioApi.getShop(id);
+  const { services, barbers } = await comercioApi.getShopServices(id);
+
+  if (!barbershop) {
+    notFound();
   }
-  */
-  /* EMERGENCY DISABLE: Auth causing potential 500 or Loyalty issues. Restoring later.
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  let loyaltyCard = null;
-  try {
-      loyaltyCard = session?.user ? await getLoyaltyCard(id, session.user.id) : null;
-  } catch (error) {
-      console.error("Failed to fetch loyalty card:", error);
-  }
-  */
+
+  // Combine services with shop info for the component
+  const servicesWithShop = services.map(s => ({
+    ...s,
+    barbershopId: barbershop.id
+  }));
+
   // Re-enable session just for isFavorited check (safe check)
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -62,10 +59,6 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
           }
       });
       isFavorited = !!userFavorite;
-  }
-
-  if (!barbershop) {
-    notFound();
   }
 
   return (
@@ -127,47 +120,39 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
         </div>
 
         {/* Galeria */}
-        <div className="flex flex-col gap-3 px-5">
-          <PageSectionTitle>Galeria</PageSectionTitle>
-          <BarbershopGallery 
-            photos={[
-                ...barbershop.photos.map((url) => ({ url, alt: `Foto da barbearia ${barbershop.name}` })),
-                ...barbershop.Style.map((style) => ({ url: style.imageUrl, alt: style.name }))
-            ]} 
-          />
-        </div>
-
-        {/* Divider */}
-        <div className="py-6">
-          <div className="bg-border h-px w-full" />
-        </div>
-
-        {/* Loyalty Card - DISABLED FOR DEBUG
-        {session?.user && (
-            <div className="px-5 pb-6">
-                <LoyaltyCard 
-                    currentPoints={loyaltyCard?.currentPoints || 0}
-                    freeCuts={loyaltyCard?.freeCuts || 0}
-                    tier={loyaltyCard?.tier || "BRONZE"}
-                    totalLifetimePoints={loyaltyCard?.totalLifetimePoints || 0}
-                />
+        {((barbershop.photos && barbershop.photos.length > 0) || (barbershop.styles && barbershop.styles.length > 0)) && (
+            <div className="flex flex-col gap-3 px-5">
+            <PageSectionTitle>Galeria</PageSectionTitle>
+            <BarbershopGallery 
+                photos={[
+                    ...(barbershop.photos || []).map((url) => ({ url, alt: `Foto da barbearia ${barbershop.name}` })),
+                    ...(barbershop.styles || []).map((style) => ({ url: style.imageUrl, alt: style.name }))
+                ]} 
+            />
             </div>
         )}
-        */}
+        
+        {/* Divider if Gallery existed */}
+        {((barbershop.photos && barbershop.photos.length > 0) || (barbershop.styles && barbershop.styles.length > 0)) && (
+             <div className="py-6">
+                <div className="bg-border h-px w-full" />
+             </div>
+        )}
+
 
         {/* Serviços */}
         <div className="flex flex-col gap-3 px-5">
           <PageSectionTitle>Serviços</PageSectionTitle>
           <div className="flex flex-col gap-3">
-            {barbershop.services.map((service) => (
+            {servicesWithShop.map((service) => (
               <ServiceItem
                 key={service.id}
-                service={service}
+                service={service as any} // Service interface match
                 barbershop={{
                   id: barbershop.id,
                   name: barbershop.name,
                   isOpen: barbershop.isOpen,
-                  barbers: barbershop.Barber,
+                  barbers: barbers as any, // Barber interface match
                 }}
               />
             ))}
@@ -209,8 +194,10 @@ const BarbershopPage = async ({ params }: PageProps<"/barbershops/[id]">) => {
         />
 
         {/* Minibar Feature */}
-        <Minibar products={barbershop.BarbershopProduct} />
-
+        {barbershop.products && barbershop.products.length > 0 && (
+             <Minibar products={barbershop.products as any} />
+        )}
+       
         {/* Footer spacing */}
         <div className="pt-[60px]" />
       </div>

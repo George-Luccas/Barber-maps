@@ -7,9 +7,9 @@ import { hash, compare } from "bcryptjs";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+      provider: "postgresql",
   }),
-  timeout: 30000, // Increase connection timeout
+  timeout: 30000, 
   baseURL: process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"), 
   basePath: "/api/auth",
   trustedOrigins: [
@@ -19,14 +19,15 @@ export const auth = betterAuth({
     "https://www.barbermaps.com.br",
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://*", // Allow any HTTPS domain (Custom Domains)
-    "*", // Emergency fallback
+    "https://*", 
+    "*", 
   ],
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
     password: {
         hash: async (password: string) => {
+          console.log("[DEBUG] Custom Hash Function Called");
           const hashedPassword = await hash(password, 10);
           return hashedPassword;
         },

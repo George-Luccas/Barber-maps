@@ -8,7 +8,7 @@ async function main() {
         console.log(`Successfully fetched ${barbershops.length} barbershops.`);
         if (barbershops.length > 0) {
             console.log("Sample Barbershop:", barbershops[0].name);
-            console.log("Sample Stories Count:", barbershops[0].Style?.length || 0);
+            console.log("Sample Stories Count:", barbershops[0].styles?.length || 0);
         }
     } catch (e: any) {
         console.error("FAILED to fetch barbershops:", e);

@@ -1,7 +1,7 @@
 import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { openai } from "@ai-sdk/openai";
 import z from "zod";
-import { prisma } from "@/lib/prisma";
+import { comercioApi } from "@/services/comercio-api";
 import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
 import { createBooking } from "@/actions/create-booking";
 
@@ -19,7 +19,7 @@ export const POST = async (request: Request) => {
       month: "long",
       day: "numeric",
     })} (${new Date().toISOString().split("T")[0]})
-chat/r
+
     Seu objetivo é ajudar os usuários a:
     - Encontrar barbearias (por nome ou todas disponíveis)
     - Verificar disponibilidade de horários para barbearias específicas
@@ -58,6 +58,7 @@ chat/r
     - Após o usuário confirmar explicitamente a escolha (ex: "confirmo", "pode agendar", "quero esse horário"), use a tool createBooking
     - Parâmetros necessários:
       * serviceId: ID do serviço escolhido
+      * barbershopId: ID da barbearia escolhida
       * date: Data e horário no formato ISO (YYYY-MM-DDTHH:mm:ss) - exemplo: "2025-11-05T10:00:00"
     - Se a criação for bem-sucedida (success: true), informe ao usuário que a reserva foi confirmada com sucesso
     - Se houver erro (success: false), explique o erro ao usuário:
@@ -84,26 +85,14 @@ chat/r
         }),
         execute: async ({ name }) => {
           console.log("searchBarbershops", name);
-          if (!name?.trim()) {
-            const barbershops = await prisma.barbershop.findMany({
-              include: {
-                services: true,
-              },
-            });
-            return barbershops;
-          }
-          const barbershops = await prisma.barbershop.findMany({
-            where: {
-              name: {
-                contains: name,
-                mode: "insensitive",
-              },
-            },
-            include: {
-              services: true,
-            },
-          });
-          return barbershops;
+          const barbershops = await comercioApi.getShops({ search: name });
+          
+          // Enrich with services for top results to help LLM
+          const detailedShops = await Promise.all(barbershops.slice(0, 3).map(async (shop) => {
+            const { services } = await comercioApi.getShopServices(shop.id);
+            return { ...shop, services };
+          }));
+          return detailedShops;
         },
       }),
       getAvailableTimeSlotsForBarbershop: tool({
@@ -135,17 +124,19 @@ chat/r
           "Cria um novo agendamento para um serviço específico em uma data específica.",
         inputSchema: z.object({
           serviceId: z.uuid(),
+          barbershopId: z.uuid(),
           date: z
             .string()
             .describe(
               "A data no formato ISO (YYYY-MM-DD) para a qual você deseja criar o agendamento.",
             ),
         }),
-        execute: async ({ serviceId, date }) => {
+        execute: async ({ serviceId, barbershopId, date }) => {
           console.log("createBooking", serviceId, date);
           try {
             await createBooking({
               serviceId,
+              barbershopId,
               date: new Date(date),
             });
             return {

@@ -8,7 +8,7 @@ async function main() {
   const results = await getBarbershops({ state: state || undefined, city: city || undefined, search: search || undefined });
   console.log("Filters:", { state, city, search });
   console.log("Found", results.length, "barbershops");
-  console.log(results.map(b => ({ id: b.id, name: b.name, city: b.city, state: b.state })));
+  console.log(results.map(b => ({ id: b.id, name: b.name, city: b.city })));
 }
 
 main().catch(e => {

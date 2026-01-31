@@ -81,11 +81,7 @@ export const getBarbershopsByServiceName = async (serviceName: string) => {
 export const getBarbershopsWithStories = async () => {
     // API doesn't support stories yet. Return empty or basic list.
     const shops = await comercioApi.getShops();
-    return shops.slice(0, 10).map(shop => ({
-        ...shop,
-        Style: shop.styles || [], // Use styles as stories substitute
-        dailyGoal: 0
-    }));
+    return shops.slice(0, 10);
 };
 
 export const getBarbershopRanking = async (city?: string) => {

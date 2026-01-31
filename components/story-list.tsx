@@ -2,17 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Barbershop, Style } from "@prisma/client";
+import { Barbershop, Style } from "@/services/comercio-api";
 import StoryViewer from "./story-viewer";
 
-// Extended Barbershop type to include Style and override dailyGoal as number
-interface BarbershopWithStyles extends Omit<Barbershop, 'dailyGoal'> {
-  Style: Style[];
-  dailyGoal: number;
-}
-
 interface StoryListProps {
-  barbershops: BarbershopWithStyles[];
+  barbershops: Barbershop[];
 }
 
 const StoryList = ({ barbershops }: StoryListProps) => {
@@ -21,12 +15,12 @@ const StoryList = ({ barbershops }: StoryListProps) => {
   // Map database data to StoryViewer format
   const storiesData = barbershops.map((barbershop) => {
     // If has styles, use them. Otherwise, use cover image as a single story.
-    const hasStyles = barbershop.Style && barbershop.Style.length > 0;
+    const hasStyles = barbershop.styles && barbershop.styles.length > 0;
     
     let stories = [];
     
     if (hasStyles) {
-        stories = barbershop.Style.map(style => ({
+        stories = barbershop.styles.map(style => ({
             id: style.id,
             url: style.imageUrl,
             type: "image" as const,

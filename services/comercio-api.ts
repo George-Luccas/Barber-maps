@@ -2,6 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL;
 const API_KEY = process.env.COMERCIO_API_KEY;
 
 // Runtime check to prevent crashes and infinite loading due to missing environment variables
+// Triggering redeploy after user added environment variables to Vercel
 const isConfigured = !!(API_URL && API_KEY && !API_URL.includes("undefined") && API_URL !== "http://localhost:3000/api/external/v1");
 
 if (!isConfigured) {

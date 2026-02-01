@@ -1,5 +1,16 @@
-// Normalize API_URL to remove trailing slash if present
-const RAW_API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL;
+// Helper to determine the base URL dynamically
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_COMERCIO_API_URL) {
+    return process.env.NEXT_PUBLIC_COMERCIO_API_URL;
+  }
+  // Vercel automatically sets VERCEL_URL (without https://)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api/external/v1`;
+  }
+  return "http://localhost:3000/api/external/v1";
+};
+
+const RAW_API_URL = getBaseUrl();
 const API_URL = RAW_API_URL?.endsWith("/") ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 const API_KEY = process.env.COMERCIO_API_KEY;
 
@@ -8,8 +19,7 @@ const isConfigured = !!(
   API_URL && 
   API_KEY && 
   API_URL.startsWith("http") && 
-  !API_URL.includes("undefined") && 
-  API_URL !== "http://localhost:3000/api/external/v1"
+  !API_URL.includes("undefined")
 );
 
 if (!isConfigured) {
@@ -108,14 +118,19 @@ export const comercioApi = {
 
   getShopServices: async (id: string): Promise<{ services: Service[], barbers: Barber[] }> => {
     if (!isConfigured) return { services: [], barbers: [] };
+    const url = `${API_URL}/shops/${id}/services`;
+    console.log(`[API] Fetching services from: ${url}`);
     try {
-      const url = `${API_URL}/shops/${id}/services`;
       const res = await fetch(url, { headers, cache: 'no-store' });
       if (!res.ok) {
         console.error(`❌ API error at ${url}: ${res.status} ${res.statusText}`);
+        const text = await res.text();
+        console.error(`Response body: ${text}`);
         return { services: [], barbers: [] };
       }
-      return await res.json();
+      const data = await res.json();
+      console.log(`[API] Services fetched: ${data.services?.length ?? 0}, Barbers: ${data.barbers?.length ?? 0}`);
+      return data;
     } catch (error) {
       console.error("API Exception (getShopServices):", error);
       return { services: [], barbers: [] };
@@ -125,9 +140,16 @@ export const comercioApi = {
   getAvailability: async (shopId: string, date: string): Promise<string[]> => {
     if (!isConfigured) return [];
     try {
-      const res = await fetch(`${API_URL}/shops/${shopId}/availability?date=${date}`, { headers, cache: 'no-store' });
-      if (!res.ok) throw new Error(`Erro ao buscar disponibilidade: ${res.statusText}`);
+      const url = `${API_URL}/shops/${shopId}/availability?date=${date}`;
+      console.log(`[API] Fetching availability from: ${url}`);
+      const res = await fetch(url, { headers, cache: 'no-store' });
+      if (!res.ok) {
+         const text = await res.text();
+         console.error(`❌ API error at ${url}: ${res.status} ${res.statusText} - Body: ${text}`);
+         throw new Error(`Erro ao buscar disponibilidade: ${res.statusText}`);
+      }
       const data: AvailabilityResponse = await res.json();
+      console.log(`[API] Availability fetched for ${date}: ${data.availableSlots?.length ?? 0} slots`);
       return data.availableSlots || [];
     } catch (error) {
       console.error("API Error (getAvailability):", error);
@@ -166,3 +188,4 @@ export const comercioApi = {
     return data;
   }
 };
+

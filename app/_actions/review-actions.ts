@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/prisma";
+import { prisma as db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 interface CreateReviewParams {
@@ -66,7 +66,7 @@ export const getBarbershopRating = async (barbershopId: string) => {
 
   if (reviews.length === 0) return { average: 0, count: 0 };
 
-  const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+  const sum = reviews.reduce((acc: number, review) => acc + review.rating, 0);
   const average = sum / reviews.length;
 
   return {

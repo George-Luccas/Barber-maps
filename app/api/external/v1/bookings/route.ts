@@ -25,8 +25,16 @@ export async function POST(req: Request) {
 
     console.log("[LOCAL API] Received Booking Request:", body);
 
-    if (!barbershopId || !serviceId || !date || !clientEmail) {
-        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const missingFields = [];
+    if (!barbershopId) missingFields.push("barbershopId");
+    if (!serviceId) missingFields.push("serviceId");
+    if (!date) missingFields.push("date");
+    if (!clientEmail) missingFields.push("clientEmail");
+
+    if (missingFields.length > 0) {
+        const errorMessage = `Missing required fields: ${missingFields.join(", ")}`;
+        console.error(`[LOCAL API] Validation Error: ${errorMessage}`);
+        return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     // Since we are running locally, the User should exist in our DB.

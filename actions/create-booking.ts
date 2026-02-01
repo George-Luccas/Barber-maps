@@ -39,7 +39,12 @@ export const createBooking = protectedActionClient
              serviceId,
              barberId: barberId || "",
              date: date.toISOString(),
-             clientName: user.name || "Cliente",
+             // Send both formats to be safe, or prioritizing the one the error requested
+             clientName: user.name || "Cliente",  // Keep for legacy/local if needed
+             user: {
+                name: user.name || "Cliente",
+                email: user.email || undefined,
+             },
              clientEmail: user.email || undefined,
              clientPhone: undefined,
              isSubscription: parsedInput.isSubscription

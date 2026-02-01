@@ -88,9 +88,14 @@ export interface CreateBookingPayload {
   serviceId: string;
   barberId: string;
   date: string;
-  clientName: string;
+  clientName?: string;
   clientEmail?: string;
   clientPhone?: string;
+  user?: {
+    name: string;
+    email?: string;
+    phone?: string;
+  };
   isSubscription?: boolean;
 }
 

@@ -184,7 +184,7 @@ export const comercioApi = {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error || "Erro ao criar agendamento");
+      throw new Error(`${data.error || "Erro ao criar agendamento"} (URL: ${API_URL}/bookings)`);
     }
     return data;
   }

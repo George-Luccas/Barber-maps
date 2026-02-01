@@ -18,6 +18,10 @@ import { headers } from "next/headers";
 import { FavoriteButton } from "./_components/favorite-button";
 import { prisma } from "@/lib/prisma";
 import { BarbershopGallery } from "@/components/barbershop-gallery";
+import { getBarbershopReviews, getBarbershopRating } from "@/app/_actions/review-actions";
+import { RatingSummary } from "@/components/rating-stars";
+import { ReviewForm } from "@/components/review-form";
+import { ReviewList } from "@/components/review-list";
 
 interface PageProps {
   params: Promise<{
@@ -61,6 +65,13 @@ const BarbershopPage = async ({ params }: PageProps) => {
       isFavorited = !!userFavorite;
   }
 
+  const reviews = await getBarbershopReviews(id);
+  const rating = await getBarbershopRating(id);
+
+  const userReview = session?.user 
+    ? reviews.find(r => r.userId === session.user?.id) 
+    : undefined;
+
   return (
     <div>
       {/* Banner Header */}
@@ -101,6 +112,9 @@ const BarbershopPage = async ({ params }: PageProps) => {
             </Badge>
           </div>
           <p className="text-muted-foreground text-sm">{barbershop.address}</p>
+          <div className="mt-2">
+            <RatingSummary average={rating.average} count={rating.count} />
+          </div>
         </div>
 
         {/* Divider */}
@@ -197,6 +211,25 @@ const BarbershopPage = async ({ params }: PageProps) => {
         {barbershop.products && barbershop.products.length > 0 && (
              <Minibar products={barbershop.products as any} />
         )}
+
+        {/* Avaliações */}
+        <div className="py-6">
+          <div className="bg-border h-px w-full" />
+        </div>
+
+        <div className="flex flex-col gap-4 px-5 pb-10">
+          <div className="flex items-center justify-between">
+            <PageSectionTitle>Avaliações</PageSectionTitle>
+            {session?.user && (
+              <ReviewForm 
+                barbershopId={id} 
+                userId={session.user.id} 
+                initialData={userReview ? { rating: userReview.rating, comment: userReview.comment } : undefined}
+              />
+            )}
+          </div>
+          <ReviewList reviews={reviews as any} />
+        </div>
        
         {/* Footer spacing */}
         <div className="pt-[60px]" />

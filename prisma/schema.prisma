@@ -39,6 +39,7 @@ model Barbershop {
   Style                Style[]
   LoyaltyCards         LoyaltyCard[]
   favoritedBy          UserFavorite[]
+  reviews              Review[]
 }
 
 model BarbershopService {
@@ -253,6 +254,7 @@ model user {
   PlatformFeedback PlatformFeedback[]
   LoyaltyCards     LoyaltyCard[]
   favorites        UserFavorite[]
+  reviews          Review[]
 
   @@map("user") // Optional: map to "user" table if you want to keep lowercase table names like in auth.prisma, or stick to default. Auth prisma used @@map("user"). Let's keep it consistent if possible, though strict PascalCase is standard in Prisma. The auth.prisma had @@map("user"). schema.prisma has model user (lowercase). Let's keep model user as is but ensure relationships are correct.
 }
@@ -360,4 +362,20 @@ model LoyaltyCard {
   barbershop Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   
   @@unique([userId, barbershopId])
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  rating       Int
+  comment      String?
+  userId       String
+  barbershopId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         user       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, barbershopId])
+  @@index([barbershopId])
+  @@index([userId])
 }

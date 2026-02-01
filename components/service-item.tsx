@@ -69,6 +69,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
 // ...
 
+  const isOpen = barbershop.isOpen ?? true;
+
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
       {/* Service Image */}

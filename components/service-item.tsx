@@ -56,7 +56,74 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBooking);
 
-  // ... rest of hooks ...
+  const { data: availableTimeSlots, refetch } = useGetDateAvailableTimeSlots({
+    barbershopId: barbershop.id,
+    date: selectedDate,
+    barberId: selectedBarberId,
+  });
+
+  // Fetch Membership
+  const { data: membership } = useUserMembership();
+
+  // Refetch when barber changes
+  useEffect(() => {
+    if (selectedDate) {
+        refetch();
+    }
+  }, [selectedBarberId, selectedDate, refetch]);
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSelectedTime(undefined);
+  };
+
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time);
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!selectedDate || !selectedTime) {
+      return;
+    }
+    const splittedTime = selectedTime.split(":");
+    const hours = Number(splittedTime[0]);
+    const minutes = Number(splittedTime[1]);
+    const date = new Date(selectedDate);
+    date.setHours(hours, minutes);
+    
+    const result = await executeCreateBooking({
+      serviceId: service.id,
+      barbershopId: barbershop.id,
+      date,
+      barberId: selectedBarberId,
+      isSubscription: paymentMethod === "SUBSCRIPTION",
+    });
+    
+    if (result.validationErrors) {
+      return toast.error(result.validationErrors._errors?.[0]);
+    }
+    if (result.serverError) {
+      return toast.error(
+        "Erro ao criar agendamento. Por favor, tente novamente.",
+      );
+    }
+    
+    toast.success("Reserva realizada com sucesso!");
+    setSheetIsOpen(false);
+    setSelectedDate(undefined);
+    setSelectedTime(undefined);
+    setSelectedBarberId(undefined);
+    setPaymentMethod("MONEY"); // Reset
+    
+    router.refresh();
+  };
+
+  const selectedBarber = barbershop.barbers?.find(
+     (barber) => barber.id === selectedBarberId
+  );
+  
+  const hasMembership = membership?.status === "ACTIVE";
+  const hasCredits = (membership?.current_balance ?? 0) > 0;
 
   // Update image if service changes (though key remounts usually handle this)
   useEffect(() => {

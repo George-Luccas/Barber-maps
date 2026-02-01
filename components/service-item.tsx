@@ -26,7 +26,7 @@ import { createBooking } from "@/actions/create-booking";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useUserMembership } from "@/hooks/data/use-user-membership";
 
-import { useUserMembership } from "@/hooks/data/use-user-membership";
+
 
 interface ServiceItemProps {
   service: BarbershopService;

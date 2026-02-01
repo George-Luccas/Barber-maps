@@ -41,7 +41,8 @@ export const createBooking = protectedActionClient
              date: date.toISOString(),
              clientName: user.name || "Cliente",
              clientEmail: user.email || undefined,
-             clientPhone: undefined 
+             clientPhone: undefined,
+             isSubscription: parsedInput.isSubscription
         });
 
         return booking;

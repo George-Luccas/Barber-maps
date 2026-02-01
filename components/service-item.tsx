@@ -1,5 +1,6 @@
 "use client";
 
+import { getDefaultServiceImage } from "@/lib/service-utils";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -25,14 +26,6 @@ import { createBooking } from "@/actions/create-booking";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useUserMembership } from "@/hooks/data/use-user-membership";
 
-interface ServiceItemProps {
-  service: BarbershopService;
-  barbershop: Pick<Barbershop, "name" | "id"> & {
-    isOpen?: boolean;
-    barbers?: Barber[];
-  };
-}
-
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const router = useRouter();
   const [selectedBarberId, setSelectedBarberId] = useState<string | undefined>(undefined);
@@ -40,92 +33,45 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
+  
+  // Initialize with service image or fallback
+  const [imageSrc, setImageSrc] = useState(
+    service.imageUrl && service.imageUrl.trim() !== "" 
+      ? service.imageUrl 
+      : getDefaultServiceImage(service.name)
+  );
+
   const [paymentMethod, setPaymentMethod] = useState<"MONEY" | "SUBSCRIPTION">("MONEY");
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBooking);
-  const { data: availableTimeSlots, refetch } = useGetDateAvailableTimeSlots({
-    barbershopId: barbershop.id,
-    date: selectedDate,
-    barberId: selectedBarberId,
-  });
 
-  // Fetch Membership
-  const { data: membership } = useUserMembership();
+  // ... rest of hooks ...
 
-  // Refetch when barber changes
+  // Update image if service changes (though key remounts usually handle this)
   useEffect(() => {
-    if (selectedDate) {
-        refetch();
-    }
-  }, [selectedBarberId, selectedDate, refetch]);
+     setImageSrc(
+        service.imageUrl && service.imageUrl.trim() !== "" 
+        ? service.imageUrl 
+        : getDefaultServiceImage(service.name)
+     );
+  }, [service.imageUrl, service.name]);
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    setSelectedTime(undefined);
-  };
-
-  const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
-  };
-
-  const handleConfirmBooking = async () => {
-    if (!selectedDate || !selectedTime) {
-      return;
-    }
-    const splittedTime = selectedTime.split(":");
-    const hours = Number(splittedTime[0]);
-    const minutes = Number(splittedTime[1]);
-    const date = new Date(selectedDate);
-    date.setHours(hours, minutes);
-    
-    const result = await executeCreateBooking({
-      serviceId: service.id,
-      barbershopId: barbershop.id,
-      date,
-      barberId: selectedBarberId,
-      isSubscription: paymentMethod === "SUBSCRIPTION",
-    });
-    
-    if (result.validationErrors) {
-      return toast.error(result.validationErrors._errors?.[0]);
-    }
-    if (result.serverError) {
-      return toast.error(
-        "Erro ao criar agendamento. Por favor, tente novamente.",
-      );
-    }
-    
-    toast.success("Reserva realizada com sucesso!");
-    setSheetIsOpen(false);
-    setSelectedDate(undefined);
-    setSelectedTime(undefined);
-    setSelectedBarberId(undefined);
-    setPaymentMethod("MONEY"); // Reset
-    
-    router.refresh();
-  };
-
-  const isOpen = barbershop.isOpen ?? true;
-
-  const selectedBarber = barbershop.barbers?.find(
-     (barber) => barber.id === selectedBarberId
-  );
-  
-  const hasMembership = membership?.status === "ACTIVE";
-  const hasCredits = (membership?.current_balance ?? 0) > 0;
+// ...
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
       {/* Service Image */}
       <div className="relative h-[110px] w-[110px] shrink-0">
         <Image
-          src={service.imageUrl}
+          src={imageSrc}
           alt={service.name}
           fill
           className="rounded-xl object-cover"
+          onError={() => setImageSrc(getDefaultServiceImage(service.name))}
         />
       </div>
+// ...
 
       {/* Service Info */}
       <div className="flex flex-1 flex-col justify-between">

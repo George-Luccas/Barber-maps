@@ -91,6 +91,7 @@ export interface CreateBookingPayload {
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
+  isSubscription?: boolean;
 }
 
 // --- Funções da API ---

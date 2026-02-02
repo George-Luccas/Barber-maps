@@ -9,7 +9,7 @@ export default async function DebugAuthPage() {
   });
 
   let dbUser = null;
-  let bookings = [];
+  let bookings: any[] = [];
   
   if (session?.user?.email) {
       dbUser = await prisma.user.findUnique({

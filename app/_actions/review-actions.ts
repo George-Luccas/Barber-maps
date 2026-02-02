@@ -72,9 +72,20 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
 
     if (!existingReview) {
         // It's a new review! Award point.
-        await db.loyaltyCard.updateMany({
-            where: { userId, barbershopId },
-            data: {
+        await db.loyaltyCard.upsert({
+            where: {
+                userId_barbershopId: {
+                    userId,
+                    barbershopId
+                }
+            },
+            create: {
+                userId,
+                barbershopId,
+                currentPoints: 1,
+                totalLifetimePoints: 1,
+            },
+            update: {
                 currentPoints: { increment: 1 },
                 totalLifetimePoints: { increment: 1 }
             }

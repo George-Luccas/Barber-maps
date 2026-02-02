@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   try {
     const shopCount = await prisma.barbershop.count();
-    const serviceCount = await prisma.service.count();
+    const serviceCount = await prisma.barbershopService.count();
     const userCount = await prisma.user.count();
     
     console.log("--- DB Status ---");

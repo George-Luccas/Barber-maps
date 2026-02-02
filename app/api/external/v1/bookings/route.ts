@@ -76,3 +76,61 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
+    const apiKey = req.headers.get("Authorization")?.replace("Bearer ", "");
+
+    // NOTE: Add strict API Key validation here if needed for production
+    
+    if (!email) {
+        return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    try {
+        const user = await db.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const bookings = await db.booking.findMany({
+            where: {
+                userId: user.id
+            },
+            include: {
+                barbershop: {
+                    select: {
+                        name: true,
+                        address: true,
+                        imageUrl: true
+                    }
+                },
+                service: {
+                    select: {
+                        name: true,
+                        priceInCents: true,
+                        description: true,
+                        imageUrl: true
+                    }
+                },
+                Barber: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: {
+                date: 'desc'
+            }
+        });
+
+        return NextResponse.json(bookings, { status: 200 });
+    } catch (error: any) {
+        console.error("[LOCAL API] Get Bookings Error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}

@@ -6,14 +6,12 @@ const prisma = new PrismaClient();
 async function main() {
   const email = "georgeluccas300@gmail.com";
   
+  /* 
+   * FIX: Relations are missing in Prisma Schema for user -> bookings.
+   * Querying bookings manually via findMany instead of include.
+   */
   const user = await prisma.user.findUnique({
-    where: { email },
-    include: {
-        bookings: {
-            where: { status: "COMPLETED" },
-            take: 5
-        }
-    }
+    where: { email }
   });
 
   if (!user) {
@@ -21,9 +19,17 @@ async function main() {
       return;
   }
 
-  console.log(`User ${user.name} has ${user.bookings.length} completed bookings.`);
+  const completedBookings = await prisma.booking.findMany({
+      where: { 
+          userId: user.id,
+          status: "COMPLETED"
+      },
+      take: 5
+  });
 
-  if (user.bookings.length === 0) {
+  console.log(`User ${user.name} has ${completedBookings.length} completed bookings.`);
+
+  if (completedBookings.length === 0) {
       console.log("No completed bookings. Checking for ANY bookings to update...");
       const anyBooking = await prisma.booking.findFirst({
           where: { userId: user.id }
@@ -41,7 +47,7 @@ async function main() {
       }
   } else {
       console.log("User already has completed bookings. Review should work.");
-       user.bookings.forEach(b => console.log(`- ${b.id} (${b.date})`));
+       completedBookings.forEach(b => console.log(`- ${b.id} (${b.date})`));
   }
 }
 

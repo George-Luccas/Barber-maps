@@ -85,12 +85,12 @@ export const getBarbershopsWithStories = async () => {
 };
 
 export const getBarbershopRanking = async (city?: string) => {
-   // Ranking not supported in API. Return list.
+   // Ranking now supported in API via `bookingsCount`
    const shops = await comercioApi.getShops({ city });
    return shops.map(shop => ({
        ...shop,
        dailyGoal: 0,
-       bookingsCount: 0 // API doesn't expose booking counts
+       bookingsCount: (shop as any).bookingsCount || 0 
    }));
 };
 

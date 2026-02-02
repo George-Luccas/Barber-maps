@@ -93,7 +93,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         console.log(`[Loyalty] Awarded 1 point to user ${userId} for reviewing shop ${barbershopId}`);
     }
 
-    revalidatePath("/barbershops/[id]", "page");
+    revalidatePath(`/barbershops/${barbershopId}`);
     revalidatePath("/");
     
     return review;

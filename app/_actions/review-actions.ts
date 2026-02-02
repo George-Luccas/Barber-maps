@@ -28,7 +28,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   });
 
   if (!hasCompletedBooking) {
-      throw new Error("Você só pode avaliar após concluir um agendamento nesta barbearia.");
+      throw new Error(`Você só pode avaliar após concluir um agendamento nesta barbearia. (Debug: User ${userId} Shop ${barbershopId})`);
   }
 
   try {

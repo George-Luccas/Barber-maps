@@ -34,13 +34,13 @@ export const ReviewList = ({ reviews }: ReviewListProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={review.user.image || undefined} />
-                <AvatarFallback>{review.user.name[0]}</AvatarFallback>
+                <AvatarImage src={review.user?.image || undefined} />
+                <AvatarFallback>{review.user?.name?.[0] ?? "?"}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-semibold">{review.user.name}</p>
+                <p className="text-sm font-semibold">{review.user?.name ?? "Usuário Anônimo"}</p>
                 <p className="text-xs text-gray-400">
-                  {format(new Date(review.createdAt), "dd 'de' MMMM", { locale: ptBR })}
+                  {review.createdAt ? format(new Date(review.createdAt), "dd 'de' MMMM", { locale: ptBR }) : ""}
                 </p>
               </div>
             </div>

@@ -105,37 +105,47 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
 };
 
 export const getBarbershopReviews = async (barbershopId: string) => {
-  return await db.review.findMany({
-    where: {
-      barbershopId,
-    },
-    include: {
-      user: {
-        select: {
-          name: true,
-          image: true,
+  try {
+    return await db.review.findMany({
+      where: {
+        barbershopId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
+  }
 };
 
 export const getBarbershopRating = async (barbershopId: string) => {
-  const reviews = await db.review.findMany({
-    where: { barbershopId },
-    select: { rating: true },
-  });
+  try {
+    const reviews = await db.review.findMany({
+      where: { barbershopId },
+      select: { rating: true },
+    });
 
-  if (reviews.length === 0) return { average: 0, count: 0 };
+    if (reviews.length === 0) return { average: 0, count: 0 };
 
-  const sum = reviews.reduce((acc: number, review) => acc + review.rating, 0);
-  const average = sum / reviews.length;
+    const sum = reviews.reduce((acc: number, review) => acc + review.rating, 0);
+    const average = sum / reviews.length;
 
-  return {
-    average: parseFloat(average.toFixed(1)),
-    count: reviews.length,
-  };
+    return {
+      average: parseFloat(average.toFixed(1)),
+      count: reviews.length,
+    };
+  } catch (error) {
+    console.error("Error fetching rating:", error);
+    return { average: 0, count: 0 };
+  }
 };

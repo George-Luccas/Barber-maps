@@ -32,7 +32,14 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   }
 
   try {
-    // 2. Upsert Review
+    // 2. Check if it's a new review (for Loyalty Points)
+    const existingReview = await db.review.findUnique({
+      where: { userId_barbershopId: { userId, barbershopId } }
+    });
+
+    const isNewReview = !existingReview;
+
+    // 3. Upsert Review
     const review = await db.review.upsert({
         where: {
         userId_barbershopId: {
@@ -52,26 +59,8 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         },
     });
 
-    // 3. Award Point (1 Point for Review)
-    // Only if it was a create action? Or update too? 
-    // Usually only once. upsert returns the object, hard to know if created or updated without separate query.
-    // For simplicity and user happiness, let's strictly award if "create" happened, OR 
-    // just ensure they don't farm points. 
-    // Since unique constraint exists on [userId, barbershopId], they can only have ONE review per shop.
-    // So we can check if they ALREADY had a review before this upsert?
-    // Actually simpler: if we just upserted, we can try to award points if we haven't tracked this yet.
-    // But since the schema doesn't track "Points Awarded for Review", let's just award it.
-    // Risk: User edits review 100 times -> 100 points.
-    // Mitigation: We need to know if this is a NEW review.
-    
-    // Better approach:
-    // Check if review existed before upsert.
-    const existingReview = await db.review.findUnique({
-        where: { userId_barbershopId: { userId, barbershopId } }
-    });
-
-    if (!existingReview) {
-        // It's a new review! Award point.
+    // 4. Award Point (Only if it was a new review)
+    if (isNewReview) {
         await db.loyaltyCard.upsert({
             where: {
                 userId_barbershopId: {
@@ -100,6 +89,10 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
 
   } catch (error) {
     console.error("Error creating review:", error);
+    // Return or throw detailed error to client
+    if (error instanceof Error) {
+        throw new Error(error.message); 
+    }
     throw new Error("Erro ao salvar avaliação.");
   }
 };

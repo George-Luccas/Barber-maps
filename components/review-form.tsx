@@ -63,7 +63,6 @@ export const ReviewForm = ({ barbershopId, userId, initialData }: ReviewFormProp
       })
       toast.success("Avaliação enviada com sucesso!")
       setIsOpen(false)
-      setIsOpen(false)
     } catch (error: any) {
       console.error(error)
       // Attempt to extract the error message if it's an Error object or string

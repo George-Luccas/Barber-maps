@@ -1,0 +1,50 @@
+
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const email = "georgeluccas300@gmail.com";
+  
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+        bookings: {
+            where: { status: "COMPLETED" },
+            take: 5
+        }
+    }
+  });
+
+  if (!user) {
+      console.log("User not found");
+      return;
+  }
+
+  console.log(`User ${user.name} has ${user.bookings.length} completed bookings.`);
+
+  if (user.bookings.length === 0) {
+      console.log("No completed bookings. Checking for ANY bookings to update...");
+      const anyBooking = await prisma.booking.findFirst({
+          where: { userId: user.id }
+      });
+
+      if (anyBooking) {
+          console.log(`Found booking ${anyBooking.id} with status ${anyBooking.status}. Updating to COMPLETED...`);
+          await prisma.booking.update({
+              where: { id: anyBooking.id },
+              data: { status: "COMPLETED" }
+          });
+          console.log("Updated to COMPLETED. User can now review.");
+      } else {
+          console.log("No bookings at all. User needs to book first.");
+      }
+  } else {
+      console.log("User already has completed bookings. Review should work.");
+       user.bookings.forEach(b => console.log(`- ${b.id} (${b.date})`));
+  }
+}
+
+main()
+  .catch((e) => console.error(e))
+  .finally(async () => await prisma.$disconnect());

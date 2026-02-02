@@ -63,8 +63,12 @@ export const ReviewForm = ({ barbershopId, userId, initialData }: ReviewFormProp
       })
       toast.success("Avaliação enviada com sucesso!")
       setIsOpen(false)
-    } catch (error) {
-      toast.error("Erro ao enviar avaliação.")
+      setIsOpen(false)
+    } catch (error: any) {
+      console.error(error)
+      // Attempt to extract the error message if it's an Error object or string
+      const message = error instanceof Error ? error.message : "Erro ao enviar avaliação.";
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }

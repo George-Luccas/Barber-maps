@@ -5,9 +5,6 @@ async function main() {
   const email = "georgeluccas300@gmail.com";
   const user = await prisma.user.findUnique({
     where: { email },
-    include: {
-        bookings: { take: 5 }
-    }
   });
 
   if (!user) {

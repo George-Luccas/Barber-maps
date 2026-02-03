@@ -31,7 +31,9 @@ export const createBooking = protectedActionClient
             "Creating booking via API for service",
             serviceId,
             "at barbershop",
-            barbershopId
+            barbershopId,
+            "User Email:",
+            user.email 
         );
 
         const booking = await comercioApi.createBooking({

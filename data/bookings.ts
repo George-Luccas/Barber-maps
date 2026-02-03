@@ -87,8 +87,13 @@ export const getUserBookings = async () => {
   const finishedExternal = externalBookings.filter(b => new Date(b.date) < now || b.cancelledAt || b.status === 'CANCELLED');
 
   // Combine lists
-  const allConfirmed = [...confirmedBookingsData, ...confirmedExternal].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const allFinished = [...finishedBookingsData, ...finishedExternal].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const allConfirmed = [...confirmedBookingsData, ...confirmedExternal]
+    .filter(b => !isNaN(new Date(b.date).getTime())) // Safety Check
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  const allFinished = [...finishedBookingsData, ...finishedExternal]
+    .filter(b => !isNaN(new Date(b.date).getTime())) // Safety Check
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 
   // 2. Extract User IDs (in this case it's just the session user, but good pattern for admin views)

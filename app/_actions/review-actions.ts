@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma";
+import { comercioApi } from "@/services/comercio-api";
 import { revalidatePath } from "next/cache";
 
 interface CreateReviewParams {
@@ -19,7 +20,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   // (Or we could be stricter: check if they reviewed THIS specific booking, 
   // but usually one review per shop or per recent visit is the pattern. 
   // The unique constraint userId_barbershopId suggests one review per shop.)
-  const hasCompletedBooking = await db.booking.findFirst({
+  let hasCompletedBooking = await db.booking.findFirst({
     where: {
       userId,
       barbershopId,
@@ -27,12 +28,52 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     }
   });
 
+  // If match not found locally, check external API
+  if (!hasCompletedBooking) {
+      console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
+      
+      const user = await db.user.findUnique({ where: { id: userId } });
+      if (user?.email) {
+          const externalBookings = await comercioApi.getUserBookings(user.email);
+          const matched = externalBookings.find((b: any) => 
+              b.barbershopId === barbershopId && 
+              (b.status === "COMPLETED" || b.status === "FINISHED")
+          );
+          
+          if (matched) {
+              console.log("[Review Action] Found matching external booking!", matched.id);
+              hasCompletedBooking = matched;
+          }
+      }
+  }
+
   if (!hasCompletedBooking) {
       throw new Error(`Você só pode avaliar após concluir um agendamento nesta barbearia. (Debug: User ${userId} Shop ${barbershopId})`);
   }
 
   try {
-    // 2. Check if it's a new review (for Loyalty Points)
+    // 2. Ensure Barbershop exists locally (Sync for external shops)
+    const shopExists = await db.barbershop.findUnique({ where: { id: barbershopId } });
+    if (!shopExists) {
+        console.log(`[Review Action] Syncing external shop ${barbershopId} to local DB...`);
+        const externalShop = await comercioApi.getShop(barbershopId);
+        if (externalShop) {
+            await db.barbershop.create({
+                data: {
+                    id: externalShop.id,
+                    name: externalShop.name,
+                    address: externalShop.address,
+                    imageUrl: externalShop.imageUrl,
+                    phones: externalShop.phones,
+                    description: externalShop.description
+                }
+            });
+        } else {
+            console.warn(`[Review Action] Could not fetch shop details for ${barbershopId}. Foreign key constraint might fail.`);
+        }
+    }
+
+    // 3. Check if it's a new review (for Loyalty Points)
     const existingReview = await db.review.findUnique({
       where: { userId_barbershopId: { userId, barbershopId } }
     });

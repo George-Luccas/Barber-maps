@@ -192,6 +192,24 @@ export const comercioApi = {
       throw new Error(`${data.error || "Erro ao criar agendamento"} (URL: ${API_URL}/bookings)`);
     }
     return data;
+  },
+
+  getUserBookings: async (email: string) => {
+      if (!isConfigured) return [];
+      try {
+          const url = `${API_URL}/bookings?email=${email}`;
+          console.log(`[API] Fetching user bookings from: ${url}`);
+          const res = await fetch(url, { headers, cache: 'no-store' });
+          if (!res.ok) {
+              console.error(`❌ API error at ${url}: ${res.status} ${res.statusText}`);
+              return [];
+          }
+          const data = await res.json();
+          return data;
+      } catch (error) {
+          console.error("API Exception (getUserBookings):", error);
+          return [];
+      }
   }
 };
 

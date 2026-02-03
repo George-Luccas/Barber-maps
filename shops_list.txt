@@ -1,0 +1,4 @@
+--- MATCHING SHOPS ---
+FOUND: George Luccas Barber [099d3846-2648-41be-bde3-8bcdfc741a0c]
+FOUND: Demo Barber Shop [demo-shop-uuid]
+FOUND: adm Barber Shop [0be86c9a-cb0e-4d31-9487-c936869a501c]

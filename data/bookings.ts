@@ -59,6 +59,7 @@ export const getUserBookings = async () => {
   // Map external bookings to match internal schema
   const externalBookings = (Array.isArray(externalBookingsData) ? externalBookingsData : []).map(b => ({
       ...b,
+      date: new Date(b.date), // Critical: Convert ISO string to Date object for UI components
       // Ensure barbershop has required fields for UI
       barbershop: {
           id: b.barbershopId,
@@ -70,7 +71,7 @@ export const getUserBookings = async () => {
       service: {
           id: b.serviceId,
           name: b.service?.name || "Serviço",
-          priceInCents: b.service?.priceInCents || 0,
+          priceInCents: Number(b.service?.priceInCents) || 0,
           ...b.service
       },
       barber: b.Barber ? {

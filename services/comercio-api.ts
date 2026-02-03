@@ -205,6 +205,10 @@ export const comercioApi = {
               return [];
           }
           const data = await res.json();
+          if (!Array.isArray(data)) {
+               console.error("API returned non-array for bookings:", data);
+               return [];
+          }
           return data;
       } catch (error) {
           console.error("API Exception (getUserBookings):", error);

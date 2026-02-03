@@ -57,7 +57,7 @@ export const getUserBookings = async () => {
   ]);
 
   // Map external bookings to match internal schema
-  const externalBookings = (externalBookingsData as any[]).map(b => ({
+  const externalBookings = (Array.isArray(externalBookingsData) ? externalBookingsData : []).map(b => ({
       ...b,
       // Ensure barbershop has required fields for UI
       barbershop: {

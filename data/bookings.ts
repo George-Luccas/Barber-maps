@@ -66,6 +66,7 @@ export const getUserBookings = async () => {
           name: b.barbershop?.name || "Barbearia Externa",
           imageUrl: b.barbershop?.imageUrl || "",
           address: b.barbershop?.address || "",
+          phones: b.barbershop?.phones || [], // CRITICAL: Ensure array exists
           ...b.barbershop
       },
       service: {

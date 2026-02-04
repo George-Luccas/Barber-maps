@@ -33,25 +33,48 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   });
 
   // If match not found locally, check external API
+
+  // If match not found locally, check external API
   if (!hasCompletedBooking) {
       console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
       
       const user = await db.user.findUnique({ where: { id: userId } });
       if (user?.email) {
           const externalBookings = await comercioApi.getUserBookings(user.email);
-          const matched = externalBookings.find((b: any) => 
-              b.barbershopId === barbershopId && 
-              (
-                b.status === "COMPLETED" || 
-                b.status === "FINISHED" ||
-                (b.status === "CONFIRMED" && new Date(b.date) < new Date())
-              )
-          );
+          console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${user.email}`);
+
+          const matched = externalBookings.find((b: any) => {
+              if (b.barbershopId !== barbershopId) return false;
+              
+              const bookingDate = new Date(b.date);
+              const now = new Date();
+              
+              // Status Logic aligned with Frontend "Finalizados":
+              // 1. Explicitly Completed/Finished
+              const explicitSuccess = b.status === "COMPLETED" || b.status === "FINISHED";
+              
+              // 2. Or Past Date (and not cancelled)
+              const isCancelled = b.status === "CANCELLED" || !!b.cancelledAt;
+              const isPastAndActive = !isCancelled && bookingDate < now;
+
+              const isValid = explicitSuccess || isPastAndActive;
+
+              if (isValid) {
+                  console.log(`[Review Action] Validation Success: Booking ${b.id} | Status: ${b.status} | Date: ${bookingDate.toISOString()}`);
+              } else {
+                 console.log(`[Review Action] Skip Booking ${b.id}: Status=${b.status}, Date=${bookingDate.toISOString()}, IsCancelled=${isCancelled}, Past=${bookingDate < now}`);
+              }
+              return isValid;
+          });
           
           if (matched) {
               console.log("[Review Action] Found matching external booking!", matched.id);
               hasCompletedBooking = matched;
+          } else {
+              console.warn("[Review Action] No matching external booking found despite searching.");
           }
+      } else {
+        console.warn("[Review Action] User has no email, cannot check external bookings.");
       }
   }
 

@@ -224,6 +224,7 @@ const BarbershopPage = async ({ params }: PageProps) => {
               <ReviewForm 
                 barbershopId={id} 
                 userId={session.user.id} 
+                userEmail={session.user.email}
                 initialData={userReview ? { rating: userReview.rating, comment: userReview.comment } : undefined}
               />
             )}

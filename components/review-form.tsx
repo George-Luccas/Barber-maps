@@ -34,13 +34,14 @@ const formSchema = z.object({
 interface ReviewFormProps {
   barbershopId: string
   userId: string
+  userEmail?: string | null
   initialData?: {
     rating: number
     comment?: string | null
   }
 }
 
-export const ReviewForm = ({ barbershopId, userId, initialData }: ReviewFormProps) => {
+export const ReviewForm = ({ barbershopId, userId, userEmail, initialData }: ReviewFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -58,6 +59,7 @@ export const ReviewForm = ({ barbershopId, userId, initialData }: ReviewFormProp
       await createBarbershopReview({
         barbershopId,
         userId,
+        userEmail,
         rating: values.rating,
         comment: values.comment,
       })

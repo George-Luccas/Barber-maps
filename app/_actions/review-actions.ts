@@ -10,12 +10,13 @@ interface CreateReviewParams {
   userId: string;
   rating: number;
   comment?: string;
+  userEmail?: string | null;
 }
 
 export const createBarbershopReview = async (params: CreateReviewParams) => {
-  const { barbershopId, userId, rating, comment } = params;
+  const { barbershopId, userId, rating, comment, userEmail } = params;
   
-  console.log(`[Review Action] Attempting to create review for User ${userId} at Shop ${barbershopId}`);
+  console.log(`[Review Action] Attempting to create review for User ${userId} (${userEmail}) at Shop ${barbershopId}`);
 
   // 1. Validate: User must have at least one COMPLETED booking at this shop
   // (Or we could be stricter: check if they reviewed THIS specific booking, 
@@ -38,10 +39,9 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   if (!hasCompletedBooking) {
       console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
       
-      const user = await db.user.findUnique({ where: { id: userId } });
-      if (user?.email) {
-          const externalBookings = await comercioApi.getUserBookings(user.email);
-          console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${user.email}`);
+      if (userEmail) {
+          const externalBookings = await comercioApi.getUserBookings(userEmail);
+          console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
 
           const matched = externalBookings.find((b: any) => {
               if (b.barbershopId !== barbershopId) return false;
@@ -74,7 +74,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
               console.warn("[Review Action] No matching external booking found despite searching.");
           }
       } else {
-        console.warn("[Review Action] User has no email, cannot check external bookings.");
+        console.warn("[Review Action] User email not provided, cannot check external bookings.");
       }
   }
 

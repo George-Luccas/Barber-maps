@@ -214,6 +214,25 @@ export const comercioApi = {
           console.error("API Exception (getUserBookings):", error);
           return [];
       }
+  },
+
+  getUserProfile: async (email: string) => {
+    if (!isConfigured) return null;
+    try {
+        const url = `${API_URL}/users?email=${email}`;
+        console.log(`[API] Fetching user profile from: ${url}`);
+        const res = await fetch(url, { headers, cache: 'no-store' });
+        
+        if (!res.ok) {
+            console.error(`❌ API error at ${url}: ${res.status} ${res.statusText}`);
+            return null;
+        }
+        
+        return await res.json();
+    } catch (error) {
+        console.error("API Exception (getUserProfile):", error);
+        return null;
+    }
   }
 };
 

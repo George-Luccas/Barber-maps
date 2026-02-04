@@ -9,6 +9,7 @@ import { getUserBookings } from "@/data/bookings";
 import { getUserFavorites, getUserStats } from "@/app/_actions/user-actions";
 import { ProfileContent } from "./_components/profile-content";
 import { prisma } from "@/lib/prisma";
+import { comercioApi } from "@/services/comercio-api";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -31,12 +32,23 @@ export default async function ProfilePage() {
     )
   }
 
-  // Fetch fresh user data to get updated image/phone
-  const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
-  });
+  // Fetch fresh user data to get updated image/phone via API
+  // NOTE: Changed from prisma.user.findUnique to API call to prevent direct DB connection issues
+  const user = session.user.email ? await comercioApi.getUserProfile(session.user.email) : null;
 
-  if (!user) return null; // Should ideally handle this case better
+  if (!user) {
+      // Fallback to session user if API fails, but ideally we want the fresh data
+     console.error("Failed to fetch user profile from API");
+     // return null; 
+  }
+  
+  // Backup user object if API returns null but we have session
+  const displayUser = user || {
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+      image: session.user.image
+  };
 
   const bookingData = await getUserBookings();
   const favorites = await getUserFavorites();
@@ -47,7 +59,7 @@ export default async function ProfilePage() {
       <Header />
       
       <ProfileContent 
-        user={user}
+        user={displayUser}
         bookings={{
             confirmed: bookingData.confirmedBookings,
             finished: bookingData.finishedBookings

@@ -66,14 +66,21 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         console.log(`[Review Action] Syncing external shop ${barbershopId} to local DB...`);
         const externalShop = await comercioApi.getShop(barbershopId);
         if (externalShop) {
+            // SAFE DATA SANITIZATION
+            const safePhones = Array.isArray(externalShop.phones) ? externalShop.phones : [];
+            const safeName = externalShop.name || "Barbearia Externa";
+            const safeAddress = externalShop.address || "Endereço não disponível";
+            const safeImageUrl = externalShop.imageUrl || "";
+            const safeDescription = externalShop.description || "Sem descrição";
+
             await db.barbershop.create({
                 data: {
                     id: externalShop.id,
-                    name: externalShop.name || "Barbearia Externa",
-                    address: externalShop.address || "Endereço não disponível",
-                    imageUrl: externalShop.imageUrl || "",
-                    phones: externalShop.phones || [], // Critical: Default to empty array
-                    description: externalShop.description || "Sem descrição"
+                    name: safeName,
+                    address: safeAddress,
+                    imageUrl: safeImageUrl,
+                    phones: safePhones,
+                    description: safeDescription
                 }
             });
         } else {
@@ -132,8 +139,12 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         console.log(`[Loyalty] Awarded 1 point to user ${userId} for reviewing shop ${barbershopId}`);
     }
 
-    revalidatePath(`/barbershops/${barbershopId}`);
-    revalidatePath("/");
+    try {
+      revalidatePath(`/barbershops/${barbershopId}`);
+      revalidatePath("/");
+    } catch (revalError) {
+      console.error("Revalidation failed (non-critical):", revalError);
+    }
     
     return review;
 

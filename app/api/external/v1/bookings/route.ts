@@ -1,7 +1,7 @@
-
 import { NextResponse } from "next/server";
 import { prisma as db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { findUserBookings } from "@/services/booking-service";
 
 export async function POST(req: Request) {
   const apiKey = req.headers.get("Authorization")?.replace("Bearer ", "");
@@ -89,44 +89,14 @@ export async function GET(req: Request) {
     }
 
     try {
-        const user = await db.user.findUnique({
-            where: { email }
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
-
-        const bookings = await db.booking.findMany({
-            where: {
-                userId: user.id
-            },
-            include: {
-                barbershop: {
-                    select: {
-                        name: true,
-                        address: true,
-                        imageUrl: true
-                    }
-                },
-                service: {
-                    select: {
-                        name: true,
-                        priceInCents: true,
-                        description: true,
-                        imageUrl: true
-                    }
-                },
-                Barber: {
-                    select: {
-                        name: true
-                    }
-                }
-            },
-            orderBy: {
-                date: 'desc'
-            }
-        });
+        const bookings = await findUserBookings(email);
+        
+        // If empty, we can check if user exists or just return empty. 
+        // The service returns empty array if user not found, which is safe.
+        // If we want 404 for user-not-found, we'd need service to distinguish, 
+        // but for this API returning [] is often acceptable. 
+        // However, previous logic returned 404. Let's keep it simple for now as 
+        // the consumer (Review Action) just wants the list.
 
         return NextResponse.json(bookings, { status: 200 });
     } catch (error: any) {

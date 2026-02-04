@@ -4,6 +4,7 @@ import { prisma as db } from "@/lib/prisma";
 import { comercioApi } from "@/services/comercio-api";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { findUserBookings } from "@/services/booking-service";
 
 interface CreateReviewParams {
   barbershopId: string;
@@ -22,7 +23,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   // (Or we could be stricter: check if they reviewed THIS specific booking, 
   // but usually one review per shop or per recent visit is the pattern. 
   // The unique constraint userId_barbershopId suggests one review per shop.)
-  let hasCompletedBooking = await db.booking.findFirst({
+  let hasCompletedBooking: any = await db.booking.findFirst({
     where: {
       userId,
       barbershopId,
@@ -40,10 +41,10 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
       console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
       
       if (userEmail) {
-          const externalBookings = await comercioApi.getUserBookings(userEmail);
+          const externalBookings = await findUserBookings(userEmail);
           console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
 
-          const matched = externalBookings.find((b: any) => {
+          const matched = externalBookings.find((b) => {
               if (b.barbershopId !== barbershopId) return false;
               
               const bookingDate = new Date(b.date);

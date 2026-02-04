@@ -45,6 +45,7 @@ export interface ShopServices {
 }
 
 export const getShopDetails = async (id: string): Promise<ShopDetails | null> => {
+  console.log(`[ShopService] Fetching details for ID: ${id}`);
   const barbershop = await prisma.barbershop.findUnique({
     where: { id },
     include: {
@@ -53,7 +54,11 @@ export const getShopDetails = async (id: string): Promise<ShopDetails | null> =>
     },
   });
 
-  if (!barbershop) return null;
+  if (!barbershop) {
+    console.error(`[ShopService] Shop not found for ID: ${id}`);
+    return null;
+  }
+  console.log(`[ShopService] Shop found: ${barbershop.name}`);
 
   return {
     id: barbershop.id,

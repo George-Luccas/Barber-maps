@@ -39,7 +39,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         
         if (userEmail) {
             try {
-                const externalBookings = await findUserBookings(userEmail);
+                const externalBookings = await comercioApi.getUserBookings(userEmail);
                 console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
 
                 const matched = externalBookings.find((b) => {

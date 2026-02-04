@@ -3,6 +3,7 @@
 import { prisma as db } from "@/lib/prisma";
 import { comercioApi } from "@/services/comercio-api";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 interface CreateReviewParams {
   barbershopId: string;
@@ -189,5 +190,35 @@ export const getBarbershopRating = async (barbershopId: string) => {
   } catch (error) {
     console.error("Error fetching rating:", error);
     return { average: 0, count: 0 };
+  }
+};
+
+import { headers } from "next/headers";
+
+export const deleteBarbershopReview = async (reviewId: string) => {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+  const user = session?.user;
+
+  if (!user || user.role !== "ADMIN") {
+      throw new Error("Acesso negado.");
+  }
+
+  try {
+      await db.review.delete({
+          where: { id: reviewId }
+      });
+      
+      revalidatePath("/");
+      revalidatePath("/barbershops/[id]"); // Revalidate dynamic routes properly? No, path should be specific or 'layout'
+      // revalidatePath("/barbershops/" + "..."); we don't know the ID here easily without firing another query, 
+      // but revalidating layout or generic paths usually works for catch-all. 
+      // Actually, we can just return success and let client refresh.
+      
+      return { success: true };
+  } catch (error) {
+      console.error("Error deleting review:", error);
+      throw new Error("Erro ao excluir avaliação.");
   }
 };

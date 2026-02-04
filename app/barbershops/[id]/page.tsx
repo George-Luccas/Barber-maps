@@ -228,7 +228,7 @@ const BarbershopPage = async ({ params }: PageProps) => {
               />
             )}
           </div>
-          <ReviewList reviews={reviews as any} />
+          <ReviewList reviews={reviews as any} isAdmin={(session?.user as any)?.role === "ADMIN"} />
         </div>
        
         {/* Footer spacing */}

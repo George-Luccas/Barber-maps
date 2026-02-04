@@ -5,6 +5,7 @@ import { comercioApi } from "@/services/comercio-api";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { findUserBookings } from "@/services/booking-service";
+import { getShopDetails } from "@/services/shop-service";
 
 interface CreateReviewParams {
   barbershopId: string;
@@ -88,7 +89,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     const shopExists = await db.barbershop.findUnique({ where: { id: barbershopId } });
     if (!shopExists) {
         console.log(`[Review Action] Syncing external shop ${barbershopId} to local DB...`);
-        const externalShop = await comercioApi.getShop(barbershopId);
+        const externalShop = await getShopDetails(barbershopId);
         if (externalShop) {
             // SAFE DATA SANITIZATION
             const safePhones = Array.isArray(externalShop.phones) ? externalShop.phones : [];

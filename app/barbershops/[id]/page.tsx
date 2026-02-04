@@ -2,8 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Smartphone } from "lucide-react";
 // import { getBarbershopById } from "@/data/barbershops"; // OLD
-// import { comercioApi } from "@/services/comercio-api"; // NEW
-import { getShopDetails, getShopServicesData } from "@/services/shop-service";
+import { comercioApi } from "@/services/comercio-api"; // NEW
+// import { getShopDetails, getShopServicesData } from "@/services/shop-service";
 import { PageSectionTitle } from "@/components/ui/page";
 import Footer from "@/components/footer";
 import ServiceItem from "@/components/service-item";
@@ -34,8 +34,8 @@ const BarbershopPage = async ({ params }: PageProps) => {
   const { id } = await params;
   
   // --- MIGRAÇÃO API ---
-  const barbershop = await getShopDetails(id);
-  const { services, barbers } = await getShopServicesData(id);
+  const barbershop = await comercioApi.getShop(id);
+  const { services, barbers } = await comercioApi.getShopServices(id);
 
   if (!barbershop) {
     notFound();

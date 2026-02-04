@@ -68,11 +68,11 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
             await db.barbershop.create({
                 data: {
                     id: externalShop.id,
-                    name: externalShop.name,
-                    address: externalShop.address,
+                    name: externalShop.name || "Barbearia Externa",
+                    address: externalShop.address || "Endereço não disponível",
                     imageUrl: externalShop.imageUrl || "",
                     phones: externalShop.phones || [], // Critical: Default to empty array
-                    description: externalShop.description || ""
+                    description: externalShop.description || "Sem descrição"
                 }
             });
         } else {

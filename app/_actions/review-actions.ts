@@ -19,71 +19,71 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   
   console.log(`[Review Action] Attempting to create review for User ${userId} (${userEmail}) at Shop ${barbershopId}`);
 
-  // 1. Validate: User must have at least one COMPLETED booking at this shop
-  // (Or we could be stricter: check if they reviewed THIS specific booking, 
-  // but usually one review per shop or per recent visit is the pattern. 
-  // The unique constraint userId_barbershopId suggests one review per shop.)
-  let hasCompletedBooking: any = await db.booking.findFirst({
-    where: {
-      userId,
-      barbershopId,
-      OR: [
-        { status: "COMPLETED" },
-        { status: "CONFIRMED", date: { lt: new Date() } }
-      ]
-    }
-  });
-
-  // If match not found locally, check external API
-
-  // If match not found locally, check external API
-  if (!hasCompletedBooking) {
-      console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
-      
-      if (userEmail) {
-          const externalBookings = await findUserBookings(userEmail);
-          console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
-
-          const matched = externalBookings.find((b) => {
-              if (b.barbershopId !== barbershopId) return false;
-              
-              const bookingDate = new Date(b.date);
-              const now = new Date();
-              
-              // Status Logic aligned with Frontend "Finalizados":
-              // 1. Explicitly Completed/Finished
-              const explicitSuccess = b.status === "COMPLETED" || b.status === "FINISHED";
-              
-              // 2. Or Past Date (and not cancelled)
-              const isCancelled = b.status === "CANCELLED" || !!b.cancelledAt;
-              const isPastAndActive = !isCancelled && bookingDate < now;
-
-              const isValid = explicitSuccess || isPastAndActive;
-
-              if (isValid) {
-                  console.log(`[Review Action] Validation Success: Booking ${b.id} | Status: ${b.status} | Date: ${bookingDate.toISOString()}`);
-              } else {
-                 console.log(`[Review Action] Skip Booking ${b.id}: Status=${b.status}, Date=${bookingDate.toISOString()}, IsCancelled=${isCancelled}, Past=${bookingDate < now}`);
-              }
-              return isValid;
-          });
-          
-          if (matched) {
-              console.log("[Review Action] Found matching external booking!", matched.id);
-              hasCompletedBooking = matched;
-          } else {
-              console.warn("[Review Action] No matching external booking found despite searching.");
-          }
-      } else {
-        console.warn("[Review Action] User email not provided, cannot check external bookings.");
-      }
-  }
-
-  if (!hasCompletedBooking) {
-      throw new Error(`Você só pode avaliar após concluir um agendamento nesta barbearia. (Debug: User ${userId} Shop ${barbershopId})`);
-  }
-
   try {
+    // 1. Validate: User must have at least one COMPLETED booking at this shop
+    let hasCompletedBooking: any = await db.booking.findFirst({
+        where: {
+        userId,
+        barbershopId,
+        OR: [
+            { status: "COMPLETED" },
+            { status: "CONFIRMED", date: { lt: new Date() } }
+        ]
+        }
+    });
+
+    // If match not found locally, check external API
+    if (!hasCompletedBooking) {
+        console.log(`[Review Action] Local booking not found. Checking external API for User ${userId}...`);
+        
+        if (userEmail) {
+            try {
+                const externalBookings = await findUserBookings(userEmail);
+                console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
+
+                const matched = externalBookings.find((b) => {
+                    if (b.barbershopId !== barbershopId) return false;
+                    
+                    const bookingDate = new Date(b.date);
+                    const now = new Date();
+                    
+                    // Status Logic aligned with Frontend "Finalizados":
+                    // 1. Explicitly Completed/Finished
+                    const explicitSuccess = b.status === "COMPLETED" || b.status === "FINISHED";
+                    
+                    // 2. Or Past Date (and not cancelled)
+                    const isCancelled = b.status === "CANCELLED" || !!b.cancelledAt;
+                    const isPastAndActive = !isCancelled && bookingDate < now;
+
+                    const isValid = explicitSuccess || isPastAndActive;
+
+                    if (isValid) {
+                        console.log(`[Review Action] Validation Success: Booking ${b.id} | Status: ${b.status} | Date: ${bookingDate.toISOString()}`);
+                    } else {
+                    console.log(`[Review Action] Skip Booking ${b.id}: Status=${b.status}, Date=${bookingDate.toISOString()}, IsCancelled=${isCancelled}, Past=${bookingDate < now}`);
+                    }
+                    return isValid;
+                });
+                
+                if (matched) {
+                    console.log("[Review Action] Found matching external booking!", matched.id);
+                    hasCompletedBooking = matched;
+                } else {
+                    console.warn("[Review Action] No matching external booking found despite searching.");
+                }
+            } catch (err) {
+                console.error("[Review Action] Error fetching external bookings:", err);
+                // Don't throw here, just proceed (hasCompletedBooking remains null)
+            }
+        } else {
+            console.warn("[Review Action] User email not provided, cannot check external bookings.");
+        }
+    }
+
+    if (!hasCompletedBooking) {
+        throw new Error(`Você só pode avaliar após concluir um agendamento nesta barbearia.`);
+    }
+
     // 2. Ensure Barbershop exists locally (Sync for external shops)
     const shopExists = await db.barbershop.findUnique({ where: { id: barbershopId } });
     if (!shopExists) {

@@ -24,7 +24,10 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     where: {
       userId,
       barbershopId,
-      status: "COMPLETED"
+      OR: [
+        { status: "COMPLETED" },
+        { status: "CONFIRMED", date: { lt: new Date() } }
+      ]
     }
   });
 
@@ -37,7 +40,11 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
           const externalBookings = await comercioApi.getUserBookings(user.email);
           const matched = externalBookings.find((b: any) => 
               b.barbershopId === barbershopId && 
-              (b.status === "COMPLETED" || b.status === "FINISHED")
+              (
+                b.status === "COMPLETED" || 
+                b.status === "FINISHED" ||
+                (b.status === "CONFIRMED" && new Date(b.date) < new Date())
+              )
           );
           
           if (matched) {

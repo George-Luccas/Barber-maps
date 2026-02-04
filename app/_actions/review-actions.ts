@@ -70,13 +70,14 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
                     id: externalShop.id,
                     name: externalShop.name,
                     address: externalShop.address,
-                    imageUrl: externalShop.imageUrl,
-                    phones: externalShop.phones,
-                    description: externalShop.description
+                    imageUrl: externalShop.imageUrl || "",
+                    phones: externalShop.phones || [], // Critical: Default to empty array
+                    description: externalShop.description || ""
                 }
             });
         } else {
-            console.warn(`[Review Action] Could not fetch shop details for ${barbershopId}. Foreign key constraint might fail.`);
+            console.warn(`[Review Action] Could not fetch shop details for ${barbershopId}.`);
+            throw new Error("Não foi possível identificar a barbearia para salvar a avaliação. Tente novamente.");
         }
     }
 

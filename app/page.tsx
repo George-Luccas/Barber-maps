@@ -165,10 +165,14 @@ export default async function Home({ searchParams }: HomeProps) {
             
             {loyaltyCards.length > 0 ? (
                 (() => {
-                    // Show only the card with most points
-                    const topCard = loyaltyCards.reduce((prev, current) => 
-                        (prev.currentPoints > current.currentPoints) ? prev : current
-                    );
+                    // Show only the card with most points (tiebreaker: totalLifetimePoints)
+                    const topCard = loyaltyCards.reduce((prev, current) => {
+                        if (prev.currentPoints !== current.currentPoints) {
+                            return prev.currentPoints > current.currentPoints ? prev : current;
+                        }
+                        // Tiebreaker: more lifetime points wins
+                        return prev.totalLifetimePoints > current.totalLifetimePoints ? prev : current;
+                    });
                     return (
                         <div className="w-full">
                             <Link href={`/barbershops/${topCard.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors text-center">

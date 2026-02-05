@@ -9,7 +9,6 @@ import { getUserBookings } from "@/data/bookings";
 import { getUserFavorites, getUserStats } from "@/app/_actions/user-actions";
 import { ProfileContent } from "./_components/profile-content";
 import { prisma } from "@/lib/prisma";
-import { comercioApi } from "@/services/comercio-api";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -32,22 +31,27 @@ export default async function ProfilePage() {
     )
   }
 
-  // Fetch fresh user data to get updated image/phone via API
-  // NOTE: Changed from prisma.user.findUnique to API call to prevent direct DB connection issues
-  const user = session.user.email ? await comercioApi.getUserProfile(session.user.email) : null;
+  // Fetch fresh user data to get updated image/phone from local database
+  const user = session.user.email ? await prisma.user.findUnique({
+    where: { email: session.user.email }
+  }) : null;
 
   if (!user) {
-      // Fallback to session user if API fails, but ideally we want the fresh data
-     console.error("Failed to fetch user profile from API");
-     // return null; 
+      // Fallback to session user if DB query fails
+      console.error("Failed to fetch user profile from database");
   }
   
   // Backup user object if API returns null but we have session
-  const displayUser = user || {
+  // Ensure createdAt is a Date object (API returns string)
+  const displayUser = user ? {
+      ...user,
+      createdAt: new Date(user.createdAt)
+  } : {
       id: session.user.id,
       name: session.user.name,
       email: session.user.email,
-      image: session.user.image
+      image: session.user.image,
+      createdAt: new Date(session.user.createdAt || Date.now())
   };
 
   const bookingData = await getUserBookings();

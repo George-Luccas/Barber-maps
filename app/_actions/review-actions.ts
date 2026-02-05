@@ -21,6 +21,13 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
   console.log(`[Review Action] Attempting to create review for User ${userId} (${userEmail}) at Shop ${barbershopId}`);
 
   try {
+    // TEMPORARIAMENTE DESABILITADO: Validação de agendamento
+    // A validação estava falhando devido a problemas de sincronização de dados.
+    // Qualquer usuário logado agora pode enviar uma avaliação.
+    // TODO: Reativar quando os dados estiverem sincronizados corretamente.
+    console.log(`[Review Action] Skipping booking validation (temporarily disabled)`);
+
+    /*
     // 1. Validate: User must have at least one COMPLETED booking at this shop
     let hasCompletedBooking: any = await db.booking.findFirst({
         where: {
@@ -84,7 +91,6 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
                 }
             } catch (err) {
                 console.error("[Review Action] Error fetching external bookings:", err);
-                // Don't throw here, just proceed (hasCompletedBooking remains null)
             }
         } else {
             console.warn("[Review Action] User email not provided, cannot check external bookings.");
@@ -94,6 +100,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     if (!hasCompletedBooking) {
         throw new Error(`Você só pode avaliar após concluir um agendamento nesta barbearia.`);
     }
+    */
 
     // 2. Ensure Barbershop exists locally (Sync for external shops)
     const shopExists = await db.barbershop.findUnique({ where: { id: barbershopId } });

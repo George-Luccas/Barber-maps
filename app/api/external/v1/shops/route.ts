@@ -27,25 +27,16 @@ export async function GET(req: Request) {
             whereClause.city = { contains: city, mode: "insensitive" };
         }
 
-        // Calculate Start of Current Quarter (Quarterly Reset)
-        const now = new Date();
-        const currentMonth = now.getMonth(); // 0-11
-        const startMonth = Math.floor(currentMonth / 3) * 3;
-        const startOfCurrentQuarter = new Date(now.getFullYear(), startMonth, 1);
+        // Count ALL bookings (not just quarterly)
+        console.log(`[API] Fetching shops with ALL bookings count`);
 
-        console.log(`[API] Fetching shops with bookings from: ${startOfCurrentQuarter.toISOString()}`);
-
-        // Fetch shops with booking counts (Filtered by Quarter)
+        // Fetch shops with ALL booking counts
         const shops = await db.barbershop.findMany({
             where: whereClause,
             include: {
                 _count: {
                     select: { 
-                        bookings: {
-                            where: {
-                                date: { gte: startOfCurrentQuarter }
-                            }
-                        } 
+                        bookings: true // Count ALL bookings, not just quarterly
                     }
                 },
                 // Include Services/Products usually fetched via separate details call, 

@@ -40,10 +40,20 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         if (userEmail) {
             try {
                 const externalBookings = await findUserBookings(userEmail);
-                console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
+                console.log(`[Review Action] Found ${externalBookings.length} bookings for ${userEmail}`);
+                
+                // Debug: Log all bookings found
+                externalBookings.forEach((b, i) => {
+                    console.log(`[Review Action] Booking ${i}: ID=${b.id}, ShopID=${b.barbershopId}, Status=${b.status}, Date=${b.date}`);
+                });
+                console.log(`[Review Action] Target BarbershopId: ${barbershopId}`);
 
                 const matched = externalBookings.find((b) => {
-                    if (b.barbershopId !== barbershopId) return false;
+                    const shopMatch = b.barbershopId === barbershopId;
+                    if (!shopMatch) {
+                        console.log(`[Review Action] Shop mismatch: ${b.barbershopId} !== ${barbershopId}`);
+                        return false;
+                    }
                     
                     const bookingDate = new Date(b.date);
                     const now = new Date();
@@ -59,18 +69,18 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
                     const isValid = explicitSuccess || isPastAndActive;
 
                     if (isValid) {
-                        console.log(`[Review Action] Validation Success: Booking ${b.id} | Status: ${b.status} | Date: ${bookingDate.toISOString()}`);
+                        console.log(`[Review Action] ✅ Valid booking found: ${b.id} | Status: ${b.status} | Date: ${bookingDate.toISOString()}`);
                     } else {
-                    console.log(`[Review Action] Skip Booking ${b.id}: Status=${b.status}, Date=${bookingDate.toISOString()}, IsCancelled=${isCancelled}, Past=${bookingDate < now}`);
+                        console.log(`[Review Action] ❌ Skip Booking ${b.id}: Status=${b.status}, Date=${bookingDate.toISOString()}, IsCancelled=${isCancelled}, Past=${bookingDate < now}`);
                     }
                     return isValid;
                 });
                 
                 if (matched) {
-                    console.log("[Review Action] Found matching external booking!", matched.id);
+                    console.log("[Review Action] ✅ Found matching booking!", matched.id);
                     hasCompletedBooking = matched;
                 } else {
-                    console.warn("[Review Action] No matching external booking found despite searching.");
+                    console.warn("[Review Action] ❌ No matching booking found despite searching.");
                 }
             } catch (err) {
                 console.error("[Review Action] Error fetching external bookings:", err);

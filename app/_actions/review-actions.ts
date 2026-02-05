@@ -4,7 +4,7 @@ import { prisma as db } from "@/lib/prisma";
 import { comercioApi } from "@/services/comercio-api";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-// import { findUserBookings } from "@/services/booking-service";
+import { findUserBookings } from "@/services/booking-service";
 // import { getShopDetails } from "@/services/shop-service";
 
 interface CreateReviewParams {
@@ -39,7 +39,7 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
         
         if (userEmail) {
             try {
-                const externalBookings = await comercioApi.getUserBookings(userEmail);
+                const externalBookings = await findUserBookings(userEmail);
                 console.log(`[Review Action] Found ${externalBookings.length} external bookings for ${userEmail}`);
 
                 const matched = externalBookings.find((b) => {

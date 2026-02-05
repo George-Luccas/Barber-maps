@@ -170,7 +170,7 @@ export const comercioApi = {
         if (params?.search) queryParams.append("search", params.search);
         if (params?.city) queryParams.append("city", params.city);
 
-        const res = await fetch(`${API_URL}/shops?${queryParams.toString()}`, { headers, next: { revalidate: 60 } });
+        const res = await fetch(`${API_URL}/shops?${queryParams.toString()}`, { headers, cache: 'no-store' });
         if (!res.ok) throw new Error(`Erro ao buscar lojas: ${res.statusText}`);
         return await res.json();
     } catch (error) {

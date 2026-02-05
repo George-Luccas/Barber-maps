@@ -259,15 +259,49 @@ export const deleteBarbershopReview = async (reviewId: string) => {
   }
 
   try {
+      // 1. First, fetch the review to get userId and barbershopId
+      const review = await db.review.findUnique({
+          where: { id: reviewId },
+          select: { userId: true, barbershopId: true }
+      });
+
+      if (!review) {
+          throw new Error("Avaliação não encontrada.");
+      }
+
+      // 2. Delete the review
       await db.review.delete({
           where: { id: reviewId }
       });
+
+      // 3. Deduct 1 loyalty point from the user's card for this barbershop
+      const loyaltyCard = await db.loyaltyCard.findUnique({
+          where: {
+              userId_barbershopId: {
+                  userId: review.userId,
+                  barbershopId: review.barbershopId
+              }
+          }
+      });
+
+      if (loyaltyCard && loyaltyCard.currentPoints > 0) {
+          await db.loyaltyCard.update({
+              where: {
+                  userId_barbershopId: {
+                      userId: review.userId,
+                      barbershopId: review.barbershopId
+                  }
+              },
+              data: {
+                  currentPoints: { decrement: 1 },
+                  totalLifetimePoints: { decrement: 1 }
+              }
+          });
+          console.log(`[Loyalty] Removed 1 point from user ${review.userId} for deleted review at shop ${review.barbershopId}`);
+      }
       
       revalidatePath("/");
-      revalidatePath("/barbershops/[id]"); // Revalidate dynamic routes properly? No, path should be specific or 'layout'
-      // revalidatePath("/barbershops/" + "..."); we don't know the ID here easily without firing another query, 
-      // but revalidating layout or generic paths usually works for catch-all. 
-      // Actually, we can just return success and let client refresh.
+      revalidatePath("/barbershops/[id]");
       
       return { success: true };
   } catch (error) {

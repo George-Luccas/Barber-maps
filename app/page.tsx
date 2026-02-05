@@ -164,28 +164,32 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
             
             {loyaltyCards.length > 0 ? (
-                <div className="flex flex-col gap-4 w-full">
-                    {loyaltyCards.map((card) => (
-                        <div key={card.id} className="w-full">
-                             <Link href={`/barbershops/${card.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors text-center">
-                                {card.barbershop.name}
-                             </Link>
+                (() => {
+                    // Show only the card with most points
+                    const topCard = loyaltyCards.reduce((prev, current) => 
+                        (prev.currentPoints > current.currentPoints) ? prev : current
+                    );
+                    return (
+                        <div className="w-full">
+                            <Link href={`/barbershops/${topCard.barbershopId}`} className="block mb-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors text-center">
+                                {topCard.barbershop.name}
+                            </Link>
                             <Link href="/loyalty" className="block cursor-pointer hover:opacity-95 transition-opacity">
                                 <PremiumLoyaltyCard 
-                                    barbershopName={card.barbershop.name}
-                                    barbershopImage={card.barbershop.imageUrl}
-                                    currentPoints={card.currentPoints}
-                                    tier={card.tier}
-                                    totalLifetimePoints={card.totalLifetimePoints}
+                                    barbershopName={topCard.barbershop.name}
+                                    barbershopImage={topCard.barbershop.imageUrl}
+                                    currentPoints={topCard.currentPoints}
+                                    tier={topCard.tier}
+                                    totalLifetimePoints={topCard.totalLifetimePoints}
                                     userName={session?.user?.name || "Cliente"}
                                     userAvatar={session?.user?.image || undefined}
-                                    freeCuts={card.freeCuts}
-                                    transactions={card.transactions}
+                                    freeCuts={topCard.freeCuts}
+                                    transactions={topCard.transactions}
                                 />
                             </Link>
                         </div>
-                    ))}
-                </div>
+                    );
+                })()
             ) : (
                 <div className="w-full flex justify-center py-4">
                     <PremiumLoyaltyCard 

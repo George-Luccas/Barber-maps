@@ -20,6 +20,7 @@ import { LocationFilter } from "@/components/location-filter";
 import BarbershopStories from "@/components/barbershop-stories";
 import PromotionsCarousel from "@/components/promotions-carousel";
 import BarbershopRanking from "@/components/barbershop-ranking";
+import NavigationTabs from "@/components/navigation-tabs";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getUserLoyaltyCards } from "@/app/_actions/loyalty";
@@ -85,6 +86,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <BarbershopStories />
         </div>
         
+        <NavigationTabs />
         <PromotionsCarousel />
 
         <QuickSearch />

@@ -7,13 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Image from "next/image";
-import { Search, ArrowLeft, Trash2 } from "lucide-react";
+import { Search, ArrowLeft, Trash2, Store, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
+interface BarbershopData {
+    id: string;
+    name: string;
+    address: string;
+    imageUrl?: string | null;
+    isSuspended: boolean;
+    bookingsCount: number;
+    source: "local" | "comercio";
+}
+
 export default function AdminBarbershopsPage() {
-    const [barbershops, setBarbershops] = useState<any[]>([]);
-    const [filtered, setFiltered] = useState<any[]>([]);
+    const [barbershops, setBarbershops] = useState<BarbershopData[]>([]);
+    const [filtered, setFiltered] = useState<BarbershopData[]>([]);
     const [search, setSearch] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
@@ -41,13 +51,26 @@ export default function AdminBarbershopsPage() {
         }
     };
 
-    const handleToggleSuspension = async (id: string, currentStatus: boolean) => {
+    const handleToggleSuspension = async (shop: BarbershopData) => {
         try {
-            await toggleBarbershopSuspension(id, !currentStatus);
-            toast.success(`Barbearia ${!currentStatus ? 'suspensa' : 'ativada'} com sucesso`);
-            loadData(); // Reload to refresh state
+            await toggleBarbershopSuspension(shop.id, !shop.isSuspended, shop.source);
+            toast.success(`Barbearia ${!shop.isSuspended ? 'suspensa' : 'ativada'} com sucesso`);
+            loadData();
         } catch (error) {
             toast.error("Erro ao alterar status");
+        }
+    };
+
+    const handleDelete = async (shop: BarbershopData) => {
+        if (!confirm(`Tem certeza que deseja excluir a barbearia "${shop.name}"? Essa ação não pode ser desfeita.`)) {
+            return;
+        }
+        try {
+            await deleteBarbershop(shop.id, shop.source);
+            toast.success("Barbearia excluída com sucesso");
+            loadData();
+        } catch (error) {
+            toast.error("Erro ao excluir barbearia");
         }
     };
 
@@ -82,13 +105,22 @@ export default function AdminBarbershopsPage() {
                     <div className="p-10 text-center border rounded-lg">Nenhuma barbearia encontrada.</div>
                 ) : (
                     filtered.map((shop) => (
-                        <Card key={shop.id} className="overflow-hidden">
+                        <Card key={`${shop.source}-${shop.id}`} className="overflow-hidden">
                             <div className="flex flex-col md:flex-row items-center gap-4 p-4">
                                 <div className="relative h-16 w-16 min-w-16 rounded-full overflow-hidden bg-muted">
                                     <Image src={shop.imageUrl || "/placeholder.png"} alt={shop.name} fill className="object-cover" />
                                 </div>
                                 <div className="flex-1 text-center md:text-left">
-                                    <h3 className="font-bold text-lg">{shop.name}</h3>
+                                    <div className="flex items-center gap-2 justify-center md:justify-start">
+                                        <h3 className="font-bold text-lg">{shop.name}</h3>
+                                        <Badge variant="outline" className={shop.source === "comercio" ? "border-blue-500 text-blue-500" : "border-green-500 text-green-500"}>
+                                            {shop.source === "comercio" ? (
+                                                <><Globe className="size-3 mr-1" /> Comercio</>
+                                            ) : (
+                                                <><Store className="size-3 mr-1" /> Local</>
+                                            )}
+                                        </Badge>
+                                    </div>
                                     <p className="text-sm text-muted-foreground">{shop.address}</p>
                                 </div>
                                 <div className="flex flex-col items-center gap-2">
@@ -104,7 +136,7 @@ export default function AdminBarbershopsPage() {
                                         <Button 
                                             variant={shop.isSuspended ? "default" : "secondary"} 
                                             size="sm"
-                                            onClick={() => handleToggleSuspension(shop.id, shop.isSuspended)}
+                                            onClick={() => handleToggleSuspension(shop)}
                                         >
                                             {shop.isSuspended ? "Reativar" : "Suspender"}
                                         </Button>
@@ -112,17 +144,7 @@ export default function AdminBarbershopsPage() {
                                             variant="destructive" 
                                             size="icon"
                                             className="h-9 w-9"
-                                            onClick={async () => {
-                                                if (confirm(`Tem certeza que deseja excluir a barbearia "${shop.name}"? Essa ação não pode ser desfeita.`)) {
-                                                    try {
-                                                        await deleteBarbershop(shop.id);
-                                                        toast.success("Barbearia excluída com sucesso");
-                                                        loadData();
-                                                    } catch (error) {
-                                                        toast.error("Erro ao excluir barbearia");
-                                                    }
-                                                }
-                                            }}
+                                            onClick={() => handleDelete(shop)}
                                         >
                                             <Trash2 className="size-4" />
                                         </Button>
@@ -136,3 +158,4 @@ export default function AdminBarbershopsPage() {
         </div>
     );
 }
+

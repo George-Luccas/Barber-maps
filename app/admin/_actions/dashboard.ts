@@ -3,9 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
+const COMERCIO_API_URL = process.env.COMERCIO_API_URL || "http://localhost:3001";
+
 // --- Barbershops ---
 export async function getAdminBarbershops() {
-  const barbershops = await prisma.barbershop.findMany({
+  // Buscar barbearias locais
+  const localBarbershops = await prisma.barbershop.findMany({
     orderBy: { name: "asc" },
     include: {
         _count: {
@@ -14,24 +17,71 @@ export async function getAdminBarbershops() {
     }
   });
 
-  return barbershops.map((b: any) => ({
+  const localData = localBarbershops.map((b: any) => ({
     ...b,
-    dailyGoal: Number(b.dailyGoal), // Convert Decimal
-    bookingsCount: b._count.bookings
+    dailyGoal: Number(b.dailyGoal),
+    bookingsCount: b._count.bookings,
+    source: "local" as const,
   }));
+
+  // Tentar buscar barbearias da API externa
+  let externalData: any[] = [];
+  try {
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/shops`, {
+      next: { revalidate: 0 }, // Sem cache para admin
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      externalData = (data.shops || []).map((shop: any) => ({
+        id: shop.id,
+        name: shop.name,
+        address: shop.address || "Endereço não configurado",
+        imageUrl: shop.imageUrl,
+        isSuspended: shop.isSuspended || false,
+        bookingsCount: shop.bookingsCount || 0,
+        source: "comercio" as const,
+      }));
+    }
+  } catch (error) {
+    console.error("[Admin] Erro ao buscar barbearias externas:", error);
+  }
+
+  // Combinar e ordenar por nome
+  return [...localData, ...externalData].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function toggleBarbershopSuspension(id: string, isSuspended: boolean) {
-    await prisma.barbershop.update({
-        where: { id },
-        data: { isSuspended }
+export async function toggleBarbershopSuspension(id: string, isSuspended: boolean, source: "local" | "comercio" = "local") {
+  if (source === "comercio") {
+    // Chamar API externa para suspender
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/shops/${id}/suspend`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isSuspended }),
     });
+    if (!response.ok) throw new Error("Erro ao suspender barbearia externa");
+    return;
+  }
+
+  await prisma.barbershop.update({
+      where: { id },
+      data: { isSuspended }
+  });
 }
 
-export async function deleteBarbershop(id: string) {
-    await prisma.barbershop.delete({
-        where: { id }
+export async function deleteBarbershop(id: string, source: "local" | "comercio" = "local") {
+  if (source === "comercio") {
+    // Chamar API externa para deletar
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/shops/${id}`, {
+      method: "DELETE",
     });
+    if (!response.ok) throw new Error("Erro ao deletar barbearia externa");
+    return;
+  }
+
+  await prisma.barbershop.delete({
+      where: { id }
+  });
 }
 
 // --- Users ---

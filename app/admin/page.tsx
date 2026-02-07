@@ -31,15 +31,23 @@ export default function AdminDashboard() {
       title: "Barbearias",
       description: "Gerenciar parceiros e unidades",
       icon: Scissors,
-      href: "/admin/barbershops", // Placeholder route
+      href: "/admin/barbershops",
       color: "text-blue-500",
       bgColor: "bg-blue-500/10"
+    },
+    {
+      title: "Barbeiros",
+      description: "Gerenciar barbeiros comerciais",
+      icon: Users,
+      href: "/admin/barbers",
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-500/10"
     },
     {
       title: "Usuários",
       description: "Controle de acesso e clientes",
       icon: Users,
-      href: "/admin/users", // Placeholder route
+      href: "/admin/users",
       color: "text-green-500",
       bgColor: "bg-green-500/10"
     },

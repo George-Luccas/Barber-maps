@@ -2,7 +2,18 @@
  * Busca barbeiros exclusivamente da API do Comercio
  */
 
-const COMERCIO_API_URL = process.env.COMERCIO_API_URL || "http://localhost:3001";
+const COMERCIO_API_URL = process.env.NEXT_PUBLIC_COMERCIO_API_URL || process.env.COMERCIO_API_URL || "http://localhost:3001/api/external/v1";
+const COMERCIO_API_KEY = process.env.COMERCIO_API_KEY || "";
+
+// Log para debug
+console.log("[Barbers] API URL:", COMERCIO_API_URL);
+console.log("[Barbers] API Key exists:", !!COMERCIO_API_KEY);
+
+// Headers padrão para autenticação na API do Comercio
+const getApiHeaders = () => ({
+  "Content-Type": "application/json",
+  ...(COMERCIO_API_KEY && { "Authorization": `Bearer ${COMERCIO_API_KEY}` }),
+});
 
 export interface BarberFromAPI {
   id: string;
@@ -53,7 +64,8 @@ export interface BarberWithRanking {
  */
 export async function getBarbers(): Promise<BarberWithShop[]> {
   try {
-    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers`, {
+    const response = await fetch(`${COMERCIO_API_URL}/barbers`, {
+      headers: getApiHeaders(),
       next: { revalidate: 60 },
     });
 
@@ -65,18 +77,18 @@ export async function getBarbers(): Promise<BarberWithShop[]> {
     const data = await response.json();
     const barbers = data.barbers || [];
 
-    return barbers.map((barber: BarberFromAPI) => ({
+    return barbers.map((barber: any) => ({
       id: barber.id,
       name: barber.name,
       email: barber.email,
       phone: barber.phone,
-      imageUrl: barber.imageUrl,
-      barbershopId: barber.isAutonomous ? "autonomo" : barber.id,
+      imageUrl: barber.image || barber.imageUrl, // API pode retornar image ou imageUrl
+      barbershopId: barber.isAutonomous ? "autonomo" : (barber.barbershopId || barber.id),
       barbershop: {
-        id: barber.isAutonomous ? "autonomo" : barber.id,
+        id: barber.isAutonomous ? "autonomo" : (barber.barbershopId || barber.id),
         name: barber.workplaceName || "Autônomo",
         address: barber.isAutonomous ? "Barbeiro Autônomo" : (barber.workplaceName || ""),
-        imageUrl: barber.imageUrl,
+        imageUrl: barber.image || barber.imageUrl,
       }
     }));
   } catch (error) {
@@ -90,7 +102,8 @@ export async function getBarbers(): Promise<BarberWithShop[]> {
  */
 export async function getPopularBarbers(): Promise<BarberWithShop[]> {
   try {
-    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers?sort=popular`, {
+    const response = await fetch(`${COMERCIO_API_URL}/barbers?sort=popular`, {
+      headers: getApiHeaders(),
       next: { revalidate: 60 },
     });
 
@@ -126,7 +139,8 @@ export async function getPopularBarbers(): Promise<BarberWithShop[]> {
  */
 export async function getBarberById(id: string): Promise<BarberWithShop | null> {
   try {
-    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers/${id}`, {
+    const response = await fetch(`${COMERCIO_API_URL}/barbers/${id}`, {
+      headers: getApiHeaders(),
       next: { revalidate: 60 },
     });
 
@@ -135,20 +149,28 @@ export async function getBarberById(id: string): Promise<BarberWithShop | null> 
       return null;
     }
 
-    const barber: BarberFromAPI = await response.json();
+    const data = await response.json();
+    
+    // Suporte para api que retorna { barber: ... } ou o objeto direto
+    const barber = data.barber || data;
+
+    if (!barber || !barber.name) {
+        console.error("[Barbers] Dados do barbeiro inválidos:", barber);
+        return null;
+    }
 
     return {
       id: barber.id,
       name: barber.name,
       email: barber.email,
       phone: barber.phone,
-      imageUrl: barber.imageUrl,
-      barbershopId: barber.isAutonomous ? "autonomo" : barber.id,
+      imageUrl: barber.image || barber.imageUrl,
+      barbershopId: barber.isAutonomous ? "autonomo" : (barber.barbershopId || barber.id),
       barbershop: {
-        id: barber.isAutonomous ? "autonomo" : barber.id,
+        id: barber.isAutonomous ? "autonomo" : (barber.barbershopId || barber.id),
         name: barber.workplaceName || "Autônomo",
         address: barber.isAutonomous ? "Barbeiro Autônomo" : (barber.workplaceName || ""),
-        imageUrl: barber.imageUrl,
+        imageUrl: barber.image || barber.imageUrl,
       },
       _count: {
         Booking: barber.bookingsCount || 0,
@@ -165,7 +187,8 @@ export async function getBarberById(id: string): Promise<BarberWithShop | null> 
  */
 export async function getBarberRanking(): Promise<BarberWithRanking[]> {
   try {
-    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers?sort=popular`, {
+    const response = await fetch(`${COMERCIO_API_URL}/barbers?sort=popular`, {
+      headers: getApiHeaders(),
       next: { revalidate: 60 },
     });
 

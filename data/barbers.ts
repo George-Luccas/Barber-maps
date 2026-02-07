@@ -1,4 +1,23 @@
-import { prisma } from "@/lib/prisma";
+/**
+ * Busca barbeiros exclusivamente da API do Comercio
+ */
+
+const COMERCIO_API_URL = process.env.COMERCIO_API_URL || "http://localhost:3001";
+
+export interface BarberFromAPI {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  imageUrl: string | null;
+  bio: string | null;
+  yearsOfExperience: number;
+  workplaceName: string | null;
+  isAutonomous: boolean;
+  specialties: string[];
+  bookingsCount: number;
+  accountType: string;
+}
 
 export interface BarberWithShop {
   id: string;
@@ -18,131 +37,6 @@ export interface BarberWithShop {
   };
 }
 
-export async function getBarbers(): Promise<BarberWithShop[]> {
-  try {
-    const barbers = await prisma.barber.findMany({
-      include: {
-        Barbershop: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            imageUrl: true,
-          }
-        }
-      },
-      orderBy: {
-        name: "asc"
-      }
-    });
-
-    return barbers.map((barber) => ({
-      id: barber.id,
-      name: barber.name,
-      email: barber.email,
-      phone: barber.phone,
-      imageUrl: barber.imageUrl,
-      barbershopId: barber.barbershopId,
-      barbershop: {
-        id: barber.Barbershop.id,
-        name: barber.Barbershop.name,
-        address: barber.Barbershop.address,
-        imageUrl: barber.Barbershop.imageUrl,
-      }
-    }));
-  } catch (error) {
-    console.error("Erro ao buscar barbeiros:", error);
-    return [];
-  }
-}
-
-export async function getPopularBarbers(): Promise<BarberWithShop[]> {
-  try {
-    // Get barbers with most bookings
-    const barbers = await prisma.barber.findMany({
-      include: {
-        Barbershop: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            imageUrl: true,
-          }
-        },
-        _count: {
-          select: { Booking: true }
-        }
-      },
-      orderBy: {
-        Booking: {
-          _count: "desc"
-        }
-      },
-      take: 10
-    });
-
-    return barbers.map((barber) => ({
-      id: barber.id,
-      name: barber.name,
-      email: barber.email,
-      phone: barber.phone,
-      imageUrl: barber.imageUrl,
-      barbershopId: barber.barbershopId,
-      barbershop: {
-        id: barber.Barbershop.id,
-        name: barber.Barbershop.name,
-        address: barber.Barbershop.address,
-        imageUrl: barber.Barbershop.imageUrl,
-      }
-    }));
-  } catch (error) {
-    console.error("Erro ao buscar barbeiros populares:", error);
-    return [];
-  }
-}
-
-export async function getBarberById(id: string): Promise<BarberWithShop | null> {
-  try {
-    const barber = await prisma.barber.findUnique({
-      where: { id },
-      include: {
-        Barbershop: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            imageUrl: true,
-          }
-        },
-        _count: {
-          select: { Booking: true }
-        }
-      }
-    });
-
-    if (!barber) return null;
-
-    return {
-      id: barber.id,
-      name: barber.name,
-      email: barber.email,
-      phone: barber.phone,
-      imageUrl: barber.imageUrl,
-      barbershopId: barber.barbershopId,
-      barbershop: {
-        id: barber.Barbershop.id,
-        name: barber.Barbershop.name,
-        address: barber.Barbershop.address,
-        imageUrl: barber.Barbershop.imageUrl,
-      },
-      _count: barber._count,
-    };
-  } catch (error) {
-    console.error("Erro ao buscar barbeiro:", error);
-    return null;
-  }
-}
-
 export interface BarberWithRanking {
   id: string;
   name: string;
@@ -154,41 +48,147 @@ export interface BarberWithRanking {
   };
 }
 
-export async function getBarberRanking(): Promise<BarberWithRanking[]> {
+/**
+ * Busca todos os barbeiros da API do Comercio
+ */
+export async function getBarbers(): Promise<BarberWithShop[]> {
   try {
-    const barbers = await prisma.barber.findMany({
-      include: {
-        Barbershop: {
-          select: {
-            id: true,
-            name: true,
-          }
-        },
-        _count: {
-          select: { Booking: true }
-        }
-      },
-      orderBy: {
-        Booking: {
-          _count: "desc"
-        }
-      },
-      take: 10
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers`, {
+      next: { revalidate: 60 },
     });
 
-    return barbers.map((barber) => ({
+    if (!response.ok) {
+      console.error("[Barbers] Erro ao buscar da API:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const barbers = data.barbers || [];
+
+    return barbers.map((barber: BarberFromAPI) => ({
       id: barber.id,
       name: barber.name,
+      email: barber.email,
+      phone: barber.phone,
       imageUrl: barber.imageUrl,
-      bookingsCount: barber._count.Booking,
+      barbershopId: barber.isAutonomous ? "autonomo" : barber.id,
       barbershop: {
-        id: barber.Barbershop.id,
-        name: barber.Barbershop.name,
+        id: barber.isAutonomous ? "autonomo" : barber.id,
+        name: barber.workplaceName || "Autônomo",
+        address: barber.isAutonomous ? "Barbeiro Autônomo" : (barber.workplaceName || ""),
+        imageUrl: barber.imageUrl,
       }
     }));
   } catch (error) {
-    console.error("Erro ao buscar ranking de barbeiros:", error);
+    console.error("[Barbers] Erro ao buscar barbeiros:", error);
     return [];
   }
 }
 
+/**
+ * Busca barbeiros populares (ordenados por bookings)
+ */
+export async function getPopularBarbers(): Promise<BarberWithShop[]> {
+  try {
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers?sort=popular`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      return getBarbers(); // Fallback para lista normal
+    }
+
+    const data = await response.json();
+    const barbers = data.barbers || [];
+
+    return barbers.slice(0, 10).map((barber: BarberFromAPI) => ({
+      id: barber.id,
+      name: barber.name,
+      email: barber.email,
+      phone: barber.phone,
+      imageUrl: barber.imageUrl,
+      barbershopId: barber.isAutonomous ? "autonomo" : barber.id,
+      barbershop: {
+        id: barber.isAutonomous ? "autonomo" : barber.id,
+        name: barber.workplaceName || "Autônomo",
+        address: barber.isAutonomous ? "Barbeiro Autônomo" : (barber.workplaceName || ""),
+        imageUrl: barber.imageUrl,
+      }
+    }));
+  } catch (error) {
+    console.error("[Barbers] Erro ao buscar populares:", error);
+    return [];
+  }
+}
+
+/**
+ * Busca um barbeiro pelo ID
+ */
+export async function getBarberById(id: string): Promise<BarberWithShop | null> {
+  try {
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers/${id}`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      console.error("[Barbers] Barbeiro não encontrado:", id);
+      return null;
+    }
+
+    const barber: BarberFromAPI = await response.json();
+
+    return {
+      id: barber.id,
+      name: barber.name,
+      email: barber.email,
+      phone: barber.phone,
+      imageUrl: barber.imageUrl,
+      barbershopId: barber.isAutonomous ? "autonomo" : barber.id,
+      barbershop: {
+        id: barber.isAutonomous ? "autonomo" : barber.id,
+        name: barber.workplaceName || "Autônomo",
+        address: barber.isAutonomous ? "Barbeiro Autônomo" : (barber.workplaceName || ""),
+        imageUrl: barber.imageUrl,
+      },
+      _count: {
+        Booking: barber.bookingsCount || 0,
+      },
+    };
+  } catch (error) {
+    console.error("[Barbers] Erro ao buscar barbeiro:", error);
+    return null;
+  }
+}
+
+/**
+ * Busca ranking de barbeiros (ordenados por bookings)
+ */
+export async function getBarberRanking(): Promise<BarberWithRanking[]> {
+  try {
+    const response = await fetch(`${COMERCIO_API_URL}/api/external/v1/barbers?sort=popular`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      console.error("[Barbers] Erro ao buscar ranking:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const barbers = data.barbers || [];
+
+    return barbers.slice(0, 10).map((barber: BarberFromAPI) => ({
+      id: barber.id,
+      name: barber.name,
+      imageUrl: barber.imageUrl,
+      bookingsCount: barber.bookingsCount || 0,
+      barbershop: {
+        id: barber.isAutonomous ? "autonomo" : barber.id,
+        name: barber.workplaceName || "Autônomo",
+      }
+    }));
+  } catch (error) {
+    console.error("[Barbers] Erro ao buscar ranking:", error);
+    return [];
+  }
+}

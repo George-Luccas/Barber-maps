@@ -16,7 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImageGallery } from "@/components/image-gallery";
-import { Phone, Mail, MapPin, Store, ArrowLeft, Scissors, Star, Calendar, ImageIcon, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Store, ArrowLeft, Scissors, Star, Calendar, ImageIcon, MessageCircle, Instagram } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -225,6 +225,21 @@ export default async function BarberPage({ params }: BarberPageProps) {
                   Agendar com {barber.name.split(' ')[0]}
                 </Button>
               </Link>
+          )}
+          
+          {/* Instagram Button */}
+          {barber.instagram && (
+            <Link 
+              href={`https://instagram.com/${barber.instagram.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '')}`} 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mt-4"
+            >
+              <Button className="w-full h-14 text-lg bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 gap-2 shadow-lg transition-all text-white border-0" size="lg">
+                <Instagram className="size-6 text-white" />
+                Ver no Instagram
+              </Button>
+            </Link>
           )}
         </div>
       </div>

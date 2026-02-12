@@ -1,3 +1,4 @@
+import { prisma as db } from "@/lib/prisma";
 /**
  * Busca barbeiros exclusivamente da API do Comercio
  */
@@ -35,6 +36,7 @@ export interface BarberWithShop {
   name: string;
   email: string | null;
   phone: string | null;
+  instagram?: string | null;
   imageUrl: string | null;
   bio?: string | null;
   yearsOfExperience?: number;
@@ -81,11 +83,24 @@ export async function getBarbers(): Promise<BarberWithShop[]> {
     const data = await response.json();
     const barbers = data.barbers || [];
 
+    // Fetch local overrides (Instagram)
+    let localBarbersMap = new Map<string, string | null>();
+    try {
+        const localBarbers = await db.barber.findMany({
+            // @ts-ignore
+            select: { id: true, instagram: true }
+        });
+        localBarbers.forEach(b => localBarbersMap.set(b.id, b.instagram));
+    } catch (e) {
+        console.error("Failed to fetch local barber attributes", e);
+    }
+
     return barbers.map((barber: any) => ({
       id: barber.id,
       name: barber.name,
       email: barber.email,
       phone: barber.phone,
+      instagram: localBarbersMap.get(barber.id) || null,
       imageUrl: barber.image || barber.imageUrl, // API pode retornar image ou imageUrl
       bio: barber.bio || "Barbeiro profissional com anos de experiência em cortes modernos e clássicos.",
       yearsOfExperience: barber.yearsOfExperience || Math.floor(Math.random() * 10) + 1, // Fallback randomico se não tiver na API
@@ -160,6 +175,7 @@ export async function getBarberById(id: string): Promise<BarberWithShop | null> 
       return null;
     }
 
+// ... inside getBarberById
     const data = await response.json();
     
     // Suporte para api que retorna { barber: ... } ou o objeto direto
@@ -170,11 +186,27 @@ export async function getBarberById(id: string): Promise<BarberWithShop | null> 
         return null;
     }
 
+    // Fetch local overrides (Instagram)
+    let instagram = null;
+    try {
+        // @ts-ignore: Prisma types might be stale
+        const local = await db.barber.findUnique({ 
+            where: { id: barber.id },
+            // @ts-ignore
+            select: { instagram: true }
+        });
+        // @ts-ignore
+        instagram = local?.instagram;
+    } catch (e) {
+        console.error("Failed to fetch local barber attributes", e);
+    }
+
     return {
       id: barber.id,
       name: barber.name,
       email: barber.email,
       phone: barber.phone,
+      instagram: instagram || null,
       imageUrl: barber.image || barber.imageUrl,
       barbershopId: barber.isAutonomous ? "autonomo" : (barber.barbershopId || barber.id),
       barbershop: {

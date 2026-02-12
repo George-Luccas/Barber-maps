@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Trophy, CalendarCheck } from "lucide-react";
+import { Sparkles, Trophy, Star } from "lucide-react";
 import { BarberWithShop } from "@/data/barbers";
 
 interface BarberCardProps {
-  barber: BarberWithShop;
+  barber: BarberWithShop & { rating?: number; reviewCount?: number };
 }
 
 const BarberCard = ({ barber }: BarberCardProps) => {
@@ -95,14 +95,14 @@ const BarberCard = ({ barber }: BarberCardProps) => {
                   </span>
                 </div>
 
-                {/* Bookings */}
+                {/* Avaliações */}
                 <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-md flex flex-col items-center justify-center gap-0.5 group-hover:bg-neon-purple/10 group-hover:border-neon-purple/30 transition-colors">
-                  <div className="flex items-center gap-1 text-green-400">
-                    <CalendarCheck className="w-3 h-3" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">Cortes</span>
+                  <div className="flex items-center gap-1 text-yellow-400">
+                    <Star className="w-3 h-3 fill-yellow-400" />
+                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">Avaliações</span>
                   </div>
                   <span className="text-xl font-bold text-white leading-none">
-                    {barber.bookingsCount || "0"}
+                    {barber.rating ? barber.rating.toFixed(1) : "5.0"}
                   </span>
                 </div>
               </div>

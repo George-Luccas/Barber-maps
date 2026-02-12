@@ -82,3 +82,48 @@ export async function getBarberRankingByRating(): Promise<BarberWithRating[]> {
     return [];
   }
 }
+
+export async function getAllBarbersWithRatings(): Promise<BarberWithRating[]> {
+  try {
+    const allBarbers = await getBarbers();
+
+    // Fetch All Reviews for aggregation
+    // @ts-ignore: Prisma types are stale
+    const reviews = await db.review.findMany({
+      where: {
+        // @ts-ignore
+        barberId: { not: null }
+      },
+      select: {
+        // @ts-ignore
+        barberId: true,
+        rating: true,
+      },
+    });
+
+    const ratingMap = new Map<string, { total: number; count: number }>();
+
+    // @ts-ignore
+    reviews.forEach((r: any) => {
+      if (!r.barberId) return;
+      const current = ratingMap.get(r.barberId) || { total: 0, count: 0 };
+      ratingMap.set(r.barberId, {
+        total: current.total + r.rating,
+        count: current.count + 1,
+      });
+    });
+
+    return allBarbers.map((barber) => {
+      const stats = ratingMap.get(barber.id);
+      const avgRating = stats ? stats.total / stats.count : 0;
+      return {
+        ...barber,
+        rating: avgRating,
+        reviewCount: stats ? stats.count : 0,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching all barbers with ratings:", error);
+    return [];
+  }
+}

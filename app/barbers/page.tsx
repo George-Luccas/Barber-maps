@@ -5,7 +5,7 @@ import BarberItem from "@/components/barber-item";
 import BarberCard from "@/components/barber-card";
 import BarberRanking from "@/components/barber-ranking";
 import { getBarbers } from "@/data/barbers";
-import { getBarberRankingByRating } from "@/app/_actions/ranking";
+import { getBarberRankingByRating, getAllBarbersWithRatings } from "@/app/_actions/ranking";
 import {
   PageContainer,
   PageSectionTitle,
@@ -16,7 +16,7 @@ import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 export const dynamic = "force-dynamic";
 
 export default async function BarbersPage() {
-  const barbers = await getBarbers();
+  const barbers = await getAllBarbersWithRatings();
   // Fetch ranking by rating
   const rankingBarbers = await getBarberRankingByRating();
 

@@ -27,7 +27,7 @@ async function main() {
   } else {
       const review = user.reviews[0];
       console.log("Latest Review Found:");
-      console.log(`- Shop: ${review.barbershop.name}`);
+      console.log(`- Shop: ${review.barbershop?.name || "N/A"}`);
       console.log(`- Rating: ${review.rating} (Type: ${typeof review.rating})`);
       console.log(`- Comment: ${review.comment}`);
       console.log(`- CreatedAt: ${review.createdAt}`);

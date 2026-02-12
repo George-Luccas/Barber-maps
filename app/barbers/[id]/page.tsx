@@ -16,7 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImageGallery } from "@/components/image-gallery";
-import { Phone, Mail, MapPin, Store, ArrowLeft, Scissors, Star, Calendar, ImageIcon } from "lucide-react";
+import { Phone, Mail, MapPin, Store, ArrowLeft, Scissors, Star, Calendar, ImageIcon, MessageCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -205,13 +205,27 @@ export default async function BarberPage({ params }: BarberPageProps) {
               <ReviewList reviews={reviews as any} isAdmin={(session?.user as any)?.role === "ADMIN"} />
             </div>
 
-          {/* CTA */}
-          <Link href={`/barbershops/${barber.barbershop.id}`} className="block">
-            <Button className="w-full h-14 text-lg bg-neon-purple hover:bg-neon-purple/90 gap-2" size="lg">
-              <Calendar className="size-5" />
-              Agendar com {barber.name.split(' ')[0]}
-            </Button>
-          </Link>
+          {/* CTA - WhatsApp or Schedule Fallback */}
+          {barber.phone ? (
+              <Link 
+                href={`https://wa.me/${barber.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${barber.name}, gostaria de saber mais sobre seus serviços.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 gap-2 shadow-lg hover:shadow-green-500/20 transition-all" size="lg">
+                  <MessageCircle className="size-6" />
+                  Falar comigo
+                </Button>
+              </Link>
+          ) : (
+              <Link href={`/barbershops/${barber.barbershop.id}`} className="block">
+                <Button className="w-full h-14 text-lg bg-neon-purple hover:bg-neon-purple/90 gap-2" size="lg">
+                  <Calendar className="size-5" />
+                  Agendar com {barber.name.split(' ')[0]}
+                </Button>
+              </Link>
+          )}
         </div>
       </div>
 

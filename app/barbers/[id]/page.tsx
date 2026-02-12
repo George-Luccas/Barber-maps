@@ -1,3 +1,13 @@
+
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getBarberReviews, getBarberRating } from "@/app/_actions/review-actions";
+import { ReviewForm } from "@/components/review-form";
+import { ReviewList } from "@/components/review-list";
+import { PageSectionTitle } from "@/components/ui/page";
+
+// ... (existing imports)
+
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { getBarberById } from "@/data/barbers";
@@ -22,8 +32,22 @@ export default async function BarberPage({ params }: BarberPageProps) {
     notFound();
   }
 
-  // Imagens de galeria placeholder (depois você pode adicionar campo real no banco)
+  // Session for reviews
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // Fetch reviews
+  const reviews = await getBarberReviews(id);
+  const rating = await getBarberRating(id);
+
+  const userReview = session?.user 
+    ? reviews.find((r: any) => r.userId === session.user?.id) 
+    : undefined;
+
+  // Imagens de galeria placeholder
   const galleryImages = [
+    // ... (existing)
     "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
     "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400",
     "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400",
@@ -38,6 +62,7 @@ export default async function BarberPage({ params }: BarberPageProps) {
       
       {/* Cover Image */}
       <div className="relative h-48 md:h-64 w-full">
+         {/* ... existing cover image code ... */}
         <Image
           src={barber.barbershop.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
           alt="Cover"
@@ -90,7 +115,7 @@ export default async function BarberPage({ params }: BarberPageProps) {
             </div>
             <div className="text-center p-4 rounded-xl bg-muted/50 border border-border">
               <div className="text-2xl font-bold text-yellow-400 flex items-center justify-center gap-1">
-                <Star className="size-5 fill-yellow-400" /> 4.9
+                <Star className="size-5 fill-yellow-400" /> {rating.average} ({rating.count})
               </div>
               <div className="text-xs text-muted-foreground">Avaliação</div>
             </div>
@@ -158,6 +183,27 @@ export default async function BarberPage({ params }: BarberPageProps) {
               <span>{barber.barbershop.address}</span>
             </div>
           </div>
+
+           {/* Avaliações */}
+            <div className="py-6">
+              <div className="bg-border h-px w-full" />
+            </div>
+
+            <div className="flex flex-col gap-4 pb-10">
+              <div className="flex items-center justify-between">
+                <PageSectionTitle>Avaliações</PageSectionTitle>
+                {session?.user && (
+                    <ReviewForm 
+                        barbershopId={barber.barbershop.id}
+                        barberId={barber.id}
+                        userId={session.user.id}
+                        userEmail={session.user.email}
+                        initialData={userReview ? { rating: userReview.rating, comment: userReview.comment } : undefined}
+                    />
+                )}
+              </div>
+              <ReviewList reviews={reviews as any} isAdmin={(session?.user as any)?.role === "ADMIN"} />
+            </div>
 
           {/* CTA */}
           <Link href={`/barbershops/${barber.barbershop.id}`} className="block">

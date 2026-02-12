@@ -246,6 +246,127 @@ export const getBarbershopRating = async (barbershopId: string) => {
   }
 };
 
+
+interface CreateBarberReviewParams {
+  barberId: string;
+  barbershopId: string; // Still needed for context or relations
+  userId: string;
+  rating: number;
+  comment?: string;
+  userEmail?: string | null;
+}
+
+export const createBarberReview = async (params: CreateBarberReviewParams) => {
+  const { barberId, barbershopId, userId, rating, comment, userEmail } = params;
+  
+  console.log(`[Review Action] Creating review for Barber ${barberId} by User ${userId}`);
+
+  try {
+     // 0. Check for existing review in current cycle (USER REQUEST: One review per cycle)
+     const now = new Date();
+     const currentMonth = now.getMonth();
+     const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+     const startOfQuarter = new Date(now.getFullYear(), quarterStartMonth, 1);
+
+     const existingCycleReview = await db.review.findFirst({
+         where: {
+             userId,
+             barberId,
+             createdAt: {
+                 gte: startOfQuarter
+             }
+         }
+     });
+
+     if (existingCycleReview) {
+         throw new Error("Você já avaliou este barbeiro neste ciclo trimestral. Aguarde o próximo ciclo!");
+     }
+
+     // 1. Check if Barbershop exists locally
+     // We do NOT sync external shops anymore per user request.
+     // If shop exists, we link it. If not, we leave it null.
+     const shopExists = await db.barbershop.findUnique({ where: { id: barbershopId } });
+     const finalBarbershopId = shopExists ? barbershopId : undefined;
+
+     if (!shopExists) {
+         console.log(`[Review Action] Shop ${barbershopId} not found locally. Proceeding with independent barber review.`);
+     }
+
+     // 2. Ensuring Barber exists locally
+     const barberExists = await db.barber.findUnique({ where: { id: barberId } });
+     if (!barberExists) {
+         // Minimal create
+         await db.barber.create({
+             data: {
+                 id: barberId,
+                 name: "Barbeiro", // Placeholder
+                 barbershopId: finalBarbershopId, // Can be null now
+                 updatedAt: new Date()
+             }
+         });
+     }
+
+     // 3. Create Review
+    const review = await db.review.create({
+        data: {
+            userId,
+            barbershopId: finalBarbershopId, // Can be null now
+            barberId,
+            rating,
+            comment,
+        }
+    });
+
+    revalidatePath(`/barbers/${barberId}`);
+    return review;
+
+  } catch (error) {
+      console.error("[Review Action] Error creating barber review:", error);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error("Erro ao salvar avaliação do barbeiro.");
+  }
+}
+
+export const getBarberReviews = async (barberId: string) => {
+    try {
+        return await db.review.findMany({
+            where: { barberId },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        image: true,
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" }
+        });
+    } catch (error) {
+        return [];
+    }
+}
+
+export const getBarberRating = async (barberId: string) => {
+    try {
+        const reviews = await db.review.findMany({
+            where: { barberId },
+            select: { rating: true }
+        });
+        
+        if (reviews.length === 0) return { average: 0, count: 0 };
+        
+        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+        return {
+            average: parseFloat((sum / reviews.length).toFixed(1)),
+            count: reviews.length
+        };
+    } catch (error) {
+        return { average: 0, count: 0 };
+    }
+}
+
 import { headers } from "next/headers";
 
 export const deleteBarbershopReview = async (reviewId: string) => {
@@ -274,30 +395,34 @@ export const deleteBarbershopReview = async (reviewId: string) => {
           where: { id: reviewId }
       });
 
-      // 3. Deduct 1 loyalty point from the user's card for this barbershop
-      const loyaltyCard = await db.loyaltyCard.findUnique({
-          where: {
-              userId_barbershopId: {
-                  userId: review.userId,
-                  barbershopId: review.barbershopId
-              }
-          }
-      });
-
-      if (loyaltyCard && loyaltyCard.currentPoints > 0) {
-          await db.loyaltyCard.update({
+      // 3. Deduct 1 loyalty point from the user's card for this barbershop IF exists
+      if (review.barbershopId) {
+          const loyaltyCard = await db.loyaltyCard.findUnique({
               where: {
                   userId_barbershopId: {
                       userId: review.userId,
                       barbershopId: review.barbershopId
                   }
-              },
-              data: {
-                  currentPoints: { decrement: 1 },
-                  totalLifetimePoints: { decrement: 1 }
               }
           });
-          console.log(`[Loyalty] Removed 1 point from user ${review.userId} for deleted review at shop ${review.barbershopId}`);
+
+          if (loyaltyCard && loyaltyCard.currentPoints > 0) {
+              await db.loyaltyCard.update({
+                  where: {
+                      userId_barbershopId: {
+                          userId: review.userId,
+                          barbershopId: review.barbershopId
+                      }
+                  },
+                  data: {
+                      currentPoints: { decrement: 1 },
+                      totalLifetimePoints: { decrement: 1 }
+                  }
+              });
+              console.log(`[Loyalty] Removed 1 point from user ${review.userId} for deleted review at shop ${review.barbershopId}`);
+          }
+      } else {
+          console.log(`[Loyalty] Skipping point deduction - Review ${reviewId} is not linked to a barbershop.`);
       }
       
       revalidatePath("/");

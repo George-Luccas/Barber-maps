@@ -9,7 +9,9 @@ interface BarberWithStats {
   id: string;
   name: string;
   imageUrl: string | null;
-  bookingsCount: number;
+  bookingsCount?: number;
+  rating?: number; // Added rating
+  reviewCount?: number; // Added review count
   barbershop: {
     id: string;
     name: string;
@@ -23,164 +25,143 @@ interface BarberRankingProps {
 const BarberRanking = ({ barbers }: BarberRankingProps) => {
   if (barbers.length === 0) return null;
 
-  const getMedalStyle = (index: number) => {
+  // Utilize the passed order (already sorted by rating)
+  const sortedBarbers = barbers.slice(0, 10);
+  const maxRating = 5; // Max rating is always 5
+
+  const getBarStyles = (index: number) => {
     switch (index) {
-      case 0: return { 
-        bg: "bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500", 
-        border: "border-yellow-400",
-        shadow: "shadow-[0_0_15px_rgba(250,204,21,0.6)]",
-        text: "text-yellow-900"
+      case 0: return {
+        gradient: "bg-gradient-to-t from-yellow-600 via-yellow-400 to-yellow-200",
+        shadow: "shadow-[0_0_30px_rgba(250,204,21,0.5)]",
+        border: "border-yellow-300",
+        text: "text-yellow-400"
       };
-      case 1: return { 
-        bg: "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400", 
+      case 1: return {
+        gradient: "bg-gradient-to-t from-gray-600 via-gray-400 to-gray-200",
+        shadow: "shadow-[0_0_20px_rgba(156,163,175,0.4)]",
         border: "border-gray-300",
-        shadow: "shadow-[0_0_10px_rgba(156,163,175,0.5)]",
-        text: "text-gray-700"
+        text: "text-gray-300"
       };
-      case 2: return { 
-        bg: "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700", 
-        border: "border-amber-500",
-        shadow: "shadow-[0_0_10px_rgba(217,119,6,0.5)]",
-        text: "text-amber-900"
+      case 2: return {
+        gradient: "bg-gradient-to-t from-orange-700 via-orange-500 to-orange-300",
+        shadow: "shadow-[0_0_20px_rgba(249,115,22,0.4)]",
+        border: "border-orange-400",
+        text: "text-orange-400"
       };
-      default: return { 
-        bg: "bg-gradient-to-br from-purple-700 to-purple-900", 
+      default: return {
+        gradient: "bg-gradient-to-t from-purple-900 via-purple-600 to-purple-400",
+        shadow: "shadow-[0_0_15px_rgba(168,85,247,0.3)]",
         border: "border-purple-500",
-        shadow: "",
-        text: "text-purple-200"
+        text: "text-purple-300"
       };
     }
   };
 
   return (
-    <div className="relative mx-4 my-6 p-1 rounded-2xl bg-gradient-to-b from-purple-600 via-purple-800 to-purple-600">
-      {/* Inner container */}
-      <div className="relative rounded-xl bg-black/95 p-4 overflow-hidden">
-        
-        {/* Glow effects */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-purple-600/30 blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-purple-600/30 blur-3xl" />
-        
-        {/* Header */}
-        <div className="relative text-center mb-6 pt-2">
-          <div className="flex items-center justify-center gap-4">
-            {/* Navalha de barbeiro clássica com animação */}
-            <motion.div
-              animate={{ rotate: [-10, 10, -10] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <svg 
-                className="w-12 h-12 text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1"
-              >
-                {/* Lâmina - fina e curva */}
-                <path d="M4 10 Q10 8 20 4 L21 5 Q11 9 5 11 Z" fill="currentColor" />
-                {/* Cabo - fino e longo */}
-                <path d="M4 10 L4 21 Q4 22 5 22 L6 22 Q7 22 7 21 L7 11" fill="currentColor" opacity="0.7" />
-                {/* Pino central no cabo */}
-                <circle cx="5.5" cy="14" r="1" stroke="currentColor" fill="none" strokeWidth="0.8" />
-              </svg>
-            </motion.div>
-            
+    <div className="relative mx-4 my-8 p-6 rounded-3xl bg-black/40 border border-purple-500/30 backdrop-blur-sm overflow-hidden">
+        {/* Title */}
+        <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-black uppercase tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-b from-purple-200 via-white to-purple-300"
-                style={{ textShadow: '0 0 40px rgba(168, 85, 247, 0.8)' }}>
-                Ranking
-              </h2>
-              <p className="text-xl font-bold uppercase tracking-widest text-purple-400 -mt-1">
-                dos Barbeiros
-              </p>
+                <h2 className="text-2xl font-black uppercase tracking-wider text-white">
+                    Ranking <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Top 10</span>
+                </h2>
+                <div className="flex flex-col">
+                    <p className="text-xs text-muted-foreground uppercase tracking-[0.2em]">Os melhores avaliados</p>
+                    <p className="text-[10px] font-bold text-emerald-400 mt-1 uppercase tracking-wider">
+                        {(() => {
+                            const date = new Date();
+                            const month = date.getMonth();
+                            const quarters = ["Jan - Mar", "Abr - Jun", "Jul - Set", "Out - Dez"];
+                            const currentQuarter = quarters[Math.floor(month / 3)];
+                            return `● Ciclo: ${currentQuarter}`;
+                        })()}
+                    </p>
+                </div>
+            </div>
+            <Crown className="w-8 h-8 text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)] animate-pulse" />
+        </div>
+
+        {/* Chart Container - Scrollable horizontally on mobile */}
+        <div className="w-full overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex items-end justify-center min-w-max gap-4 md:gap-8 px-4 pt-12 pb-2">
+                {sortedBarbers.map((barber, index) => {
+                    const styles = getBarStyles(index);
+                    const rating = barber.rating || 0;
+                    
+                    // USER REQUEST: Rank-based strict hierarchy (1st > 2nd > 3rd...)
+                    // Instead of rating-based height, we use index-based decay.
+                    // Index 0 (1st) = 100%, Index 1 (2nd) = 90%, etc.
+                    const visualHeight = 100 - (index * 7); 
+                    
+                    return (
+                        <div key={barber.id} className="flex flex-col items-center group relative w-16 md:w-24">
+                            
+                            {/* Score Bubble */}
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 + 0.5 }}
+                                className={`mb-2 font-black text-lg ${styles.text} flex items-center gap-1`}
+                            >
+                                <span className="text-sm">★</span> {rating.toFixed(1)}
+                            </motion.div>
+
+                            {/* Bar Track (Fixed Height Area) */}
+                            <div className="h-[180px] w-full flex items-end justify-center relative">
+                                {/* The Bar */}
+                                <motion.div
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${visualHeight}%` }}
+                                    transition={{ 
+                                        duration: 1.5, 
+                                        ease: [0.34, 1.56, 0.64, 1],
+                                        delay: index * 0.1 
+                                    }}
+                                    className={`w-full relative rounded-t-lg ${styles.gradient} ${styles.shadow} opacity-90 hover:opacity-100 transition-opacity`}
+                                >
+                                    {/* Pattern Overlay */}
+                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay" />
+                                    
+                                    {/* Avatar (Inside Bar at top - absolute relative to the bar) */}
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-background z-10 overflow-hidden shadow-lg">
+                                        <Image
+                                            src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                                            alt={barber.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    
+                                    {/* Rank Number (Bottom of bar) */}
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 font-black text-black/50 text-xl md:text-2xl">
+                                        {index + 1}
+                                    </div>
+                                </motion.div>
+                                
+                                {/* Podium Base for Top 3 (Behind/Bottom of track) */}
+                                {index < 3 && (
+                                    <div className={`absolute bottom-0 w-[120%] h-1 ${styles.border.replace('border', 'bg')} blur-sm`} />
+                                )}
+                            </div>
+
+                            {/* Name (Below Bar) */}
+                            <Link href={`/barbers/${barber.id}`} className="mt-3 text-center">
+                                <span className="block text-xs font-bold uppercase tracking-wider text-white truncate max-w-[90px] group-hover:text-purple-400 transition-colors">
+                                    {barber.name.split(' ')[0]}
+                                </span>
+                                <span className="block text-[10px] text-muted-foreground">
+                                    ({barber.reviewCount || 0} avaliações)
+                                </span>
+                            </Link>
+                        </div>
+                    );
+                })}
             </div>
             
-            {/* Tesoura com animação */}
-            <motion.div
-              animate={{ rotate: [10, -10, 10] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Scissors className="w-10 h-10 text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-            </motion.div>
-          </div>
+            {/* Floor Line */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mt-[-1px]" />
         </div>
-
-        {/* Ranking List */}
-        <div className="relative space-y-2">
-          {barbers.slice(0, 5).map((barber, index) => {
-            const medal = getMedalStyle(index);
-            return (
-            <motion.div
-              key={barber.id}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                href={`/barbers/${barber.id}`}
-                className="group relative flex items-center gap-3 p-2.5 rounded-lg border border-purple-500/60 bg-gradient-to-r from-purple-950/80 via-black/50 to-purple-950/80 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all"
-              >
-                {/* Round Medal with Crown */}
-                <div className={`w-12 h-12 rounded-full ${medal.bg} ${medal.shadow} flex items-center justify-center flex-shrink-0 border-2 ${medal.border}`}>
-                  <Crown className={`w-6 h-6 ${medal.text}`} />
-                </div>
-
-                {/* Position Number */}
-                <span className={`w-8 font-black text-xl ${index === 0 ? 'text-yellow-400' : index < 3 ? 'text-gray-300' : 'text-purple-400'}`}>
-                  {index + 1}º
-                </span>
-
-                {/* Photo */}
-                <div className={`relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 border-2 ${index === 0 ? 'border-yellow-400' : 'border-purple-500/70'}`}>
-                  <Image
-                    src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
-                    alt={barber.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-                {/* Name with marquee animation */}
-                <div className="flex-1 min-w-0 overflow-hidden">
-                  <motion.span 
-                    className={`block font-bold uppercase tracking-wide whitespace-nowrap ${index === 0 ? 'text-yellow-400' : 'text-white'}`}
-                    animate={{
-                      x: ["100%", "0%", "0%", "-100%"],
-                    }}
-                    transition={{
-                      duration: 6,
-                      times: [0, 0.2, 0.8, 1],
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: index * 0.5,
-                    }}
-                  >
-                    {barber.name}
-                  </motion.span>
-                </div>
-
-                {/* Points */}
-                <div className="flex items-baseline gap-1 flex-shrink-0">
-                  <span className={`font-black text-xl ${index === 0 ? 'text-yellow-400' : 'text-purple-300'}`}>
-                    {barber.bookingsCount}
-                  </span>
-                  <span className="text-[10px] uppercase text-purple-500 font-bold">pontos</span>
-                </div>
-              </Link>
-            </motion.div>
-          )})}
-        </div>
-
-        {/* Footer decoration */}
-        <div className="flex items-center justify-center gap-6 mt-5 pt-4 border-t border-purple-800/50">
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-5 bg-gradient-to-b from-purple-400 to-purple-700 rounded-sm" />
-            <div className="w-1 h-4 bg-purple-600 rounded-full" />
-            <div className="w-1 h-4 bg-purple-600 rounded-full" />
-          </div>
-          <Scissors className="w-5 h-5 text-purple-500" />
-        </div>
-      </div>
     </div>
   );
 };

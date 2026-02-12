@@ -127,12 +127,13 @@ model Barber {
   email                String?
   phone                String?
   imageUrl             String?
-  barbershopId         String
+  barbershopId         String?
   createdAt            DateTime               @default(now())
   updatedAt            DateTime
-  Barbershop           Barbershop             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  Barbershop           Barbershop?             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   Booking              Booking[]
   FinancialTransaction FinancialTransaction[]
+  reviews              Review[]
 
   @@index([barbershopId])
 }
@@ -364,18 +365,34 @@ model LoyaltyCard {
   @@unique([userId, barbershopId])
 }
 
+
 model Review {
   id           String     @id @default(uuid())
   rating       Int
   comment      String?
   userId       String
-  barbershopId String
+  barbershopId String?
+  barberId     String? // New optional field
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  
   user         user       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  barbershop   Barbershop? @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  barber       Barber?    @relation(fields: [barberId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, barbershopId])
+  // Combined index for unique review per user per entity?
+  // Existing: @@unique([userId, barbershopId]) but this might block reviewing a barber if user reviewed shop?
+  // Or block multiples? Let's relax unique constraint or make it compound.
+  // Actually, existing schema has @@unique([userId, barbershopId]).
+  // If I add barberId, I should probably remove that unique constraint or update it.
+  // BUT modifying constraints can be tricky.
+  // User wants "Review per Barber".
+  // So a user should be able to review Barber A in Shop X, and also review Shop X? 
+  // Let's assume unique constraint should be loosened or updated.
+  // I'll comment out the @@unique for now to avoid migration issues if possible, or replace with @@unique([userId, barbershopId, barberId])? No, barberId is optional.
+  // Let's start by just adding the fields and relations.
+  
   @@index([barbershopId])
   @@index([userId])
+  @@index([barberId])
 }

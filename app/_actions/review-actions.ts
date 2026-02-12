@@ -132,31 +132,38 @@ export const createBarbershopReview = async (params: CreateReviewParams) => {
     }
 
     // 3. Check if it's a new review (for Loyalty Points)
-    const existingReview = await db.review.findUnique({
-      where: { userId_barbershopId: { userId, barbershopId } }
+    // 3. Check if it's a new review (for Loyalty Points)
+    // We use findFirst because userId_barbershopId unique constraint is not available 
+    // on optional fields in the current Prisma client generation.
+    const existingReview = await db.review.findFirst({
+      where: { 
+          userId, 
+          barbershopId 
+      }
     });
 
     const isNewReview = !existingReview;
+    let review;
 
-    // 3. Upsert Review
-    const review = await db.review.upsert({
-        where: {
-        userId_barbershopId: {
-            userId,
-            barbershopId,
-        },
-        },
-        update: {
-        rating,
-        comment,
-        },
-        create: {
-        userId,
-        barbershopId,
-        rating,
-        comment,
-        },
-    });
+    // 3. Create or Update Review (Manual Upsert)
+    if (existingReview) {
+        review = await db.review.update({
+            where: { id: existingReview.id },
+            data: {
+                rating,
+                comment,
+            }
+        });
+    } else {
+        review = await db.review.create({
+            data: {
+                userId,
+                barbershopId,
+                rating,
+                comment,
+            }
+        });
+    }
 
     // 4. Award Point (Only if it was a new review)
     if (isNewReview) {

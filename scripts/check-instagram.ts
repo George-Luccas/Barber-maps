@@ -25,7 +25,8 @@ async function main() {
                 name: barber.name,
                 instagram: "@" + barber.name.replace(/\s+/g, '').toLowerCase(),
                 imageUrl: barber.imageUrl,
-                barbershopId: barber.barbershopId
+                barbershopId: barber.barbershopId,
+                updatedAt: new Date()
             }
         });
         console.log("  -> Done.");

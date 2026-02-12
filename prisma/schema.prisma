@@ -130,7 +130,7 @@ model Barber {
   instagram            String?
   barbershopId         String?
   createdAt            DateTime               @default(now())
-  updatedAt            DateTime
+  updatedAt            DateTime               @updatedAt
   Barbershop           Barbershop?             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   Booking              Booking[]
   FinancialTransaction FinancialTransaction[]

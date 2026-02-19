@@ -17,7 +17,7 @@ interface BookingItemProps {
 
 const BookingItem = ({ booking }: BookingItemProps) => {
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
-  const status = getBookingStatus(booking.date, booking.cancelledAt);
+  const status = getBookingStatus(booking.date, booking.cancelledAt, booking.status);
 
   return (
     <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
@@ -31,6 +31,10 @@ const BookingItem = ({ booking }: BookingItemProps) => {
             ) : status === "confirmed" ? (
               <Badge className={booking.isSubscription ? "bg-violet-600 hover:bg-violet-700" : ""}>
                 {booking.isSubscription ? "ASSINATURA" : "CONFIRMADO"}
+              </Badge>
+            ) : status === "pending" ? (
+              <Badge className="bg-yellow-500 hover:bg-yellow-600">
+                PENDENTE
               </Badge>
             ) : (
               <Badge variant="secondary">FINALIZADO</Badge>

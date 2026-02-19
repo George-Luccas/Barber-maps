@@ -104,17 +104,18 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     }
     if (result.serverError) {
       return toast.error(
-        "Erro ao criar agendamento. Por favor, tente novamente.",
+        result.serverError || "Erro ao criar agendamento. Por favor, tente novamente."
       );
     }
     
-    toast.success("Reserva realizada com sucesso!");
+    toast.success("Reserva realizada! Redirecionando para envio do comprovante...");
     setSheetIsOpen(false);
     setSelectedDate(undefined);
     setSelectedTime(undefined);
     setSelectedBarberId(undefined);
     setPaymentMethod("MONEY"); // Reset
     
+    router.push("/bookings");
     router.refresh();
   };
 

@@ -59,7 +59,8 @@ export interface Barbershop {
   photos: string[];
   styles: Style[];
   products: Product[];
-  aboutUs?: string; // Adding optional aboutUs as it was used in the page
+  aboutUs?: string;
+  pixKey?: string; // Chave Pix para pagamentos
 }
 
 export interface Service {
@@ -97,6 +98,7 @@ export interface CreateBookingPayload {
     phone?: string;
   };
   isSubscription?: boolean;
+  status?: string;
 }
 
 // --- Funções da API ---
@@ -232,6 +234,31 @@ export const comercioApi = {
     } catch (error) {
         console.error("API Exception (getUserProfile):", error);
         return null;
+    }
+  },
+
+  updateBooking: async (bookingId: string, payload: any) => {
+    if (!isConfigured) throw new Error("API não configurada corretamente.");
+    try {
+        const url = `${API_URL}/bookings/${bookingId}`;
+        console.log(`[API] Updating booking at: ${url}`, payload);
+        
+        const res = await fetch(url, {
+            method: "PATCH", // Using PATCH for partial updates
+            headers,
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            console.error(`❌ API error at ${url}: ${res.status} ${res.statusText} - Body: ${text}`);
+            throw new Error(`Erro ao atualizar agendamento no sistema externo: ${res.statusText}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("API Exception (updateBooking):", error);
+        throw error; // Re-throw to be handled by the caller
     }
   }
 };

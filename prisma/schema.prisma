@@ -62,6 +62,7 @@ model Booking {
   serviceId      String
   userId         String
   status         BookingStatus     @default(CONFIRMED)
+  receiptUrl     String?
   date           DateTime          @db.Timestamptz(6)
   cancelledAt    DateTime?         @db.Timestamptz(6)
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)

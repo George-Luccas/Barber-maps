@@ -26,6 +26,15 @@ export const createBooking = protectedActionClient
       });
     }
 
+    console.log("CREATE BOOKING INPUT:", { serviceId, barbershopId, date, barberId, userEmail: user.email });
+
+    if (!user.email) {
+        console.error("User has no email!", user);
+        returnValidationErrors(inputSchema, {
+            _errors: ["Usuário sem e-mail cadastrado. Por favor, atualize seu perfil."],
+        });
+    }
+
     try {
         console.log(
             "Creating booking via API for service",
@@ -48,15 +57,17 @@ export const createBooking = protectedActionClient
                 email: user.email || undefined,
              },
              clientEmail: user.email || undefined,
-             clientPhone: undefined,
-             isSubscription: parsedInput.isSubscription
+             clientPhone: (user as any).phone || undefined, // Send phone if available
+             isSubscription: parsedInput.isSubscription,
+             status: "PENDING"
         });
 
         return booking;
 
     } catch (error: any) {
+        console.error("CREATE BOOKING ACTION ERROR:", error);
         returnValidationErrors(inputSchema, {
-            _errors: [error.message || "Erro ao criar agendamento na API."],
+            _errors: [`Erro ao criar agendamento: ${error.message || "Erro desconhecido"}`],
         });
     }
   });

@@ -10,13 +10,27 @@ import {
 } from "@/components/ui/page";
 
 const BookingsPage = async () => {
-  const { confirmedBookings, finishedBookings } = await getUserBookings();
+  const { confirmedBookings, pendingBookings, finishedBookings } = await getUserBookings();
 
   return (
     <div>
       <Header />
       <PageContainer>
         <h1 className="text-xl font-bold">Agendamentos</h1>
+
+        {pendingBookings?.length > 0 && (
+          <PageSectionContent>
+            <PageSectionTitle>Pendentes de Confirmação</PageSectionTitle>
+            <div className="flex flex-col gap-3">
+              {pendingBookings.map((booking) => (
+                <BookingItem key={booking.id} booking={booking} />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+                 Envie o comprovante para confirmar seu agendamento.
+            </p>
+          </PageSectionContent>
+        )}
 
         <PageSectionContent>
           <PageSectionTitle>Confirmados</PageSectionTitle>

@@ -17,6 +17,14 @@ export async function getBarbershopInfo(barbershopId: string, barbershopName?: s
       return { error: "Barbearia não encontrada." };
     }
     
+    // SPECIAL CASE: "Car barber" (Fix for missing API field)
+    if (shop.name === "Car barber" || shop.name === "Car Barber") {
+        return {
+            pixKey: "a4358c54-4785-4578-8647-136806848be2", // Key provided by user
+            name: shop.name
+        };
+    }
+    
     // DEMO FALLBACK: If shop exists but has no Pix Key, return a demo key so the user can test the UI
     const pixKey = shop.pixKey || "00.000.000/0001-00"; 
 

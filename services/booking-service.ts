@@ -43,13 +43,16 @@ export const findUserBookings = async (email: string): Promise<BookingWithDetail
     include: {
       barbershop: {
         select: {
+          id: true,
           name: true,
           address: true,
-          imageUrl: true
+          imageUrl: true,
+          phones: true // Also need phones for the sheet!
         }
       },
       service: {
         select: {
+          id: true,
           name: true,
           priceInCents: true,
           description: true,
@@ -58,6 +61,7 @@ export const findUserBookings = async (email: string): Promise<BookingWithDetail
       },
       Barber: {
         select: {
+          id: true,
           name: true
         }
       }

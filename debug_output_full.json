@@ -1,0 +1,11 @@
+[
+  {
+    "id": "774b0a49-a517-4782-84cc-3bab6a74d5f8",
+    "date": "2026-02-20T14:30:00.000Z",
+    "status": "PENDING",
+    "barbershopName": "Car barber",
+    "serviceName": "Combo (Corte + Barba)",
+    "price": 55,
+    "barberName": null
+  }
+]

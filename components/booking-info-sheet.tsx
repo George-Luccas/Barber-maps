@@ -48,7 +48,8 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
       const fetchPixKey = async () => {
           try {
              const { getBarbershopInfo } = await import("@/app/_actions/get-barbershop-info");
-             const info = await getBarbershopInfo(booking.barbershop.id);
+             // Pass name as fallback
+             const info = await getBarbershopInfo(booking.barbershop.id, booking.barbershop.name);
              if (info && !info.error && info.pixKey) {
                  setPixKey(info.pixKey);
              }

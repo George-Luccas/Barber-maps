@@ -72,13 +72,13 @@ export const getUserBookings = async () => {
   ]);
 
   // ... (mapping external bookings code is same) ...
-  const externalBookings = (Array.isArray(externalBookingsData) ? externalBookingsData : []).map(b => ({
+  const externalBookings = (Array.isArray(externalBookingsData) ? externalBookingsData : []).map((b: any) => ({
       ...b,
       date: new Date(b.date),
       // Ensure barbershop has required fields for UI
       barbershop: {
           id: b.barbershopId,
-          name: b.barbershop?.name || "Barbearia Externa",
+          name: b.barbershop?.name || b.barbershopName || "Barbearia Externa",
           imageUrl: b.barbershop?.imageUrl || "",
           address: b.barbershop?.address || "",
           phones: b.barbershop?.phones || [], 
@@ -86,15 +86,17 @@ export const getUserBookings = async () => {
       },
       service: {
           id: b.serviceId,
-          name: b.service?.name || "Serviço",
-          priceInCents: Number(b.service?.priceInCents) || 0,
+          name: b.service?.name || b.serviceName || "Serviço",
+          priceInCents: Number(b.service?.priceInCents) || (typeof b.price === 'number' ? b.price * 100 : 0),
+          description: b.service?.description || "",
+          imageUrl: b.service?.imageUrl || "",
           ...b.service
       },
       barber: b.Barber ? {
           id: b.barberId,
           name: b.Barber.name,
           ...b.Barber
-      } : null,
+      } : (b.barberName ? { id: b.barberId || "unknown", name: b.barberName } : null),
       isExternal: true 
   }));
 

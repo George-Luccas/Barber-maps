@@ -192,13 +192,23 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
       {/* Receipt & Pix Section */}
       {(status === "pending" || status === "confirmed") && (
           <div className="px-5 pb-4 mt-4">
-              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-yellow-600 mb-1">
-                      {status === "pending" ? "Pagamento Pendente" : "Comprovante de Pagamento"}
+              <div className={`border rounded-lg p-4 ${
+                  booking.receiptUrl 
+                    ? "bg-green-500/10 border-green-500/20 text-green-700" 
+                    : "bg-yellow-500/10 border-yellow-500/20"
+              }`}>
+                  <h3 className={`text-sm font-semibold mb-1 ${
+                      booking.receiptUrl ? "text-green-700" : "text-yellow-600"
+                  }`}>
+                      {booking.receiptUrl 
+                        ? "Comprovante enviado" 
+                        : (status === "pending" ? "Pagamento Pendente" : "Comprovante de Pagamento")
+                      }
                   </h3>
                   
-                  {pixKey && !booking.receiptUrl && (
-                      <div className="mb-4 bg-background/50 p-3 rounded border border-yellow-500/30">
+                  {/* Pix Key - Show even if receipt is uploaded, per user request */}
+                  {pixKey && (
+                      <div className="mb-4 bg-background/50 p-3 rounded border border-black/10">
                           <p className="text-xs font-semibold mb-1 text-muted-foreground">Chave Pix da Barbearia:</p>
                           <div className="flex items-center gap-2">
                               <code className="flex-1 bg-muted p-2 rounded text-xs break-all">{pixKey}</code>
@@ -207,20 +217,22 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
                       </div>
                   )}
 
-                  <p className="text-xs text-muted-foreground mb-3">
-                      {booking.receiptUrl 
-                          ? "Comprovante enviado." 
-                          : "Envie o comprovante para confirmar seu agendamento."}
-                  </p>
+                  {!booking.receiptUrl && (
+                    <p className="text-xs text-muted-foreground mb-3">
+                        Envie o comprovante para confirmar seu agendamento.
+                    </p>
+                  )}
                   
                   {booking.receiptUrl ? (
                       <div className="flex flex-col gap-2">
                           <div className="text-xs font-medium text-green-600 flex items-center gap-1">
-                              Sim, comprovante enviado! Aguardando aprovação.
+                              <span className="flex items-center justify-center size-5 rounded-full bg-green-600 text-white text-[10px]">✓</span>
+                              Comprovante em análise
                           </div>
-                          <div className="relative aspect-video w-full rounded-md overflow-hidden border">
-                               <Image src={booking.receiptUrl} alt="Comprovante" fill className="object-cover" />
-                          </div>
+                          {/* Optional: Show image preview if needed, but user just aksed for "Comprovante enviado" text and green style */}
+                           <div className="relative aspect-video w-full rounded-md overflow-hidden border">
+                                <Image src={booking.receiptUrl} alt="Comprovante" fill className="object-cover" />
+                           </div>
                       </div>
                   ) : (
                       <div className="flex flex-col gap-2">
@@ -233,11 +245,11 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
                               {isUploading ? "Enviando..." : "Enviar Comprovante"}
                           </Button>
                           <input 
-                              type="file" 
-                              id="receipt-upload" 
-                              accept="image/*" 
-                              className="hidden" 
-                              onChange={handleFileChange}
+                            type="file" 
+                            id="receipt-upload" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleFileChange}
                           />
                       </div>
                   )}

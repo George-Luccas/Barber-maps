@@ -176,7 +176,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 transition-all duration-300;
+    @apply border-border outline-ring/50 transition-[colors,opacity,transform,border-color,box-shadow] duration-300;
   }
   body {
     @apply bg-background text-foreground selection:bg-neon-purple/30;

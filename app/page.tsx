@@ -14,18 +14,21 @@ import {
   PageSectionTitle,
 } from "@/components/ui/page";
 import Footer from "@/components/footer";
-import QuickSearch from "@/components/quick-search";
-import MembershipWidget from "@/components/membership-widget";
-import { LocationFilter } from "@/components/location-filter";
-import BarbershopStories from "@/components/barbershop-stories";
-import PromotionsCarousel from "@/components/promotions-carousel";
-import BarbershopRanking from "@/components/barbershop-ranking";
 import NavigationTabs from "@/components/navigation-tabs";
+import BarbershopStories from "@/components/barbershop-stories";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getUserLoyaltyCards } from "@/app/_actions/loyalty";
 import { PremiumLoyaltyCard } from "@/components/loyalty/premium-card";
 import { Gift } from "lucide-react";
+import nextDynamic from "next/dynamic";
+
+// Lazy load components below the fold
+const PromotionsCarousel = nextDynamic(() => import("@/components/promotions-carousel"), { ssr: false });
+const QuickSearch = nextDynamic(() => import("@/components/quick-search"), { ssr: false });
+const BarbershopRanking = nextDynamic(() => import("@/components/barbershop-ranking"), { ssr: false });
+const LocationFilter = nextDynamic(() => import("@/components/location-filter"), { ssr: false });
+const MembershipWidget = nextDynamic(() => import("@/components/membership-widget"), { ssr: false });
 
 export const dynamic = "force-dynamic";
 
@@ -234,7 +237,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <PageSectionContent>
           <PageSectionTitle>Barbearias</PageSectionTitle>
           <PageSectionScroller>
-            {barbershops.map((barbershop: any) => (
+            {barbershops.slice(0, 6).map((barbershop: any) => (
               <div key={barbershop.id} className="min-w-[220px]">
                 <BarbershopItem barbershop={barbershop as any} />
               </div>
@@ -245,7 +248,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <PageSectionContent>
           <PageSectionTitle>Barbearias populares</PageSectionTitle>
           <PageSectionScroller>
-            {popularBarbershops.map((barbershop: any) => (
+            {popularBarbershops.slice(0, 6).map((barbershop: any) => (
               <div key={barbershop.id} className="min-w-[220px]">
                 <BarbershopItem barbershop={barbershop as any} />
               </div>

@@ -7,7 +7,7 @@ import {
   PageSectionContent,
   PageSectionTitle,
 } from "@/components/ui/page";
-import { LocationFilter } from "@/components/location-filter";
+import LocationFilter from "@/components/location-filter";
 
 interface BarbershopsPageProps {
   searchParams: Promise<{

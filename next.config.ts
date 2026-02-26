@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'Link',
+            value: '<https://utfs.io>; rel=preconnect, <https://utfs.io>; rel=dns-prefetch',
+          },
         ],
       },
       {

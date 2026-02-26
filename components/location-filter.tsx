@@ -11,7 +11,7 @@ interface Location {
     state: string | null;
 }
 
-export const LocationFilter = () => {
+const LocationFilter = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     
@@ -19,8 +19,6 @@ export const LocationFilter = () => {
     const [selectedState, setSelectedState] = useState<string>(searchParams.get("state") || "all");
     const [selectedCity, setSelectedCity] = useState<string>(searchParams.get("city") || "");
     
-    // Available data
-
     // Available data
     const [locations, setLocations] = useState<Location[]>([]);
     const [availableStates, setAvailableStates] = useState<string[]>([]);
@@ -171,3 +169,5 @@ export const LocationFilter = () => {
         </div>
     );
 };
+
+export default LocationFilter;

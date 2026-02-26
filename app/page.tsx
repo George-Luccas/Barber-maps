@@ -41,26 +41,35 @@ interface HomeProps {
 
 export default async function Home({ searchParams }: HomeProps) {
   const { city } = await searchParams;
-  const barbershops = await getBarbershops();
-  const popularBarbershops = await getPopularBarbershops();
-  const rankingBarbershops = await getBarbershopRanking(city);
+  // Parallelize basic shop fetching
+  const [barbershops, popularBarbershops, rankingBarbershops] = await Promise.all([
+    getBarbershops(),
+    getPopularBarbershops(),
+    getBarbershopRanking(city)
+  ]);
   
-  // CORREÇÃO: Inicializamos como vazio para o app carregar enquanto
-  // resolvemos a conexão com o banco na função getUserBookings.
+  // Initialize user-specific data
   let confirmedBookings: any[] = []; 
   let loyaltyCards: any[] = [];
   let session: any = null;
 
   try {
-    // Tentamos buscar os agendamentos reais
-    const data = await getUserBookings();
-    if (data && data.confirmedBookings) {
-      confirmedBookings = data.confirmedBookings;
-    }
-
-    session = await auth.api.getSession({
+    // Run booking, session, and loyalty cards in parallel where possible
+    const sessionPromise = auth.api.getSession({
         headers: await headers(),
     });
+
+    const bookingsPromise = getUserBookings();
+
+    const [sessionData, bookingsData] = await Promise.all([
+        sessionPromise,
+        bookingsPromise
+    ]);
+
+    session = sessionData;
+    if (bookingsData && bookingsData.confirmedBookings) {
+      confirmedBookings = bookingsData.confirmedBookings;
+    }
     
     if (session?.user) {
         loyaltyCards = await getUserLoyaltyCards(session.user.id);
@@ -68,7 +77,6 @@ export default async function Home({ searchParams }: HomeProps) {
     
   } catch (error) {
     console.error("Erro ao carregar dados do usuário:", error);
-    // Se der erro, o app continua rodando com a lista vazia
   }
 
   return (

@@ -21,14 +21,13 @@ import { headers } from "next/headers";
 import { getUserLoyaltyCards } from "@/app/_actions/loyalty";
 import { PremiumLoyaltyCard } from "@/components/loyalty/premium-card";
 import { Gift } from "lucide-react";
-import nextDynamic from "next/dynamic";
-
-// Lazy load components below the fold
-const PromotionsCarousel = nextDynamic(() => import("@/components/promotions-carousel"), { ssr: false });
-const QuickSearch = nextDynamic(() => import("@/components/quick-search"), { ssr: false });
-const BarbershopRanking = nextDynamic(() => import("@/components/barbershop-ranking"), { ssr: false });
-const LocationFilter = nextDynamic(() => import("@/components/location-filter"), { ssr: false });
-const MembershipWidget = nextDynamic(() => import("@/components/membership-widget"), { ssr: false });
+import { 
+  PromotionsCarousel, 
+  QuickSearch, 
+  BarbershopRanking, 
+  LocationFilter, 
+  MembershipWidget 
+} from "@/components/dynamic-wrappers";
 
 export const dynamic = "force-dynamic";
 

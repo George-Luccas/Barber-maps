@@ -17,16 +17,35 @@ export async function getBarbershopInfo(barbershopId: string, barbershopName?: s
       return { error: "Barbearia não encontrada." };
     }
     
-    // SPECIAL CASE: "Car barber" (Fix for missing API field)
-    if (shop.name === "Car barber" || shop.name === "Car Barber") {
-        return {
-            pixKey: "a4358c54-4785-4578-8647-136806848be2", // Key provided by user
-            name: shop.name
-        };
+    // 3. Dynamic Local DB Fallback: Check if we have a Pix Key stored locally (Prisma)
+    // This allows custom keys per shop without relying on the external API
+    let pixKey = shop.pixKey;
+
+    if (!pixKey) {
+        try {
+            const { prisma } = await import("@/lib/prisma"); 
+            // Normalize name search to be safe
+            const localShop = await prisma.barbershop.findFirst({
+                where: { 
+                    name: { 
+                        equals: shop.name,
+                        mode: "insensitive" 
+                    } 
+                },
+                select: { pixKey: true }
+            });
+            
+            if (localShop?.pixKey) {
+                console.log(`[Pix] Found local key for ${shop.name}: ${localShop.pixKey}`);
+                pixKey = localShop.pixKey;
+            }
+        } catch (dbError) {
+             console.error("Error fetching local pix key:", dbError);
+        }
     }
     
-    // DEMO FALLBACK: If shop exists but has no Pix Key, return a demo key so the user can test the UI
-    const pixKey = shop.pixKey || "00.000.000/0001-00"; 
+    // 4. Final Fallback: Demo Key
+    pixKey = pixKey || "00.000.000/0001-00"; 
 
     return { 
         pixKey: pixKey,

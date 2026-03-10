@@ -84,13 +84,55 @@ export const getBarbershopsWithStories = async () => {
     return shops.slice(0, 10);
 };
 
+import { prisma as db } from "@/lib/prisma";
+
 export const getBarbershopRanking = async (city?: string) => {
-   // Ranking now supported in API via `bookingsCount`
+   // 1. Fetch shops (from API or local as needed)
    const shops = await comercioApi.getShops({ city });
-   return shops.map(shop => ({
-       ...shop,
-       dailyGoal: 0,
-       bookingsCount: (shop as any).bookingsCount || 0 
-   }));
+   
+   // 2. Get stats for these shops from local Prisma
+   const shopIds = shops.map(s => s.id);
+   
+   const reviewsSummary = await db.review.groupBy({
+       by: ['barbershopId'],
+       where: {
+           barbershopId: {
+               in: shopIds.filter(id => id !== null) as string[]
+           }
+       },
+       _count: {
+           id: true
+       },
+       _avg: {
+           rating: true
+       }
+   });
+
+   const statsMap = new Map(
+       reviewsSummary.map(r => [r.barbershopId, {
+           count: r._count.id,
+           avg: r._avg.rating || 0
+       }])
+   );
+
+   // 3. Map review stats back to shops
+   const rankedShops = shops.map(shop => {
+       const stats = statsMap.get(shop.id) || { count: 0, avg: 0 };
+       return {
+           ...shop,
+           dailyGoal: 0,
+           bookingsCount: stats.count, // Keeping for compatibility
+           averageRating: stats.avg,
+           reviewCount: stats.count
+       };
+   });
+
+   // 4. Sort by average rating descending, then review count descending
+   return rankedShops.sort((a, b) => {
+       if (b.averageRating !== a.averageRating) {
+           return b.averageRating - a.averageRating;
+       }
+       return b.reviewCount - a.reviewCount;
+   });
 };
 

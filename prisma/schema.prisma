@@ -29,6 +29,7 @@ model Barbershop {
   state                String?
   aboutUs              String?
   isSuspended          Boolean                @default(false)
+  pixKey               String?                // Chave Pix dinâmica por barbearia
   Barber               Barber[]
   user                 user?                  @relation(fields: [managerId], references: [id])
   BarbershopProduct    BarbershopProduct[]

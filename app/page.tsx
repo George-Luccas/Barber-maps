@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+﻿import Header from "@/components/header";
 import Image from "next/image";
 import banner from "@/public/banner.png";
 import BookingItem from "@/components/booking-item";
@@ -28,6 +28,8 @@ import {
   LocationFilter, 
   MembershipWidget 
 } from "@/components/dynamic-wrappers";
+import { LandoHero } from "@/components/LandoHero";
+import { SmoothScrollWrapper } from "@/components/smooth-scroll-wrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -78,11 +80,12 @@ export default async function Home({ searchParams }: HomeProps) {
     }
     
   } catch (error) {
-    console.error("Erro ao carregar dados do usuário:", error);
+    console.error("Erro ao carregar dados do usuÃ¡rio:", error);
   }
 
   return (
-    <div className="relative min-h-screen">
+    <SmoothScrollWrapper>
+      <div className="relative min-h-screen">
        <BackgroundVideo 
           src="/background.mp4" 
           className="scale-100 md:scale-125 transition-transform"
@@ -91,7 +94,10 @@ export default async function Home({ searchParams }: HomeProps) {
       <Header />
       <div className="relative z-10">
       <PageContainer>
-        <div className="pt-5"> 
+        <div className="pt-6 px-1">
+          <LandoHero />
+        </div>
+        <div> 
           <h2 className="text-xl font-bold mb-3">Destaques</h2>
           <BarbershopStories />
         </div>
@@ -101,7 +107,9 @@ export default async function Home({ searchParams }: HomeProps) {
 
         <QuickSearch />
         
-        <BarbershopRanking barbershops={rankingBarbershops as any} city={city} />
+        <div id="ranking-section">
+          <BarbershopRanking barbershops={rankingBarbershops as any} city={city} />
+        </div>
 
         <div className="mt-6">
            <LocationFilter />
@@ -128,7 +136,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 Barber Radar
               </h2>
               <p className="text-sm text-gray-400 max-w-[200px]">
-                Encontre as barbearias mais próximas de você agora mesmo.
+                Encontre as barbearias mais prÃ³ximas de vocÃª agora mesmo.
               </p>
               <div className="mt-2 text-xs font-bold text-neon-purple uppercase tracking-widest group-hover:translate-x-1 transition-transform flex items-center gap-1">
                 Ativar Scanner <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -147,13 +155,13 @@ export default async function Home({ searchParams }: HomeProps) {
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700/50 p-6 flex items-center justify-between hover:border-neon-purple/50 transition-colors group">
             <div className="flex flex-col gap-2 relative z-10">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <span className="text-2xl">💡</span>
+                <span className="text-2xl">ðŸ’¡</span>
                 Central de Melhorias
               </h2>
               <p className="text-sm text-gray-400">
-                Tem alguma <span className="text-neon-purple font-semibold">dica</span>, <span className="text-neon-purple font-semibold">sugestão</span> ou <span className="text-neon-purple font-semibold">crítica</span>?
+                Tem alguma <span className="text-neon-purple font-semibold">dica</span>, <span className="text-neon-purple font-semibold">sugestÃ£o</span> ou <span className="text-neon-purple font-semibold">crÃ­tica</span>?
                 <br />
-                Queremos ouvir você para evoluir a plataforma!
+                Queremos ouvir vocÃª para evoluir a plataforma!
               </p>
               <div className="mt-2 text-xs font-bold text-neon-purple uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Enviar Feedback <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -221,7 +229,7 @@ export default async function Home({ searchParams }: HomeProps) {
             )}
         </PageSectionContent>
 
-        {/* Agora esta parte está protegida e não quebra o app */}
+        {/* Agora esta parte estÃ¡ protegida e nÃ£o quebra o app */}
         {confirmedBookings.length > 0 && (
           <PageSectionContent>
             <PageSectionTitle>Agendamentos</PageSectionTitle>
@@ -257,6 +265,7 @@ export default async function Home({ searchParams }: HomeProps) {
       </PageContainer>
       <Footer />
       </div>
-    </div>
+     </div>
+    </SmoothScrollWrapper>
   );
 }

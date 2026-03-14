@@ -55,7 +55,7 @@ export const LandoHero = () => {
       ref={containerRef}
       whileHover={{ scale: 0.995 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative min-h-[320px] sm:min-h-[440px] md:h-[440px] w-full overflow-hidden rounded-3xl bg-[#0a0a0a] border-2 border-purple-500/50 mb-8 flex items-center justify-center cursor-default group shadow-[0_0_40px_rgba(147,51,234,0.4)] py-8 md:py-0"
+      className="relative min-h-[320px] sm:min-h-[440px] md:h-[440px] w-full overflow-hidden rounded-none sm:rounded-3xl bg-[#0a0a0a] border-y-2 border-x-0 sm:border-x-2 border-purple-500/50 mb-8 flex items-center justify-center cursor-default group shadow-[0_0_40px_rgba(147,51,234,0.4)] py-8 md:py-0"
     >
       {/* Background Glows (More visible) */}
       <motion.div

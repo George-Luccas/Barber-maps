@@ -94,7 +94,7 @@ export default async function Home({ searchParams }: HomeProps) {
       <Header />
       <div className="relative z-10">
       <PageContainer>
-        <div className="pt-6 px-1">
+        <div className="pt-6 -mx-5 sm:mx-0 px-0 sm:px-1">
           <LandoHero />
         </div>
         <div> 

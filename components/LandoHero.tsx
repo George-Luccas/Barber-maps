@@ -55,7 +55,7 @@ export const LandoHero = () => {
       ref={containerRef}
       whileHover={{ scale: 0.995 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative min-h-[440px] md:h-[440px] w-full overflow-hidden rounded-3xl bg-[#0a0a0a] border-2 border-purple-500/50 mb-8 flex items-center justify-center cursor-default group shadow-[0_0_40px_rgba(147,51,234,0.4)] py-12 md:py-0"
+      className="relative min-h-[320px] sm:min-h-[440px] md:h-[440px] w-full overflow-hidden rounded-3xl bg-[#0a0a0a] border-2 border-purple-500/50 mb-8 flex items-center justify-center cursor-default group shadow-[0_0_40px_rgba(147,51,234,0.4)] py-8 md:py-0"
     >
       {/* Background Glows (More visible) */}
       <motion.div
@@ -74,17 +74,17 @@ export const LandoHero = () => {
       >
         <video
           autoPlay
-          muted={true}
+          muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-100 brightness-110"
-          style={{ minWidth: "100%", minHeight: "100%" }}
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 brightness-125"
+          src="/0311.mp4"
         >
-          <source src="/0311.mp4" type="video/mp4" />
           Seu navegador não suporta vídeos.
         </video>
         {/* Darkening Overlay for text readability */}
-        <div className="absolute inset-0 bg-black/50 md:bg-black/40 z-10" />
+        <div className="absolute inset-0 bg-black/30 md:bg-black/20 z-10" />
       </motion.div>
 
       {/* Grid Pattern (Overlaying video) */}
@@ -104,27 +104,51 @@ export const LandoHero = () => {
       {/* Main Content */}
       <motion.div 
         style={{ x: foregroundX, y: foregroundY }}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-20 text-center px-4 md:px-6"
+        className="relative z-20 text-center px-4 md:px-6 w-full flex flex-col items-center overflow-hidden"
       >
-        <div className="inline-block px-4 py-1.5 rounded-full bg-primary/20 border border-primary/40 text-[10px] md:text-[11px] font-black tracking-[0.2em] md:tracking-[0.3em] text-primary uppercase mb-4 md:mb-6 shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+        <motion.div 
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 border border-primary/40 text-[8px] sm:text-[10px] md:text-[11px] font-black tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] text-primary uppercase mb-3 sm:mb-4 md:mb-6 shadow-[0_0_20px_rgba(var(--primary),0.2)]"
+        >
           Sua barbearia no seu bolso
-        </div>
+        </motion.div>
         
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-[1] md:leading-[0.9] mb-4 md:mb-6 select-none">
-          TRANSFORME SEU <br className="hidden sm:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary/40 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+        <h1 className="text-3xl sm:text-4xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-[1.1] md:leading-[1] mb-3 sm:mb-4 md:mb-6 select-none flex flex-col items-center">
+          <motion.span 
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            className="block"
+          >
+            TRANSFORME SEU
+          </motion.span>
+          <motion.span 
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+            className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary/40 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] mt-1 md:mt-2"
+          >
             ESTILO AGORA.
-          </span>
+          </motion.span>
         </h1>
         
-        <p className="text-gray-400 max-w-xs md:max-w-md mx-auto text-xs md:text-base font-medium leading-relaxed opacity-80 mb-6 md:mb-8">
+        <motion.p 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
+          className="text-gray-400 max-w-[260px] sm:max-w-xs md:max-w-md mx-auto text-[10px] sm:text-xs md:text-base font-medium leading-relaxed opacity-80 mb-5 sm:mb-6 md:mb-8"
+        >
           Conecte-se com os melhores profissionais e gerencie seus agendamentos com total praticidade.
-        </p>
+        </motion.p>
         
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center relative z-30">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.9 }}
+          className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center relative z-30 w-full sm:w-auto px-4 sm:px-0"
+        >
           <motion.button 
             onClick={scrollToRanking}
             whileHover={{ backgroundColor: "rgba(255, 255, 255, 1)", color: "#000000", scale: 1.05 }}
@@ -142,7 +166,7 @@ export const LandoHero = () => {
           >
             Ver Mapa
           </motion.button>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* Premium Accent Lines (Animated) */}

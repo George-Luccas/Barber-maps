@@ -178,6 +178,11 @@
   * {
     @apply border-border outline-ring/50 transition-[colors,opacity,transform,border-color,box-shadow] duration-300;
   }
+  @media (min-width: 768px) {
+    html, body {
+      zoom: 1.1 !important;
+    }
+  }
   body {
     @apply bg-background text-foreground selection:bg-neon-purple/30;
   }

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Merriweather, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TanstackQueryProvider } from "@/providers/tanstack-query";
 import { ThemeProvider } from "next-themes"; // Certifique-se de instalar com pnpm add next-themes
+import { HomeSwitcher } from "@/components/map/home-switcher";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -40,6 +42,7 @@ export default function RootLayout({
         {/* O ThemeProvider envolve tudo que está DENTRO do body */}
         <ThemeProvider attribute="class" defaultTheme="dark" themes={["light", "dark", "panther"]}>
           <TanstackQueryProvider>
+            <HomeSwitcher />
             {children}
             <Toaster />
           </TanstackQueryProvider>

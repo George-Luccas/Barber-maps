@@ -13,7 +13,6 @@ export type BookingWithRelations = Prisma.BookingGetPayload<{
     image?: string | null;
   } | null;
   isSubscription?: boolean;
-  receiptUrl?: string | null;
 };
 
 // Helper to separate Booking data from Auth data

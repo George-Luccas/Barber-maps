@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
@@ -22,7 +22,7 @@ import { getBookingStatus } from "@/lib/booking-status";
 import BookingSummary from "./booking-summary";
 import CopyButton from "@/app/barbershops/[id]/_components/copy-button";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import { Smartphone, X, Loader2, UploadCloud, Copy } from "lucide-react";
+import { Smartphone, X, Loader2, Copy } from "lucide-react";
 import { cancelBooking } from "@/actions/cancel-booking";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
@@ -33,67 +33,11 @@ interface BookingInfoSheetProps {
   onClose: () => void;
 }
 
-  /* ... */
 const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
   const router = useRouter();
   const status = getBookingStatus(booking.date, booking.cancelledAt, booking.status);
   const { executeAsync: executeCancelBooking, isPending: isCancelling } =
     useAction(cancelBooking);
-
-  const [isUploading, setIsUploading] = useState(false);
-  const [pixKey, setPixKey] = useState<string | null>(null);
-
-  // Fetch Pix Key on mount
-  useState(() => {
-      const fetchPixKey = async () => {
-          try {
-             const { getBarbershopInfo } = await import("@/app/_actions/get-barbershop-info");
-             // Pass name as fallback
-             const info = await getBarbershopInfo(booking.barbershop.id, booking.barbershop.name);
-             if (info && !info.error && info.pixKey) {
-                 setPixKey(info.pixKey);
-             }
-          } catch (e) {
-              console.error("Failed to fetch pix key", e);
-          }
-      };
-      fetchPixKey();
-  });
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 1024 * 1024 * 3) {
-      return toast.error("O arquivo deve ter no máximo 3MB.");
-    }
-
-    setIsUploading(true);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result as string;
-      try {
-        const { uploadReceipt } = await import("@/app/_actions/upload-receipt");
-        const result = await uploadReceipt({
-          bookingId: booking.id,
-          receiptDataVal: base64,
-        });
-
-        if (result?.error) {
-          toast.error(result.error);
-        } else {
-          toast.success("Comprovante enviado com sucesso!");
-          router.refresh();
-        }
-      } catch (error) {
-        toast.error("Erro ao enviar comprovante.");
-      } finally {
-        setIsUploading(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
- /* ... */
 
   const handleCancelBooking = async () => {
     const result = await executeCancelBooking({ bookingId: booking.id });
@@ -190,73 +134,7 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
           </div>
         )}
 
-      {/* Receipt & Pix Section */}
-      {(status === "pending" || status === "confirmed") && (
-          <div className="px-5 pb-4 mt-4">
-              <div className={`border rounded-lg p-4 ${
-                  booking.receiptUrl 
-                    ? "bg-green-500/10 border-green-500/20 text-green-700" 
-                    : "bg-yellow-500/10 border-yellow-500/20"
-              }`}>
-                  <h3 className={`text-sm font-semibold mb-1 ${
-                      booking.receiptUrl ? "text-green-700" : "text-yellow-600"
-                  }`}>
-                      {booking.receiptUrl 
-                        ? "Comprovante enviado" 
-                        : (status === "pending" ? "Pagamento Pendente" : "Comprovante de Pagamento")
-                      }
-                  </h3>
-                  
-                  {/* Pix Key - Show even if receipt is uploaded, per user request */}
-                  {pixKey && (
-                      <div className="mb-4 bg-background/50 p-3 rounded border border-black/10">
-                          <p className="text-xs font-semibold mb-1 text-muted-foreground">Chave Pix da Barbearia:</p>
-                          <div className="flex items-center gap-2">
-                              <code className="flex-1 bg-muted p-2 rounded text-xs break-all">{pixKey}</code>
-                              <CopyButton text={pixKey} />
-                          </div>
-                      </div>
-                  )}
 
-                  {!booking.receiptUrl && (
-                    <p className="text-xs text-muted-foreground mb-3">
-                        Envie o comprovante para confirmar seu agendamento.
-                    </p>
-                  )}
-                  
-                  {booking.receiptUrl ? (
-                      <div className="flex flex-col gap-2">
-                          <div className="text-xs font-medium text-green-600 flex items-center gap-1">
-                              <span className="flex items-center justify-center size-5 rounded-full bg-green-600 text-white text-[10px]">✓</span>
-                              Comprovante em análise
-                          </div>
-                          {/* Optional: Show image preview if needed, but user just aksed for "Comprovante enviado" text and green style */}
-                           <div className="relative aspect-video w-full rounded-md overflow-hidden border">
-                                <Image src={booking.receiptUrl} alt="Comprovante" fill className="object-cover" />
-                           </div>
-                      </div>
-                  ) : (
-                      <div className="flex flex-col gap-2">
-                          <Button 
-                            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" 
-                            disabled={isUploading}
-                            onClick={() => document.getElementById("receipt-upload")?.click()}
-                          >
-                              {isUploading ? <Loader2 className="animate-spin size-4 mr-2" /> : <UploadCloud className="size-4 mr-2" />}
-                              {isUploading ? "Enviando..." : "Enviar Comprovante"}
-                          </Button>
-                          <input 
-                            type="file" 
-                            id="receipt-upload" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleFileChange}
-                          />
-                      </div>
-                  )}
-              </div>
-          </div>
-      )}
       </div>
 
 

@@ -13,7 +13,7 @@ export async function PATCH(
     // if (apiKey !== process.env.COMERCIO_API_KEY) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json();
-    const { receiptUrl, status } = body;
+    const { status } = body;
 
     console.log(`[API] Updating booking ${id}`, body);
 
@@ -28,7 +28,6 @@ export async function PATCH(
     const updatedBooking = await db.booking.update({
       where: { id },
       data: {
-        receiptUrl: receiptUrl !== undefined ? receiptUrl : undefined,
         status: status !== undefined ? status : undefined,
       },
     });

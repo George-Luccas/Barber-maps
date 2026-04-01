@@ -64,7 +64,7 @@ export default async function BarberPage({ params }: BarberPageProps) {
       <div className="relative h-48 md:h-64 w-full">
          {/* ... existing cover image code ... */}
         <Image
-          src={barber.barbershop.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+          src={barber.barbershop.imageUrl || "/default-barber.png"}
           alt="Cover"
           fill
           className="object-cover"
@@ -87,7 +87,7 @@ export default async function BarberPage({ params }: BarberPageProps) {
           <div className="flex flex-col items-center -mt-16 mb-6">
             <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-background shadow-xl mb-4">
               <Image
-                src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                src={barber.imageUrl || "/default-barber.png"}
                 alt={barber.name}
                 fill
                 className="object-cover"

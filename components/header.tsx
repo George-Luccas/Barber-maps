@@ -1,6 +1,6 @@
-
 import Image from "next/image";
 import Link from "next/link";
+import { Bot } from "lucide-react";
 
 import { Button } from "./ui/button";
 import MenuSheet from "./menu-sheet";
@@ -14,6 +14,11 @@ const Header = () => {
         <Image src="/logo1.png" alt="BarberMaps" width={400} height={24} priority className="dark:drop-shadow-[0_0_8px_rgba(180,0,255,0.3)] transition-all max-w-[70%]" />
       </Link>
       <div className="flex items-center gap-2">
+        <Link href="/chat">
+          <Button variant="outline" size="icon" className="size-11 hover:bg-neon-purple/10 border-transparent hover:border-neon-purple/30 text-neon-purple/70 hover:text-neon-purple transition-all">
+            <Bot className="size-5" />
+          </Button>
+        </Link>
         <NotificationList />
         <ThemeToggle />
         <MenuSheet />

@@ -60,7 +60,6 @@ export interface Barbershop {
   styles: Style[];
   products: Product[];
   aboutUs?: string;
-  pixKey?: string; // Chave Pix para pagamentos
 }
 
 export interface Service {
@@ -109,7 +108,7 @@ const headers = {
 
 export const comercioApi = {
   getShop: async (id: string): Promise<Barbershop | null> => {
-    if (!isConfigured) return null;
+    if (!isConfigured || !id || id === "undefined") return null;
     try {
       const url = `${API_URL}/shops/${id}`;
       const res = await fetch(url, { headers, next: { revalidate: 60 } });

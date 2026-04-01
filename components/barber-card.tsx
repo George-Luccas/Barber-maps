@@ -49,7 +49,7 @@ const BarberCard = ({ barber }: BarberCardProps) => {
             {/* Full Height Image */}
             <div className="relative w-full h-full"> 
               <Image
-                src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                src={barber.imageUrl || "/default-barber.png"}
                 alt={barber.name}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -88,7 +88,7 @@ const BarberCard = ({ barber }: BarberCardProps) => {
                 <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-md flex flex-col items-center justify-center gap-0.5 group-hover:bg-neon-purple/10 group-hover:border-neon-purple/30 transition-colors">
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Trophy className="w-3 h-3" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">XP</span>
+                    <span className="text-xs uppercase font-bold tracking-wider opacity-80">XP</span>
                   </div>
                   <span className="text-xl font-bold text-white leading-none">
                     {barber.yearsOfExperience || "1+"} <span className="text-xs font-normal text-gray-400">anos</span>
@@ -99,7 +99,7 @@ const BarberCard = ({ barber }: BarberCardProps) => {
                 <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-md flex flex-col items-center justify-center gap-0.5 group-hover:bg-neon-purple/10 group-hover:border-neon-purple/30 transition-colors">
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Star className="w-3 h-3 fill-yellow-400" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">Avaliações</span>
+                    <span className="text-xs uppercase font-bold tracking-wider opacity-80">Avaliações</span>
                   </div>
                   <span className="text-xl font-bold text-white leading-none">
                     {barber.rating ? barber.rating.toFixed(1) : "5.0"}
@@ -118,7 +118,7 @@ const BarberCard = ({ barber }: BarberCardProps) => {
            {/* Background Image Blurred/Darkened */}
            <div className="absolute inset-0">
               <Image
-                src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                src={barber.imageUrl || "/default-barber.png"}
                 alt="Background"
                 fill
                 className="object-cover opacity-20 blur-sm"
@@ -131,7 +131,7 @@ const BarberCard = ({ barber }: BarberCardProps) => {
               
               <div className="relative w-24 h-24 rounded-full border-2 border-neon-purple shadow-[0_0_15px_rgba(168,85,247,0.5)] overflow-hidden mb-2">
                  <Image
-                    src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                    src={barber.imageUrl || "/default-barber.png"}
                     alt={barber.name}
                     fill
                     className="object-cover"
@@ -174,3 +174,4 @@ const BarberCard = ({ barber }: BarberCardProps) => {
 };
 
 export default BarberCard;
+

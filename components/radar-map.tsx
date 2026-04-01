@@ -102,7 +102,7 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
                  )}
                  <div className="flex items-center justify-between gap-2">
                     <h3 className="font-bold text-sm truncate">{shop.name}</h3>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
+                     <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold uppercase ${
                         shop.source === "google" 
                         ? "bg-purple-500/10 text-purple-500 border border-purple-500/20" 
                         : "bg-primary/10 text-primary border border-primary/20"
@@ -110,14 +110,14 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
                         {shop.source === "google" ? "Google" : "App"}
                     </span>
                  </div>
-                 <p className="text-xs text-gray-500 truncate">{shop.address}</p>
+                 <p className="text-sm text-gray-500 truncate">{shop.address}</p>
                  
                  {shop.source !== "google" ? (
-                    <Link href={`/barbershops/${shop.id}`} className="bg-primary text-primary-foreground text-xs p-2 rounded-md font-bold text-center mt-1 flex items-center justify-center gap-1 hover:opacity-90 transition-opacity">
+                    <Link href={`/barbershops/${shop.id}`} className="bg-primary text-primary-foreground text-sm p-2 rounded-md font-bold text-center mt-1 flex items-center justify-center gap-1 hover:opacity-90 transition-opacity">
                         Ver Detalhes <ArrowRight size={12}/>
                     </Link>
                  ) : (
-                    <div className="text-[10px] text-muted-foreground italic text-center mt-1">
+                    <div className="text-xs text-muted-foreground italic text-center mt-1">
                         Disponível apenas no Google
                     </div>
                  )}
@@ -131,15 +131,15 @@ const RadarMap = ({ userLocation, barbershops }: RadarMapProps) => {
       <div className="absolute top-3 right-3 z-[400] bg-card/90 backdrop-blur-sm border p-2.5 rounded-lg shadow-lg flex flex-col gap-2 pointer-events-none select-none">
          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Você</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Você</span>
          </div>
          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Salão</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Salão</span>
          </div>
          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Google</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Google</span>
          </div>
       </div>
     </div>

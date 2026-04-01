@@ -112,7 +112,7 @@ const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
             ${isTop3 ? 'w-12 h-12 sm:w-20 sm:h-20 mx-auto' : 'w-10 h-10 sm:w-12 sm:h-12'}`}
         >
           <Image
-            src={barbershop.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+            src={barbershop.imageUrl || "/default-barber.png"}
             alt={barbershop.name}
             fill
             className="object-cover"
@@ -121,10 +121,10 @@ const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className={`font-bold truncate transition-colors text-sm sm:text-base leading-tight ${isWinner ? 'text-yellow-400' : 'text-white group-hover:text-neon-purple'}`}>
+          <h3 className={`font-bold truncate transition-colors text-base sm:text-lg leading-tight ${isWinner ? 'text-yellow-400' : 'text-white group-hover:text-neon-purple'}`}>
             {barbershop.name}
           </h3>
-          <p className="text-gray-400 text-[9px] sm:text-[10px] truncate">{barbershop.address}</p>
+          <p className="text-gray-400 text-[11px] sm:text-xs truncate">{barbershop.address}</p>
           
           {/* Average Stars Display */}
           <div className={`flex items-center gap-1 mt-1 ${isTop3 ? 'sm:justify-center' : ''}`}>
@@ -132,7 +132,7 @@ const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
                 {[...Array(5)].map((_, i) => (
                     <svg 
                         key={i} 
-                        className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${i < Math.round(barbershop.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
+                        className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.round(barbershop.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
                         fill="currentColor" 
                         viewBox="0 0 20 20"
                     >
@@ -140,14 +140,14 @@ const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
                     </svg>
                 ))}
              </div>
-             <span className="text-[10px] font-bold text-white">{barbershop.averageRating.toFixed(1)}</span>
+             <span className="text-xs font-bold text-white">{barbershop.averageRating.toFixed(1)}</span>
           </div>
         </div>
 
         {/* Stats */}
         <div className={`${isTop3 ? 'sm:mt-2' : 'text-right shrink-0'}`}>
-          <div className={`font-black text-sm sm:text-xl leading-none ${isWinner ? 'text-yellow-400' : 'text-neon-purple'}`}>{barbershop.reviewCount}</div>
-          <div className="text-[7px] sm:text-[8px] text-gray-500 uppercase font-bold tracking-tighter">Avaliações</div>
+          <div className={`font-black text-base sm:text-2xl leading-none ${isWinner ? 'text-yellow-400' : 'text-neon-purple'}`}>{barbershop.reviewCount}</div>
+          <div className="text-[10px] sm:text-[11px] text-gray-500 uppercase font-bold tracking-tighter">Avaliações</div>
         </div>
 
         {/* Hover Glow - Normal */}
@@ -237,3 +237,4 @@ const BarbershopRanking = ({ barbershops, city }: BarbershopRankingProps) => {
 };
 
 export default BarbershopRanking;
+

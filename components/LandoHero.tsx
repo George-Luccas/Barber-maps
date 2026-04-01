@@ -110,7 +110,7 @@ export const LandoHero = () => {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 border border-primary/40 text-[8px] sm:text-[10px] md:text-[11px] font-black tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] text-primary uppercase mb-3 sm:mb-4 md:mb-6 shadow-[0_0_20px_rgba(var(--primary),0.2)]"
+          className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-primary/20 border border-primary/40 text-[10px] sm:text-xs md:text-sm font-black tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] text-primary uppercase mb-3 sm:mb-4 md:mb-6 shadow-[0_0_20px_rgba(var(--primary),0.2)]"
         >
           Sua barbearia no seu bolso
         </motion.div>
@@ -138,7 +138,7 @@ export const LandoHero = () => {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
-          className="text-gray-400 max-w-[260px] sm:max-w-xs md:max-w-md mx-auto text-[10px] sm:text-xs md:text-base font-medium leading-relaxed opacity-80 mb-5 sm:mb-6 md:mb-8"
+          className="text-gray-400 max-w-[260px] sm:max-w-xs md:max-w-md mx-auto text-xs sm:text-sm md:text-lg font-medium leading-relaxed opacity-80 mb-5 sm:mb-6 md:mb-8"
         >
           Conecte-se com os melhores profissionais e gerencie seus agendamentos com total praticidade.
         </motion.p>
@@ -153,7 +153,7 @@ export const LandoHero = () => {
             onClick={scrollToRanking}
             whileHover={{ backgroundColor: "rgba(255, 255, 255, 1)", color: "#000000", scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full sm:w-auto px-6 md:px-10 py-3 md:py-4 border-2 border-white/50 text-white font-black italic uppercase text-[10px] md:text-xs tracking-[0.2em] shadow-lg backdrop-blur-md cursor-pointer"
+            className="w-full sm:w-auto px-6 md:px-10 py-3 md:py-4 border-2 border-white/50 text-white font-black italic uppercase text-xs md:text-sm tracking-[0.2em] shadow-lg backdrop-blur-md cursor-pointer"
           >
             Explorar Ranking
           </motion.button>
@@ -162,7 +162,7 @@ export const LandoHero = () => {
             onClick={() => router.push('/barber-radar')}
             whileHover={{ backgroundColor: "rgba(255, 255, 255, 1)", color: "#000000", scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full sm:w-auto px-6 md:px-10 py-3 md:py-4 border-2 border-white/50 text-white font-black italic uppercase text-[10px] md:text-xs tracking-[0.2em] shadow-lg backdrop-blur-md cursor-pointer"
+            className="w-full sm:w-auto px-6 md:px-10 py-3 md:py-4 border-2 border-white/50 text-white font-black italic uppercase text-xs md:text-sm tracking-[0.2em] shadow-lg backdrop-blur-md cursor-pointer"
           >
             Ver Mapa
           </motion.button>

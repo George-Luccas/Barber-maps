@@ -126,7 +126,7 @@ const BarberRanking = ({ barbers }: BarberRankingProps) => {
                                     {/* Avatar (Inside Bar at top - absolute relative to the bar) */}
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-background z-10 overflow-hidden shadow-lg">
                                         <Image
-                                            src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+                                            src={barber.imageUrl || "/default-barber.png"}
                                             alt={barber.name}
                                             fill
                                             className="object-cover"
@@ -167,6 +167,7 @@ const BarberRanking = ({ barbers }: BarberRankingProps) => {
 };
 
 export default BarberRanking;
+
 
 
 

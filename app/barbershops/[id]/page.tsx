@@ -78,7 +78,7 @@ const BarbershopPage = async ({ params }: PageProps) => {
       {/* Banner Header */}
       <div className="relative h-[297px] w-full">
         <Image
-          src={barbershop.imageUrl ?? ""}
+          src={barbershop.imageUrl || "/default-barber.png"}
           alt={barbershop.name}
           fill
           className="object-cover"
@@ -98,7 +98,7 @@ const BarbershopPage = async ({ params }: PageProps) => {
           <div className="flex items-center gap-1.5">
             <div className="relative size-[30px] shrink-0">
               <Image
-                src={barbershop.imageUrl ?? ""}
+                src={barbershop.imageUrl || "/default-barber.png"}
                 alt={barbershop.name}
                 fill
                 className="rounded-full object-cover"

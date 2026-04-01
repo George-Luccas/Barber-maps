@@ -123,7 +123,7 @@ export function LoyaltyCard({ currentPoints, freeCuts, tier = "BRONZE", totalLif
                         
                         {/* Card Brand Header */}
                         <div className="absolute top-4 right-4 z-20">
-                            <p className="text-[10px] font-bold tracking-widest uppercase opacity-70">BarberMaps</p>
+                            <p className="text-xs font-bold tracking-widest uppercase opacity-70">BarberMaps</p>
                         </div>
 
                         <CardHeader className="pb-2 relative z-10">
@@ -156,7 +156,7 @@ export function LoyaltyCard({ currentPoints, freeCuts, tier = "BRONZE", totalLif
                                             style={{ width: `${Math.min((currentPoints / POINTS_GOAL) * 100, 100)}%` }}
                                         />
                                     </div>
-                                    <p className="text-[10px] opacity-70 mt-2 text-right">
+                                    <p className="text-xs opacity-70 mt-2 text-right">
                                         {POINTS_GOAL - currentPoints > 0 
                                             ? `Faltam ${POINTS_GOAL - currentPoints} pontos para o prêmio` 
                                             : "Prêmio disponível!"}
@@ -166,7 +166,7 @@ export function LoyaltyCard({ currentPoints, freeCuts, tier = "BRONZE", totalLif
                                 {/* Stats Footer */}
                                 <div className="flex justify-between items-end">
                                     <div className="space-y-0.5">
-                                        <p className="text-[10px] uppercase font-bold opacity-60">Total Acumulado</p>
+                                        <p className="text-xs uppercase font-bold opacity-60">Total Acumulado</p>
                                         <p className="text-lg font-black">{totalLifetimePoints}</p>
                                     </div>
                                     

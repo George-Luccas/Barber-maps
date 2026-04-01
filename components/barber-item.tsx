@@ -23,7 +23,7 @@ const BarberItem = ({ barber }: BarberItemProps) => {
       {/* Foto Redonda */}
       <div className="relative w-44 h-44 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-neon-purple transition-all duration-300 shadow-lg shadow-neon-purple/30 group-hover:shadow-neon-purple/50">
         <Image
-          src={barber.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+          src={barber.imageUrl || "/default-barber.png"}
           alt={barber.name}
           fill
           className="object-cover"
@@ -43,4 +43,5 @@ const BarberItem = ({ barber }: BarberItemProps) => {
 };
 
 export default BarberItem;
+
 

@@ -20,8 +20,7 @@ export async function POST(req: Request) {
         clientName, 
         clientEmail, 
         clientPhone,
-        isSubscription,
-        receiptUrl
+        isSubscription
     } = body;
 
     console.log("[LOCAL API] Received Booking Request:", body);
@@ -60,7 +59,6 @@ export async function POST(req: Request) {
             date: bookingDate,
             barberId: barberId || null,
             status: "PENDING", // Default to PENDING for payment confirmation
-            receiptUrl: receiptUrl || null,
             userName: clientName,
             isSubscription: isSubscription || false
         }

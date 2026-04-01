@@ -106,7 +106,7 @@ export default function AdminBarbersPage() {
                             <div className="flex flex-col md:flex-row items-center gap-4 p-4">
                                 <div className="relative h-16 w-16 min-w-16 rounded-full overflow-hidden bg-muted">
                                     <Image 
-                                        src={barber.imageUrl || "/placeholder.png"} 
+                                        src={barber.imageUrl || "/default-barber.png"} 
                                         alt={barber.name} 
                                         fill 
                                         className="object-cover" 

@@ -20,7 +20,7 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
     >
       <div className="absolute top-0 left-0 z-10 h-full w-full rounded-lg bg-linear-to-t from-black to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
       <Image
-        src={barbershop.imageUrl || "https://utfs.io/f/c97a2dc9-cf62-468b-a851-bfd2bdde775f-16p.png"}
+        src={barbershop.imageUrl || "/default-barber.png"}
         alt={barbershop.name}
         fill
         className="rounded-xl object-cover"
@@ -34,3 +34,4 @@ const BarbershopItem = ({ barbershop }: BarbershopItemProps) => {
 };
 
 export default BarbershopItem;
+
